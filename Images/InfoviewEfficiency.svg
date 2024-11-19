@@ -1,0 +1,16 @@
+<svg id="evlm5zQO1fc1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 26 26" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" project-id="bd00e92411ae4c40b8dfa761a6989c3a" export-id="6572b852297f4da7a11256559b9f6dfa" cached="false" width="26" height="26">
+    <g transform="matrix(.7 0 0 0.7 1.8 1.15)">
+        <circle r="11" transform="translate(16 18.5)" fill="#fff" stroke="#a1a1a1" stroke-width="2.5"/>
+        <line x1="16" y1="1.5" x2="16" y2="4" fill="none" stroke="#a1a1a1" stroke-width="6"/>
+        <line x1="16" y1="4" x2="16" y2="7.5" fill="none" stroke="#a1a1a1" stroke-width="2.5"/>
+        <line x1="16" y1="18.5" x2="16" y2="10" fill="none" stroke="#f00" stroke-width="2"/>
+        <circle r="1.5" transform="translate(16 18.5)" fill="#f00" stroke="#fa0404"/>
+        <line x1="8.22" y1="10.72" x2="5.75" y2="8.25" fill="none" stroke="#a1a1a1" stroke-width="3"/>
+        <line x1="23.78" y1="10.72" x2="26.25" y2="8.25" fill="none" stroke="#a1a1a1" stroke-width="3"/>
+    </g>
+    <g transform="matrix(.75 0 0 0.75 8.5 9.6)">
+        <ellipse rx="2.25" ry="2.75" transform="translate(2.25 2.75)" fill="none" stroke="#000" stroke-width="1.5"/>
+        <ellipse rx="2.25" ry="2.75" transform="translate(9.75 9.25)" fill="none" stroke="#000" stroke-width="1.5"/>
+        <line x1="2" y1="12" x2="10" y2="0" fill="none" stroke="#000" stroke-width="1.5"/>
+    </g>
+</svg>

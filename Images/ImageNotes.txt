@@ -1,0 +1,20 @@
+﻿The infoview icons were created using the SVG editor at:  app.svgator.com
+
+The following infoview icons started with an icon from the game (imported into the SVG editor):
+Employees - ...\GameUI\Media\Game\Icons\Workers.svg
+Visitors  - ...\GameUI\Media\Game\Icons\Population.svg
+Storage   - ...\GameUI\Media\Game\Icons\ZoneIndustrialWarehouses.svg
+Vehicles  - ...\GameUI\Media\Game\Resources\Vehicles.svg
+
+The following infoview icons were adapated from other images:
+Efficiency - Adapted from my Performance Monitor activation icon.
+Processing - Adapted from svgator's library image for Refresh.
+
+Icons were resized (if needed) from their original size to 26x26.
+This seems to be the default size for infoview icons in the Icons folder.
+All this mod's infoview icons are a consistent size.
+
+After each infoview icon background was determined, then a percent sign was added on top of the icon.
+The percent sign is not text.
+The percent sign is constructed from two ellipses and a line.
+The constructed percent sign was saved to the svgator library so the exact same percent sign could be added to each icon.

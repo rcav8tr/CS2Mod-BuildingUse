@@ -1,0 +1,66 @@
+﻿.buildingUseInfomodeButton {
+    // Default padding is 6rem on all sides.
+    padding-top:        2rem;           // Leave less space on top.
+    padding-left:       2rem;           // Leave less space on left.
+    padding-right:      2rem;           // Leave less space on right.
+    padding-bottom:     0rem;           // Leave no extra space on bottom.
+}
+
+.buildingUseInfomodeButton + .buildingUseInfomodeButton {
+    margin-top:         var(--gap2);    // Default space between infomodes is gap5.
+}
+
+.buildingUseInfomodeIcon {
+    height:             18rem;          // Match height of building color check box.
+    width:              18rem;          // Match height.
+    margin-right:       2rem;           // Space between icon and title.
+}
+
+.buildingUseInfomodeLegend {
+    margin-top:         -1rem;          // Default top margin is 4rem.
+}
+
+.buildingUseInfomodeGradient {
+    margin-top:         4rem;           // Leave space above  gradient for pointer.
+    margin-left:        7rem;           // Leave space before gradient for pointer.
+    margin-right:       7rem;           // Leave space after  gradient for pointer.
+    height:             8rem;           // Use same height as game's non-infomode gradients.
+}
+
+.buildingUseInfomodePointer {
+    position:           relative;       // Position is relative to its parent, the gradient.
+    top:                -4rem;          // Position a little above the gradient.
+    width:              0px;            // Zero width for this enclosing element.
+    height:             12rem;          // Use same height as game's non-infomode gradients.
+    justify-content:    center,         // Center this element on its position.
+}
+
+.buildingUseInfomodePointerIcon {
+    width:              18rem;          // This is default width of pointer icon on game's non-infomode gradients.
+    height:             12rem;          // This is default width of pointer icon on game's non-infomode gradients.
+    position:           relative;       // Replace absolute position with relative.
+    left:               -9rem           // Move icon half its width to the left to center it on its position.
+}
+
+.buildingUseInfomodePercent {
+    // Scale percent width so text fits for "100%".
+    // This calculation also ensures widths are the same for all infomodes (i.e. not based on content).
+    // When fontScale is:  1.0  1.1  1.2  1.3  1.4
+    // Then width is:       9%  10%  11%  12%  13%
+    width:              calc(10% * var(--fontScale) - 1%);
+    text-align:         right;
+}
+
+.buildingUseInfomodeValue {
+    // Scale value width so text fits for either:  "999,999" with a unit suffix OR "999,999,999" with no unit suffix.
+    // This calculation also ensures widths are the same for all infomodes (i.e. not based on content).
+    // When fontScale is:  1.0   1.1   1.2   1.3   1.4
+    // Then width is:     20.0% 21.0% 22.0% 23.0% 24.0%
+    width:              calc(10% * var(--fontScale) + 10%);
+    text-align:         right;
+}
+
+.buildingUseInfomodeValueNoBuildings {
+    width:              100%;
+    text-align:         right;
+}

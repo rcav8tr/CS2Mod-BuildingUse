@@ -1,0 +1,15 @@
+<svg id="eLzdHPNO2g11" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 26 26" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" project-id="ad9ca757532b49b8924a52a56367afc9" export-id="12b9a5446cea45aba9fd44b25df4dedd" cached="false" width="26" height="26">
+    <g transform="matrix(.85 0 0 0.85-.294335-.846004)">
+        <g transform="translate(.796 4.408)">
+            <path d="M-10008,-10482.843l16.188,10.105l13.515-10.105-16.512-8.157-13.191,8.157Z" transform="translate(10008 10493.9)" fill="#ffdc00"/>
+            <path d="M-9908.062,-10481.035l9.781,5.825v-4.525l-9.781-5.761v4.461Z" transform="translate(9914.06 10492.4)" fill="#d6a900"/>
+            <path d="M-9889.493,-10474.244l7.733-5.791v-4.338c-1.22566-.470964-2.608702-.262425-3.641.549-1.934,1.372-4.093,4.939-4.093,4.939l.001,4.641Z" transform="translate(9905.15 10491.5)" fill="#a48700"/>
+            <path d="M-9907.949,-10488.719l9.581,5.654c0,0,2.016-3.527,3.972-4.882c1.118401-.799661,2.558006-.999606,3.852-.535l-9.791-4.284c-1.18234-.392104-2.474725-.272472-3.565.33-1.540359,1.013727-2.90751,2.268778-4.049,3.717Z" transform="translate(9914.02 10495.6)" fill="#fff69f"/>
+        </g>
+    </g>
+    <g transform="matrix(.75 0 0 0.75 8.5 8.5)">
+        <ellipse rx="2.25" ry="2.75" transform="translate(2.25 2.75)" fill="none" stroke="#000" stroke-width="1.5"/>
+        <ellipse rx="2.25" ry="2.75" transform="translate(9.75 9.25)" fill="none" stroke="#000" stroke-width="1.5"/>
+        <line x1="2" y1="12" x2="10" y2="0" fill="none" stroke="#000" stroke-width="1.5"/>
+    </g>
+</svg>

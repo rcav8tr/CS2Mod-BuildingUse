@@ -1,0 +1,20 @@
+<svg id="infoviewemployees" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 26 26" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" project-id="e08993d50b634384b48f684430bc7812" export-id="4362fc52c191459c8d8229e794235c1b" cached="false" width="26" height="26">
+    <g id="infoviewemployees-u-workers">
+        <circle id="infoviewemployees-u-infoviewemployees-s-circle1" r="2.592" transform="translate(7.769 11.598)" fill="#97b4be"/>
+        <circle id="infoviewemployees-u-infoviewemployees-s-circle2" r="2.592" transform="translate(18.407 11.598)" fill="#97b4be"/>
+        <path id="infoviewemployees-u-infoviewemployees-s-path1" d="M3.4,-0.685c2.477,0,3.2,2.2,3.2,4.156v.887h-6.6v-.886c0-1.96.924-4.157,3.4-4.157Z" transform="translate(4.381 7.49)" fill="#b98e2b"/>
+        <path id="infoviewemployees-u-infoviewemployees-s-path2" d="M3.4,-0.685c2.477,0,3.2,2.2,3.2,4.156v.887h-6.6v-.886c0-1.96.924-4.157,3.4-4.157Z" transform="translate(4.469 7.49)" fill="#b98e2b"/>
+        <path id="infoviewemployees-u-infoviewemployees-s-path3" d="M3.4,-0.685c2.477,0,3.2,2.2,3.2,4.156v.887h-6.6v-.886c0-1.96.924-4.157,3.4-4.157Z" transform="translate(15.019 7.49)" fill="#b98e2b"/>
+        <path id="infoviewemployees-u-infoviewemployees-s-path4" d="M1.745,1.12c.510726.620067,1.284675.961984,2.087.922c1.548.026,2-1.036,2.267-.922c1.566.639,1.707,2.556,1.71,3.315s0,2.226,0,2.226c0,.197586-.078491.38708-.218205.526795s-.329209.218205-.526795.218205h-6.337c-.19776,0-.387405-.078628-.527148-.218559s-.218117-.329682-.217852-.527441-.024-1.442,0-2.226-.008-2.668,1.763-3.314Z" transform="translate(3.791 12.463)" fill="#97b4be"/>
+        <path id="infoviewemployees-u-infoviewemployees-s-path5" d="M1.745,1.12c.510726.620067,1.284675.961984,2.087.922c1.548.026,2-1.036,2.267-.922c1.566.639,1.707,2.556,1.71,3.315s0,2.226,0,2.226c0,.197586-.078491.38708-.218205.526795s-.329209.218205-.526795.218205h-6.337c-.19776,0-.387405-.078628-.527148-.218559s-.218117-.329682-.217852-.527441-.024-1.442,0-2.226-.008-2.668,1.763-3.314Z" transform="translate(14.429 12.463)" fill="#97b4be"/>
+        <path id="infoviewemployees-u-infoviewemployees-s-path6" d="M2.335,1.123c.680827.826525,1.712501,1.282286,2.782,1.229c2.064.034,2.666-1.382,3.022-1.229c2.088.852,2.276,3.407,2.279,4.418s0,2.967,0,2.967c0,.548971-.445029.994-.994.994h-8.445c-.548971,0-.994-.445029-.994-.994s-.032-1.922,0-2.967-.01-3.557,2.35-4.418Z" transform="translate(7.71 10.793)" fill="#c2f0ff"/>
+        <circle id="infoviewemployees-u-infoviewemployees-s-circle3" r="3.518" transform="translate(13.243 9.224)" fill="#c2f0ff"/>
+        <path id="infoviewemployees-u-infoviewemployees-s-path7" d="M4.264,-0.685c3.105,0,4.01,2.476,4.01,4.685v1L0,5v-1c0-2.209,1.159-4.685,4.264-4.685Z" transform="translate(8.863 4.006)" fill="#e9aa19"/>
+        <path id="infoviewemployees-u-infoviewemployees-s-path8" d="M314.795,-233.485l1.1,7.716h6.252l.851-7.615-1.1-.726-1.238,3.389h-3.31l-1.451-3.389-1.104.625Z" transform="translate(-306 246)" fill="#e9aa19"/>
+    </g>
+    <g id="infoviewemployees-u-percent" transform="matrix(.75 0 0 0.75 8.5 8.5)">
+        <ellipse id="infoviewemployees-u-infoviewemployees-s-ellipse1" rx="2.25" ry="2.75" transform="translate(2.25 2.75)" fill="none" stroke="#000" stroke-width="1.5"/>
+        <ellipse id="infoviewemployees-u-infoviewemployees-s-ellipse2" rx="2.25" ry="2.75" transform="translate(9.75 9.25)" fill="none" stroke="#000" stroke-width="1.5"/>
+        <line id="infoviewemployees-u-infoviewemployees-s-line1" x1="2" y1="12" x2="10" y2="0" fill="none" stroke="#000" stroke-width="1.5"/>
+    </g>
+</svg>
