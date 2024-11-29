@@ -1,1 +1,1 @@
-﻿- Initial release.
+﻿- Add missing translations.

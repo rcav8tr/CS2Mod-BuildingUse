@@ -1419,10 +1419,10 @@ namespace BuildingUse
                 jobHandleNext                     = JobChunkExtensions.ScheduleParallel(updateColorsJobAttachmentBuilding, _queryAttachmentBuilding, jobHandleMiddleBuilding);
             }
             JobHandle jobHandleTempObject         = JobChunkExtensions.ScheduleParallel(updateColorsJobTempObject,         _queryTempObject,         jobHandleNext);
-            JobHandle jobHandlesubObject          = JobChunkExtensions.ScheduleParallel(updateColorsJobSubObject,          _querySubObject,          jobHandleTempObject);
+            JobHandle jobHandleSubObject          = JobChunkExtensions.ScheduleParallel(updateColorsJobSubObject,          _querySubObject,          jobHandleTempObject);
 
             // Prevent these jobs from running again until last job is complete.
-            base.Dependency = jobHandlesubObject;
+            base.Dependency = jobHandleSubObject;
 
             // Wait for the main building job to complete before accessing total used and capacity.
             jobHandleMainBuilding.Complete();

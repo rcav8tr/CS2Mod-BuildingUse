@@ -1,9 +1,18 @@
 ﻿# Building Use
-Six new infoviews show the use of buildings as a percent of their capacity.
-You determine whether unused or fully used buildings are good or bad for your city for each building type.
+Six new infoviews show the use of buildings as a percent of their capacity for:
+- Employees
+- Visitors
+- Storage
+- Vehicles
+- Efficiency
+- Processing
+
+See the Infoviews section below for more details on each infoview.
+
+# Description
 
 ### Building Colors
-The color of each building indicates the use percent for that building.
+The color of each building indicates the percent use for that building.
 For each building type, the gradient shows the color range for the building use.
 See the settings below for Color of Zoned Buildings and Color of Service Buildings.
 

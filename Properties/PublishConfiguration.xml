@@ -15,11 +15,20 @@
     <!-- Long description of the mod.  Copied from ReadMe.md file.  Supports minimal markdown subset. -->
     <LongDescription>
 # Building Use
-Six new infoviews show the use of buildings as a percent of their capacity.
-You determine whether unused or fully used buildings are good or bad for your city for each building type.
+Six new infoviews show the use of buildings as a percent of their capacity for:
+- Employees
+- Visitors
+- Storage
+- Vehicles
+- Efficiency
+- Processing
+
+See the Infoviews section below for more details on each infoview.
+
+# Description
 
 ### Building Colors
-The color of each building indicates the use percent for that building.
+The color of each building indicates the percent use for that building.
 For each building type, the gradient shows the color range for the building use.
 See the settings below for Color of Zoned Buildings and Color of Service Buildings.
 
@@ -166,6 +175,7 @@ The following mods were used extensively in the development of this mod:
     <Thumbnail Value="Properties/Thumbnail.png" />
 
     <!-- Screenshot.  Copied from Screenshots folder.  Include no spaces in file names.  Max file size is 2.1MB.  Can be set multiple times. -->
+    <Screenshot Value="Properties\Screenshots\00Thumbnail.png" />
     <Screenshot Value="Properties\Screenshots\10NewInfoviews.png" />
     <Screenshot Value="Properties\Screenshots\20Employees.png" />
     <Screenshot Value="Properties\Screenshots\30Visitors.png" />
@@ -183,7 +193,7 @@ The following mods were used extensively in the development of this mod:
     <ForumLink Value="https://forum.paradoxplaza.com/forum/threads/building-use.1716181/" />
 
     <!-- Version of the mod.  Copied from assembly Version. -->
-    <ModVersion Value="1.0.0" />
+    <ModVersion Value="1.0.1" />
 
     <!-- Recommended version of the base game to use the mod. -->
     <GameVersion Value="1.*" />
@@ -193,7 +203,7 @@ The following mods were used extensively in the development of this mod:
 
     <!-- Change log.  Copied from ChangeLog.md file.  Supports minimal markdown subset. -->
     <ChangeLog>
-- Initial release.
+- Add missing translations.
 </ChangeLog>
 
     <!-- External links. Supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab.  Can be set multiple times. -->

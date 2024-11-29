@@ -48,6 +48,7 @@ namespace BuildingUse
         //      A translation key that starts with "@@" is a temporary translation key that can be referenced in other translated text with "@@".
         //      Translated text cannot be blank for the default language.
         //      Blank translated text in a non-default language will use the translated text for the default language.
+        //      Translated text that starts with "$$" will retrieve the game's translated text for whatever key follows the "$$".
 
 
         // Default language code.
@@ -318,6 +319,10 @@ namespace BuildingUse
                     }
                 }
 
+                // Save active locale ID.
+                Colossal.Localization.LocalizationManager localizationManager = Game.SceneFlow.GameManager.instance.localizationManager;
+                string savedLocaleID = localizationManager.activeLocaleId;
+
                 // Do each language code.
                 foreach (string languageCode in languages.Keys)
                 {
@@ -352,8 +357,28 @@ namespace BuildingUse
                         }
                     }
 
+                    // Check for $$ reference in the translated text.
+                    if (translatedText.StartsWith("$$"))
+                    {
+                        // Get game translation key after the $$.
+                        string gameTranslationKey = translatedText.Substring(2);
+
+                        // Get the game's translation for the key.
+                        localizationManager.SetActiveLocale(languageCode);
+                        if (localizationManager.activeDictionary.TryGetValue(gameTranslationKey, out string gameTranslatedText))
+                        {
+                            // Use the game translated text.
+                            translatedText = gameTranslatedText;
+                        }
+                        else
+                        {
+                            LogUtil.Warn($"Game translation key [{gameTranslationKey}] does not exist for language [{languageCode}].");
+                            // Leave the invalid $$ reference in the translated text.
+                        }
+                    }
+
                     // Check for any @@ reference in the translated text.
-                    if (translatedText.Contains("@@"))
+                    else if (translatedText.Contains("@@"))
                     {
                         // Do each existing translation key.
                         foreach (string existingTranslationkey in translationKeys)
@@ -408,6 +433,12 @@ namespace BuildingUse
                             languages[languageCode][translationKey] = translatedText;
                         }
                     }
+                }
+
+                // Restore saved locale ID.
+                if (localizationManager.activeLocaleId != savedLocaleID)
+                {
+                    localizationManager.SetActiveLocale(savedLocaleID);
                 }
             }
         }
