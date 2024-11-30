@@ -1,1 +1,1 @@
-﻿- Add missing translations.
+﻿- Try to fix incorrect thumbnail.
