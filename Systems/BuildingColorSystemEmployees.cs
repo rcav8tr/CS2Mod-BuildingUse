@@ -119,43 +119,48 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get entity and prefab.
-                    Entity entity = entities[i];
-                    Entity prefab = prefabRefs[i].m_Prefab;
-
-                    // Logic adapted from Game.UI.InGame.HouseholdSidebarSection.CheckVisibilityJob.HasResidentialProperties().
-
-                    // Building must have building property data.
-                    if (ComponentLookupBuildingPropertyData.TryGetComponent(prefab, out Game.Prefabs.BuildingPropertyData buildingPropertyData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Building must have capacity.
-                        long capacity = buildingPropertyData.m_ResidentialProperties;
-                        if (capacity > 0L)
+                        // Get entity and prefab.
+                        Entity entity = entities[i];
+                        Entity prefab = prefabRefs[i].m_Prefab;
+
+                        // Logic adapted from Game.UI.InGame.HouseholdSidebarSection.CheckVisibilityJob.HasResidentialProperties().
+
+                        // Building must have building property data.
+                        if (ComponentLookupBuildingPropertyData.TryGetComponent(prefab, out Game.Prefabs.BuildingPropertyData buildingPropertyData))
                         {
-                            // Do each renter (i.e. potential household).
-                            long used = 0L;
-                            DynamicBuffer<Game.Buildings.Renter> renters = BufferLookupRenter[entity];
-                            for (int j = 0; j < renters.Length; j++)
+                            // Building must have capacity.
+                            long capacity = buildingPropertyData.m_ResidentialProperties;
+                            if (capacity > 0L)
                             {
-                                // If renter has at least 1 citizen, then count as 1 household for used.
-                                if (BufferLookupHouseholdCitizen.TryGetBuffer(renters[j].m_Renter, out DynamicBuffer<Game.Citizens.HouseholdCitizen> householdCitizens))
+                                // Do each renter (i.e. potential household).
+                                long used = 0L;
+                                DynamicBuffer<Game.Buildings.Renter> renters = BufferLookupRenter[entity];
+                                for (int j = 0; j < renters.Length; j++)
                                 {
-                                    if (householdCitizens.Length > 0)
+                                    // If renter has at least 1 citizen, then count as 1 household for used.
+                                    if (BufferLookupHouseholdCitizen.TryGetBuffer(renters[j].m_Renter, out DynamicBuffer<Game.Citizens.HouseholdCitizen> householdCitizens))
                                     {
-                                        used++;
+                                        if (householdCitizens.Length > 0)
+                                        {
+                                            used++;
+                                        }
                                     }
                                 }
-                            }
 
-                            // Household used and capacity are valid.
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
+                                // Household used and capacity are valid.
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
+                            }
                         }
                     }
                 }
@@ -182,60 +187,65 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get entity and prefab.
-                    Entity entity = entities[i];
-                    Entity prefab = prefabRefs[i].m_Prefab;
-
-                    // Get company, if any.
-                    bool found = false;
-                    if (Game.UI.InGame.CompanyUIUtils.HasCompany(entity, prefab, ref BufferLookupRenter, ref ComponentLookupBuildingPropertyData, ref ComponentLookupCompanyData, out Entity companyEntity))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Employee data can be computed only if company has employee buffer and work provider component.
-                        if (BufferLookupEmployee.TryGetBuffer(companyEntity, out DynamicBuffer<Game.Companies.Employee> employeeBuffer) &&
-                            ComponentLookupWorkProvider.TryGetComponent(companyEntity, out Game.Companies.WorkProvider workProvider))
+                        // Get entity and prefab.
+                        Entity entity = entities[i];
+                        Entity prefab = prefabRefs[i].m_Prefab;
+
+                        // Get company, if any.
+                        bool found = false;
+                        if (Game.UI.InGame.CompanyUIUtils.HasCompany(entity, prefab, ref BufferLookupRenter, ref ComponentLookupBuildingPropertyData, ref ComponentLookupCompanyData, out Entity companyEntity))
                         {
-                            // Found a company and company has employee buffer and work provider.
-                            found = true;
-
-                            // Get used employees.
-                            long used = employeeBuffer.Length;
-
-                            // Get building level.
-                            int buildingLevel = 1;
-                            if (ComponentLookupSpawnableBuildingData.TryGetComponent(prefab, out Game.Prefabs.SpawnableBuildingData spawnableBuildingData1))
+                            // Employee data can be computed only if company has employee buffer and work provider component.
+                            if (BufferLookupEmployee.TryGetBuffer(companyEntity, out DynamicBuffer<Game.Companies.Employee> employeeBuffer) &&
+                                ComponentLookupWorkProvider.TryGetComponent(companyEntity, out Game.Companies.WorkProvider workProvider))
                             {
-                                buildingLevel = spawnableBuildingData1.m_Level;
-                            }
-                            else if (ComponentLookupPropertyRenter.TryGetComponent(entity, out Game.Buildings.PropertyRenter propertyRenter) &&
-                                     ComponentLookupPrefabRef.TryGetComponent(propertyRenter.m_Property, out Game.Prefabs.PrefabRef propertyRenterPrefabRef) &&
-                                     ComponentLookupSpawnableBuildingData.TryGetComponent(propertyRenterPrefabRef.m_Prefab, out Game.Prefabs.SpawnableBuildingData spawnableBuildingData2))
-                            {
-                                buildingLevel = spawnableBuildingData2.m_Level;
-                            }
+                                // Found a company and company has employee buffer and work provider.
+                                found = true;
 
-                            // Get employee capacity.
-                            Entity companyPrefab = ComponentLookupPrefabRef[companyEntity].m_Prefab;
-                            Game.Prefabs.WorkplaceComplexity complexity = ComponentLookupWorkplaceData[companyPrefab].m_Complexity;
-                            Game.UI.InGame.EmploymentData workplacesData = Game.UI.InGame.EmploymentData.GetWorkplacesData(workProvider.m_MaxWorkers, buildingLevel, complexity);
-                            long capacity = workplacesData.total;
+                                // Get used employees.
+                                long used = employeeBuffer.Length;
 
-                            // Employee used and capacity are valid.
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
+                                // Get building level.
+                                int buildingLevel = 1;
+                                if (ComponentLookupSpawnableBuildingData.TryGetComponent(prefab, out Game.Prefabs.SpawnableBuildingData spawnableBuildingData1))
+                                {
+                                    buildingLevel = spawnableBuildingData1.m_Level;
+                                }
+                                else if (ComponentLookupPropertyRenter.TryGetComponent(entity, out Game.Buildings.PropertyRenter propertyRenter) &&
+                                         ComponentLookupPrefabRef.TryGetComponent(propertyRenter.m_Property, out Game.Prefabs.PrefabRef propertyRenterPrefabRef) &&
+                                         ComponentLookupSpawnableBuildingData.TryGetComponent(propertyRenterPrefabRef.m_Prefab, out Game.Prefabs.SpawnableBuildingData spawnableBuildingData2))
+                                {
+                                    buildingLevel = spawnableBuildingData2.m_Level;
+                                }
+
+                                // Get employee capacity.
+                                Entity companyPrefab = ComponentLookupPrefabRef[companyEntity].m_Prefab;
+                                Game.Prefabs.WorkplaceComplexity complexity = ComponentLookupWorkplaceData[companyPrefab].m_Complexity;
+                                Game.UI.InGame.EmploymentData workplacesData = Game.UI.InGame.EmploymentData.GetWorkplacesData(workProvider.m_MaxWorkers, buildingLevel, complexity);
+                                long capacity = workplacesData.total;
+
+                                // Employee used and capacity are valid.
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
+                            }
                         }
-                    }
 
-                    // If no company or the company has no employee buffer and work provider, building is available to rent.
-                    // Show buildings available to rent with 0%.
-                    if (!found)
-                    {
-                        UpdateEntityColor(0L, 0L, infomodeActive, infomodeIndex, colors, i);
+                        // If no company or the company has no employee buffer and work provider, building is available to rent.
+                        // Show buildings available to rent with 0%.
+                        if (!found)
+                        {
+                            UpdateEntityColor(0L, 0L, infomodeActive, infomodeIndex, colors, i);
+                        }
                     }
                 }
 
@@ -260,34 +270,39 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get entity and prefab.
-                    Entity entity = entities[i];
-                    Entity prefab = prefabRefs[i].m_Prefab;
-
-                    // Employee data for service can be computed only if entity has employee buffer and work provider component.
-                    if (BufferLookupEmployee.TryGetBuffer(entity, out DynamicBuffer<Game.Companies.Employee> employeeBuffer) &&
-                        ComponentLookupWorkProvider.TryGetComponent(entity, out Game.Companies.WorkProvider workProvider))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Get used employees.
-                        long used = employeeBuffer.Length;
+                        // Get entity and prefab.
+                        Entity entity = entities[i];
+                        Entity prefab = prefabRefs[i].m_Prefab;
 
-                        // Building level is always 1 for service buildings.
-                        int buildingLevel = 1;
+                        // Employee data for service can be computed only if entity has employee buffer and work provider component.
+                        if (BufferLookupEmployee.TryGetBuffer(entity, out DynamicBuffer<Game.Companies.Employee> employeeBuffer) &&
+                            ComponentLookupWorkProvider.TryGetComponent(entity, out Game.Companies.WorkProvider workProvider))
+                        {
+                            // Get used employees.
+                            long used = employeeBuffer.Length;
 
-                        // Get employee capacity.
-                        Game.Prefabs.WorkplaceComplexity complexity = ComponentLookupWorkplaceData[prefab].m_Complexity;
-                        Game.UI.InGame.EmploymentData workplacesData = Game.UI.InGame.EmploymentData.GetWorkplacesData(workProvider.m_MaxWorkers, buildingLevel, complexity);
-                        long capacity = workplacesData.total;
+                            // Building level is always 1 for service buildings.
+                            int buildingLevel = 1;
 
-                        // Employee used and capacity are valid.
-                        // Update entity color and accumulate totals.
-                        UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                        totalUsed     += used;
-                        totalCapacity += capacity;
+                            // Get employee capacity.
+                            Game.Prefabs.WorkplaceComplexity complexity = ComponentLookupWorkplaceData[prefab].m_Complexity;
+                            Game.UI.InGame.EmploymentData workplacesData = Game.UI.InGame.EmploymentData.GetWorkplacesData(workProvider.m_MaxWorkers, buildingLevel, complexity);
+                            long capacity = workplacesData.total;
+
+                            // Employee used and capacity are valid.
+                            // Update entity color and accumulate totals.
+                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                            totalUsed     += used;
+                            totalCapacity += capacity;
+                        }
                     }
                 }
 

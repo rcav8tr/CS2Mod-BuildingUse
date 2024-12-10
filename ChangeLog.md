@@ -1,1 +1,1 @@
-﻿- Try to fix incorrect thumbnail.
+﻿- Add district selector.

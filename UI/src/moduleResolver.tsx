@@ -58,6 +58,7 @@ export class ModuleResolver
     private _infomodeItemClasses: any;
     private _transparentButtonClasses: any;
     private _checkboxClasses: any;
+    private _dropdownClasses: any;
 
     // Provide access to component modules.
     public get Tooltip():               (props: ToolTipProps)               => JSX.Element { return this._tooltip               ?? (this._tooltip               = getModule("game-ui/common/tooltip/tooltip.tsx",               "Tooltip"               )); }
@@ -74,4 +75,5 @@ export class ModuleResolver
     public get InfomodeItemClasses():       Theme | any { return this._infomodeItemClasses      ?? (this._infomodeItemClasses       = getModule("game-ui/game/components/infoviews/active-infoview-panel/components/infomode-item/infomode-item.module.scss",   "classes")); }
     public get TransparentButtonClasses():  Theme | any { return this._transparentButtonClasses ?? (this._transparentButtonClasses  = getModule("game-ui/game/themes/transparent-button.module.scss",                                                           "classes")); }
     public get CheckboxClasses():           Theme | any { return this._checkboxClasses          ?? (this._checkboxClasses           = getModule("game-ui/common/input/toggle/checkbox/checkbox.module.scss",                                                    "classes")); }
+    public get DropdownClasses():           Theme | any { return this._dropdownClasses          ?? (this._dropdownClasses           = getModule("game-ui/menu/themes/dropdown.module.scss",                                                                     "classes")); }
 }

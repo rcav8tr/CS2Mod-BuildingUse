@@ -101,12 +101,14 @@ namespace BuildingUse
 
             // Include binding names.
             sb.AppendLine();
-            sb.AppendLine("// Define binding names for C# to UI from settings.");
+            sb.AppendLine("// Define binding names for C# to UI.");
             sb.AppendLine("export class uiBindingNames");
             sb.AppendLine("{");
             sb.AppendLine($"    public static {BuildingUseUISystem.BindingNameCountVehiclesInUse          .PadRight(40)} : string = \"{BuildingUseUISystem.BindingNameCountVehiclesInUse          }\";");
             sb.AppendLine($"    public static {BuildingUseUISystem.BindingNameCountVehiclesInMaintenance  .PadRight(40)} : string = \"{BuildingUseUISystem.BindingNameCountVehiclesInMaintenance  }\";");
             sb.AppendLine($"    public static {BuildingUseUISystem.BindingNameEfficiencyMaxColor200Percent.PadRight(40)} : string = \"{BuildingUseUISystem.BindingNameEfficiencyMaxColor200Percent}\";");
+            sb.AppendLine($"    public static {BuildingUseUISystem.BindingNameSelectedDistrict            .PadRight(40)} : string = \"{BuildingUseUISystem.BindingNameSelectedDistrict            }\";");
+            sb.AppendLine($"    public static {BuildingUseUISystem.BindingNameDistrictInfos               .PadRight(40)} : string = \"{BuildingUseUISystem.BindingNameDistrictInfos               }\";");
             sb.AppendLine("}");
 
             // Include event names.
@@ -117,6 +119,7 @@ namespace BuildingUse
             sb.AppendLine($"    public static {BuildingUseUISystem.EventNameCountVehiclesInUseClicked        .PadRight(40)} : string = \"{BuildingUseUISystem.EventNameCountVehiclesInUseClicked        }\";");
             sb.AppendLine($"    public static {BuildingUseUISystem.EventNameCountVehiclesInMaintenanceClicked.PadRight(40)} : string = \"{BuildingUseUISystem.EventNameCountVehiclesInMaintenanceClicked}\";");
             sb.AppendLine($"    public static {BuildingUseUISystem.EventNameEfficiencyMaxColorClicked        .PadRight(40)} : string = \"{BuildingUseUISystem.EventNameEfficiencyMaxColorClicked        }\";");
+            sb.AppendLine($"    public static {BuildingUseUISystem.EventNameSelectedDistrictChanged          .PadRight(40)} : string = \"{BuildingUseUISystem.EventNameSelectedDistrictChanged          }\";");
             sb.AppendLine("}");
 
             // Write the file to the UI/src folder.
@@ -195,25 +198,35 @@ namespace BuildingUse
             sb.AppendLine();
             sb.Append(GetTranslationsContent(csFile, "Infomode tooltips.", infomodeTooltips));
 
-            // Include infomode general text.
-            TranslationKeys infomodeGeneralText = new TranslationKeys()
-            {
-                "SelectAll",  
-                "DeselectAll",
-                "SelectDeselectTooltip",
-                "InUse",
-                "InMaintenance",
-                "InUseInMaintenanceTooltip",
-                "MaxColor100Percent",
-                "MaxColor200Percent",
-                "MaxColorTooltip",
-                "NoBuildings",
-                "UnitOfMeasurePrefixKilo",
-                "UnitOfMeasurePrefixMega",
-                "GigaWattHour",
-            };
+            // Include district selector text.
+            TranslationKeys districtSelectorText = new TranslationKeys() { "EntireCity", "DistrictSelectorTooltip", };
             sb.AppendLine();
-            sb.Append(GetTranslationsContent(csFile, "Infomode general text.", infomodeGeneralText));
+            sb.Append(GetTranslationsContent(csFile, "District selector text.", districtSelectorText));
+
+            // Include select/deselect text.
+            TranslationKeys selectDeselectText = new TranslationKeys() { "SelectAll", "DeselectAll", "SelectDeselectTooltip", };
+            sb.AppendLine();
+            sb.Append(GetTranslationsContent(csFile, "Select/deselect text.", selectDeselectText));
+
+            // Include vehicles in use/in maintenance text.
+            TranslationKeys vehiclesInUseInMaintenanceText = new TranslationKeys() { "InUse", "InMaintenance", "InUseInMaintenanceTooltip", };
+            sb.AppendLine();
+            sb.Append(GetTranslationsContent(csFile, "Vehicles in use/in maintenance text.", vehiclesInUseInMaintenanceText));
+
+            // Include max color text.
+            TranslationKeys maxColorText = new TranslationKeys() { "MaxColor100Percent", "MaxColor200Percent", "MaxColorTooltip", };
+            sb.AppendLine();
+            sb.Append(GetTranslationsContent(csFile, "Max color text.", maxColorText));
+
+            // Include unit of measure text.
+            TranslationKeys unitOfMeasureText = new TranslationKeys() { "UnitOfMeasurePrefixKilo", "UnitOfMeasurePrefixMega", "GigaWattHour", };
+            sb.AppendLine();
+            sb.Append(GetTranslationsContent(csFile, "Unit of measure text.", unitOfMeasureText));
+
+            // Include general text.
+            TranslationKeys generalText = new TranslationKeys() { "NoBuildings", };
+            sb.AppendLine();
+            sb.Append(GetTranslationsContent(csFile, "General text.", generalText));
 
             // For C# file only, include settings translations.
             if (csFile)

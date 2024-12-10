@@ -213,18 +213,30 @@ export class UITranslationKey
     public static InfomodeTooltipProcessingGarbageProcessing        : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProcessingGarbageProcessing]";
     public static InfomodeTooltipProcessingMailSortingSpeed         : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProcessingMailSortingSpeed]";
 
-    // Infomode general text.
+    // District selector text.
+    public static EntireCity                                        : string = "BuildingUse.EntireCity";
+    public static DistrictSelectorTooltip                           : string = "BuildingUse.DistrictSelectorTooltip";
+
+    // Select/deselect text.
     public static SelectAll                                         : string = "BuildingUse.SelectAll";
     public static DeselectAll                                       : string = "BuildingUse.DeselectAll";
     public static SelectDeselectTooltip                             : string = "BuildingUse.SelectDeselectTooltip";
+
+    // Vehicles in use/in maintenance text.
     public static InUse                                             : string = "BuildingUse.InUse";
     public static InMaintenance                                     : string = "BuildingUse.InMaintenance";
     public static InUseInMaintenanceTooltip                         : string = "BuildingUse.InUseInMaintenanceTooltip";
+
+    // Max color text.
     public static MaxColor100Percent                                : string = "BuildingUse.MaxColor100Percent";
     public static MaxColor200Percent                                : string = "BuildingUse.MaxColor200Percent";
     public static MaxColorTooltip                                   : string = "BuildingUse.MaxColorTooltip";
-    public static NoBuildings                                       : string = "BuildingUse.NoBuildings";
+
+    // Unit of measure text.
     public static UnitOfMeasurePrefixKilo                           : string = "BuildingUse.UnitOfMeasurePrefixKilo";
     public static UnitOfMeasurePrefixMega                           : string = "BuildingUse.UnitOfMeasurePrefixMega";
     public static GigaWattHour                                      : string = "BuildingUse.GigaWattHour";
+
+    // General text.
+    public static NoBuildings                                       : string = "BuildingUse.NoBuildings";
 }

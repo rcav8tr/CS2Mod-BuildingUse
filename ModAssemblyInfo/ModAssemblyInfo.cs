@@ -10,6 +10,6 @@ namespace BuildingUse
     public class ModAssemblyInfo
     {
         public const string Name        = "BuildingUse";
-        public const string Version     = "1.0.2";
+        public const string Version     = "1.1.0";
     }
 }

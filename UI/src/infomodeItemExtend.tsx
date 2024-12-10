@@ -1,6 +1,7 @@
 ﻿import { infoviewTypes              } from "cs2/bindings";
 import { ModuleRegistryExtend       } from "cs2/modding";
 
+import { DistrictSelector           } from "districtSelector";
 import { EfficiencyMaxColor         } from "efficiencyMaxColor";
 import { InfomodeItem               } from "infomodeItem";
 import   mod                          from "../mod.json";
@@ -28,27 +29,33 @@ export const InfomodeItemExtend: ModuleRegistryExtend = (Component: any) =>
         {
             // Building status type is for this mod.
 
+            // Check for special case for district selector.
+            if (buildingStatusTypeName.endsWith("District"))
+            {
+                return (<DistrictSelector />);
+            }
+
             // Check for special case for select/deselect buttons.
             if (buildingStatusTypeName.endsWith("SelectDeselect"))
             {
                 return (<SelectDeselect />);
             }
+
             // Check for special case for vehicles in use/in maintenance.
-            else if (buildingStatusType === BUBuildingStatusType.VehiclesInUseInMaintenance)
+            if (buildingStatusType === BUBuildingStatusType.VehiclesInUseInMaintenance)
             {
                 return (<VehiclesInUseInMaintenance />);
             }
+
             // Check for special case for efficiency max color.
-            else if (buildingStatusType === BUBuildingStatusType.EfficiencyMaxColor)
+            if (buildingStatusType === BUBuildingStatusType.EfficiencyMaxColor)
             {
                 return (<EfficiencyMaxColor />);
             }
-            else
-            {
-                // Not a special case.
-                // Return this mod's custom infomode item.
-                return (<InfomodeItem infomode={infomode} buildingStatusType={buildingStatusType} />);
-            }
+
+            // Not a special case.
+            // Return this mod's custom infomode item.
+            return (<InfomodeItem infomode={infomode} buildingStatusType={buildingStatusType} />);
         }
 
         // Building status type is not for this mod.

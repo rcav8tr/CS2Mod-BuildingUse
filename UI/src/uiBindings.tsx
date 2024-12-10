@@ -202,12 +202,14 @@ export const uiBindings: any =
     ProcessingMailSortingSpeedCapacity       : bindValue<number>(mod.id, "ProcessingMailSortingSpeedCapacity",            0),
 }
 
-// Define binding names for C# to UI from settings.
+// Define binding names for C# to UI.
 export class uiBindingNames
 {
     public static CountVehiclesInUse                       : string = "CountVehiclesInUse";
     public static CountVehiclesInMaintenance               : string = "CountVehiclesInMaintenance";
     public static EfficiencyMaxColor200Percent             : string = "EfficiencyMaxColor200Percent";
+    public static SelectedDistrict                         : string = "SelectedDistrict";
+    public static DistrictInfos                            : string = "DistrictInfos";
 }
 
 // Define event names for UI to C#.
@@ -216,4 +218,5 @@ export class uiEventNames
     public static CountVehiclesInUseClicked                : string = "CountVehiclesInUseClicked";
     public static CountVehiclesInMaintenanceClicked        : string = "CountVehiclesInMaintenanceClicked";
     public static EfficiencyMaxColorClicked                : string = "EfficiencyMaxColorClicked";
+    public static SelectedDistrictChanged                  : string = "SelectedDistrictChanged";
 }

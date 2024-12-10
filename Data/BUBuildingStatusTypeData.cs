@@ -12,6 +12,7 @@ namespace BuildingUse
     {
         None = 123456700,
 
+        EmployeesDistrict,
         EmployeesSelectDeselect,
         EmployeesResidential,
         EmployeesCommercial,
@@ -37,6 +38,7 @@ namespace BuildingUse
         EmployeesPost,
         EmployeesTelecom,
 
+        VisitorsDistrict,
         VisitorsSelectDeselect,
         VisitorsHealthcare,
         VisitorsCemetery,
@@ -49,6 +51,7 @@ namespace BuildingUse
         VisitorsPoliceStation,
         VisitorsPrison,
 
+        StorageDistrict,
         StorageSelectDeselect,
         StorageCommercial,
         StorageIndustrial,
@@ -62,6 +65,7 @@ namespace BuildingUse
         StorageCargoTransportation,
         StoragePost,
 
+        VehiclesDistrict,
         VehiclesSelectDeselect,
         VehiclesInUseInMaintenance,
         VehiclesCommercialTruck,
@@ -89,6 +93,7 @@ namespace BuildingUse
         VehiclesPost,
         VehiclesCargoStationTruck,
 
+        EfficiencyDistrict,
         EfficiencySelectDeselect,
         EfficiencyMaxColor,
         EfficiencyCommercial,
@@ -114,6 +119,7 @@ namespace BuildingUse
         EfficiencyPost,
         EfficiencyTelecom,
 
+        ProcessingDistrict,
         ProcessingSelectDeselect,
         ProcessingElectricityProduction,
         ProcessingWaterOutput,
@@ -168,6 +174,7 @@ namespace BuildingUse
                 buildingStatusType == BUBuildingStatusType.None ||
                 buildingStatusType == BUBuildingStatusType.VehiclesInUseInMaintenance ||
                 buildingStatusType == BUBuildingStatusType.EfficiencyMaxColor ||
+                buildingStatusTypeName.EndsWith("District") ||
                 buildingStatusTypeName.EndsWith("SelectDeselect");
 
             // Create data bindings, except for special cases.

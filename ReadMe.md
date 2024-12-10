@@ -16,6 +16,17 @@ The color of each building indicates the percent use for that building.
 For each building type, the gradient shows the color range for the building use.
 See the settings below for Color of Zoned Buildings and Color of Service Buildings.
 
+### Districts
+If your city has districts:
+- You can show data for the entire city or for a single district.
+- Your district selection is used for all Building Use infoviews.
+- Districts are listed alphabetically.
+- The default is entire city every time a game is started.
+
+If your city has no districts:
+- The data is for the entire city.
+- The district selector is hidden.
+
 ### Building Type Selection
 - You can select all or deselect all building types.
 - You can select and deselect individual building types.
@@ -139,8 +150,6 @@ This mod can be safely disabled or unsubscribed at any time.
 
 # Possible Future Enhancements
 Here are some possible future enhancements that were thought about during development but not included initially:
-- Allow the player to choose a district and show the building use for only buildings in that district.
-  "Entire city" would be one choice in the list of districts.
 - Allow the player to locate buildings for selected building types by showing an icon above each building.
 - By default, the game turns on all infomodes each time an infoview is displayed.
   Save the selections for each infoview to be used the next time the infoview is displayed.

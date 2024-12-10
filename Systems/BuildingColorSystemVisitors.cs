@@ -116,24 +116,29 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get component data with upgrades.
-                    if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupHospitalData, out Game.Prefabs.HospitalData hospitalData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Must have capacity.
-                        long capacity = hospitalData.m_PatientCapacity;
-                        if (capacity > 0)
+                        // Get component data with upgrades.
+                        if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupHospitalData, out Game.Prefabs.HospitalData hospitalData))
                         {
-                            // Get used from dynamic buffer length.
-                            long used = GetDynamicBufferLength(entities[i], ref BufferLookupPatient);
+                            // Must have capacity.
+                            long capacity = hospitalData.m_PatientCapacity;
+                            if (capacity > 0)
+                            {
+                                // Get used from dynamic buffer length.
+                                long used = GetDynamicBufferLength(entities[i], ref BufferLookupPatient);
 
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
+                            }
                         }
                     }
                 }
@@ -164,27 +169,32 @@ namespace BuildingUse
 			    NativeArray<Game.Buildings.DeathcareFacility> deathcareFacilities = buildingChunk.GetNativeArray(ref ComponentTypeHandleDeathcareFacility);
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get component data with upgrades.
-                    if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupDeathcareFacilityData, out Game.Prefabs.DeathcareFacilityData deathcareFacilityData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Check for cemetery vs crematorium.
-                        // Only cemetery has long term storage.
-                        if (deathcareFacilityData.m_LongTermStorage == longTermStorage)
+                        // Get component data with upgrades.
+                        if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupDeathcareFacilityData, out Game.Prefabs.DeathcareFacilityData deathcareFacilityData))
                         {
-                            // Used is long term stored count, for both cemetery and crematorium.
-                            long used = deathcareFacilities[i].m_LongTermStoredCount;
+                            // Check for cemetery vs crematorium.
+                            // Only cemetery has long term storage.
+                            if (deathcareFacilityData.m_LongTermStorage == longTermStorage)
+                            {
+                                // Used is long term stored count, for both cemetery and crematorium.
+                                long used = deathcareFacilities[i].m_LongTermStoredCount;
 
-                            // Get capacity.
-                            long capacity = deathcareFacilityData.m_StorageCapacity;
+                                // Get capacity.
+                                long capacity = deathcareFacilityData.m_StorageCapacity;
                         
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
+                            }
                         }
                     }
                 }
@@ -212,26 +222,31 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get component data with upgrades.
-                    if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupSchoolData, out Game.Prefabs.SchoolData schoolData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Check education level.
-                        if (schoolData.m_EducationLevel == educationLevel)
+                        // Get component data with upgrades.
+                        if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupSchoolData, out Game.Prefabs.SchoolData schoolData))
                         {
-                            // Get used from dynamic buffer length.
-                            long used = GetDynamicBufferLength(entities[i], ref BufferLookupStudent);
+                            // Check education level.
+                            if (schoolData.m_EducationLevel == educationLevel)
+                            {
+                                // Get used from dynamic buffer length.
+                                long used = GetDynamicBufferLength(entities[i], ref BufferLookupStudent);
 
-                            // Get capacity.
-                            long capacity = schoolData.m_StudentCapacity;
+                                // Get capacity.
+                                long capacity = schoolData.m_StudentCapacity;
 
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
+                            }
                         }
                     }
                 }
@@ -258,23 +273,28 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get component data with upgrades.
-                    if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupEmergencyShelterData, out Game.Prefabs.EmergencyShelterData emergencyShelterData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Get used from dynamic buffer length.
-                        long used = GetDynamicBufferLength(entities[i], ref BufferLookupOccupant);
+                        // Get component data with upgrades.
+                        if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupEmergencyShelterData, out Game.Prefabs.EmergencyShelterData emergencyShelterData))
+                        {
+                            // Get used from dynamic buffer length.
+                            long used = GetDynamicBufferLength(entities[i], ref BufferLookupOccupant);
 
-                        // Get capacity
-                        long capacity = emergencyShelterData.m_ShelterCapacity;
+                            // Get capacity
+                            long capacity = emergencyShelterData.m_ShelterCapacity;
 
-                        // Update entity color and accumulate totals.
-                        UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                        totalUsed     += used;
-                        totalCapacity += capacity;
+                            // Update entity color and accumulate totals.
+                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                            totalUsed     += used;
+                            totalCapacity += capacity;
+                        }
                     }
                 }
 
@@ -300,23 +320,28 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get component data with upgrades.
-                    if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupPoliceStationData, out Game.Prefabs.PoliceStationData policeStationData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Get used from dynamic buffer length.
-                        long used = GetDynamicBufferLength(entities[i], ref BufferLookupOccupant);
+                        // Get component data with upgrades.
+                        if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupPoliceStationData, out Game.Prefabs.PoliceStationData policeStationData))
+                        {
+                            // Get used from dynamic buffer length.
+                            long used = GetDynamicBufferLength(entities[i], ref BufferLookupOccupant);
 
-                        // Get capacity.
-                        long capacity = policeStationData.m_JailCapacity;
+                            // Get capacity.
+                            long capacity = policeStationData.m_JailCapacity;
                     
-                        // Update entity color and accumulate totals.
-                        UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                        totalUsed     += used;
-                        totalCapacity += capacity;
+                            // Update entity color and accumulate totals.
+                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                            totalUsed     += used;
+                            totalCapacity += capacity;
+                        }
                     }
                 }
 
@@ -342,23 +367,28 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get component data with upgrades.
-                    if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupPrisonData, out Game.Prefabs.PrisonData prisonData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Get used from dynamic buffer length.
-                        long used = GetDynamicBufferLength(entities[i], ref BufferLookupOccupant);
+                        // Get component data with upgrades.
+                        if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupPrisonData, out Game.Prefabs.PrisonData prisonData))
+                        {
+                            // Get used from dynamic buffer length.
+                            long used = GetDynamicBufferLength(entities[i], ref BufferLookupOccupant);
 
-                        // Get capacity.
-                        long capacity = prisonData.m_PrisonerCapacity;
+                            // Get capacity.
+                            long capacity = prisonData.m_PrisonerCapacity;
 
-                        // Update entity color and accumulate totals.
-                        UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                        totalUsed     += used;
-                        totalCapacity += capacity;
+                            // Update entity color and accumulate totals.
+                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                            totalUsed     += used;
+                            totalCapacity += capacity;
+                        }
                     }
                 }
 

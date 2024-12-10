@@ -123,23 +123,28 @@ namespace BuildingUse
 			    NativeArray<Game.Buildings.Battery> batteries = buildingChunk.GetNativeArray(ref ComponentTypeHandleBattery);
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get component data with upgrades.
-                    if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupBatteryData, out Game.Prefabs.BatteryData batteryData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Get used from battery.
-                        long used = batteries[i].storedEnergyHours;
+                        // Get component data with upgrades.
+                        if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupBatteryData, out Game.Prefabs.BatteryData batteryData))
+                        {
+                            // Get used from battery.
+                            long used = batteries[i].storedEnergyHours;
 
-                        // Get capacity.
-                        long capacity = batteryData.m_Capacity;
+                            // Get capacity.
+                            long capacity = batteryData.m_Capacity;
 
-                        // Update entity color and accumulate totals.
-                        UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                        totalUsed     += used;
-                        totalCapacity += capacity;
+                            // Update entity color and accumulate totals.
+                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                            totalUsed     += used;
+                            totalCapacity += capacity;
+                        }
                     }
                 }
 
@@ -166,51 +171,56 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get component data with upgrades.
-                    Entity entity = entities[i];
-                    if (TryGetComponentDataWithUpgrades(entity, prefabRefs[i].m_Prefab, ref ComponentLookupGarbageFacilityData, out Game.Prefabs.GarbageFacilityData garbageFacilityData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Check for landfill vs other garbage management.
-                        // Only landfill has long term storage.
-                        if (garbageFacilityData.m_LongTermStorage == longTermStorage)
+                        // Get component data with upgrades.
+                        Entity entity = entities[i];
+                        if (TryGetComponentDataWithUpgrades(entity, prefabRefs[i].m_Prefab, ref ComponentLookupGarbageFacilityData, out Game.Prefabs.GarbageFacilityData garbageFacilityData))
                         {
-                            // Get used from resources buffer.
-                            long used = 0;
-			                if (BufferLookupResources.TryGetBuffer(entity, out DynamicBuffer<Game.Economy.Resources> bufferResources))
-			                {
-				                used = Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.Garbage, bufferResources);
-			                }
+                            // Check for landfill vs other garbage management.
+                            // Only landfill has long term storage.
+                            if (garbageFacilityData.m_LongTermStorage == longTermStorage)
+                            {
+                                // Get used from resources buffer.
+                                long used = 0;
+			                    if (BufferLookupResources.TryGetBuffer(entity, out DynamicBuffer<Game.Economy.Resources> bufferResources))
+			                    {
+				                    used = Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.Garbage, bufferResources);
+			                    }
 
-                            // Get capacity.
-                            long capacity = garbageFacilityData.m_GarbageCapacity;
+                                // Get capacity.
+                                long capacity = garbageFacilityData.m_GarbageCapacity;
 
-                            // Add in any sub areas.
-		                    if (BufferLookupSubArea.TryGetBuffer(entity, out DynamicBuffer<Game.Areas.SubArea> subAreas))
-		                    {
-                                // Do each sub area.
-		                        for (int j = 0; j < subAreas.Length; j++)
+                                // Add in any sub areas.
+		                        if (BufferLookupSubArea.TryGetBuffer(entity, out DynamicBuffer<Game.Areas.SubArea> subAreas))
 		                        {
-                                    // Get storage information.
-			                        Entity subArea = subAreas[j].m_Area;
-			                        if (ComponentLookupStorage        .TryGetComponent(subArea, out Game.Areas.Storage subAreaStorage) &&
-                                        ComponentLookupGeometry       .TryGetComponent(subArea, out Game.Areas.Geometry subAreaGeometry) &&
-                                        ComponentLookupPrefabRef      .TryGetComponent(subArea, out Game.Prefabs.PrefabRef subAreaPrefabRef) &&
-                                        ComponentLookupStorageAreaData.TryGetComponent(subAreaPrefabRef.m_Prefab, out Game.Prefabs.StorageAreaData storageAreaData))
-			                        {
-					                    used     += subAreaStorage.m_Amount;
-					                    capacity += Game.Areas.AreaUtils.CalculateStorageCapacity(subAreaGeometry, storageAreaData);
-			                        }
+                                    // Do each sub area.
+		                            for (int j = 0; j < subAreas.Length; j++)
+		                            {
+                                        // Get storage information.
+			                            Entity subArea = subAreas[j].m_Area;
+			                            if (ComponentLookupStorage        .TryGetComponent(subArea, out Game.Areas.Storage subAreaStorage) &&
+                                            ComponentLookupGeometry       .TryGetComponent(subArea, out Game.Areas.Geometry subAreaGeometry) &&
+                                            ComponentLookupPrefabRef      .TryGetComponent(subArea, out Game.Prefabs.PrefabRef subAreaPrefabRef) &&
+                                            ComponentLookupStorageAreaData.TryGetComponent(subAreaPrefabRef.m_Prefab, out Game.Prefabs.StorageAreaData storageAreaData))
+			                            {
+					                        used     += subAreaStorage.m_Amount;
+					                        capacity += Game.Areas.AreaUtils.CalculateStorageCapacity(subAreaGeometry, storageAreaData);
+			                            }
+		                            }
 		                        }
-		                    }
 
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
+                            }
                         }
                     }
                 }
@@ -237,60 +247,65 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
-                NativeArray<Game.Routes.MailBox   > mailboxes  = buildingChunk.GetNativeArray(ref ComponentTypeHandleMailBox);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Routes.MailBox       > mailboxes  = buildingChunk.GetNativeArray(ref ComponentTypeHandleMailBox);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get entity and prefab.
-                    Entity entity = entities[i];
-                    Entity prefab = prefabRefs[i].m_Prefab;
-
-                    // Get the post facility data.
-                    if (TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupPostFacilityData, out Game.Prefabs.PostFacilityData postFacilityData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Building must have capacity.
-                        long capacity = postFacilityData.m_MailCapacity;
-                        if (capacity > 0L)
+                        // Get entity and prefab.
+                        Entity entity = entities[i];
+                        Entity prefab = prefabRefs[i].m_Prefab;
+
+                        // Get the post facility data.
+                        if (TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupPostFacilityData, out Game.Prefabs.PostFacilityData postFacilityData))
                         {
-                            // Get resources.
-                            long used = 0L;
-                            if (BufferLookupResources.TryGetBuffer(entity, out DynamicBuffer<Game.Economy.Resources> bufferResources))
+                            // Building must have capacity.
+                            long capacity = postFacilityData.m_MailCapacity;
+                            if (capacity > 0L)
                             {
-                                // Mail stored is sum of mail amounts.
-                                used =
-                                    Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.UnsortedMail, bufferResources) +
-                                    Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.LocalMail, bufferResources) +
-                                    Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.OutgoingMail, bufferResources);
-
-                                // If post facility has a mailbox, add in its amount.
-                                // It is unknown why the capacity of the mailbox is not included in the logic of Game.UI.InGame.MailSection.
-                                if (mailboxes.Length > 0)
+                                // Get resources.
+                                long used = 0L;
+                                if (BufferLookupResources.TryGetBuffer(entity, out DynamicBuffer<Game.Economy.Resources> bufferResources))
                                 {
-                                    used += mailboxes[i].m_MailAmount;
+                                    // Mail stored is sum of mail amounts.
+                                    used =
+                                        Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.UnsortedMail, bufferResources) +
+                                        Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.LocalMail, bufferResources) +
+                                        Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.OutgoingMail, bufferResources);
+
+                                    // If post facility has a mailbox, add in its amount.
+                                    // It is unknown why the capacity of the mailbox is not included in the logic of Game.UI.InGame.MailSection.
+                                    if (mailboxes.Length > 0)
+                                    {
+                                        used += mailboxes[i].m_MailAmount;
+                                    }
                                 }
+
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
                             }
-
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
                         }
-                    }
-                    // Get the mailbox data.
-                    else if (mailboxes.Length > 0 && ComponentLookupMailBoxData.TryGetComponent(prefab, out Game.Prefabs.MailBoxData mailBoxData))
-                    {
-                        // There must be capacity.
-                        long capacity = mailBoxData.m_MailCapacity;
-                        if (capacity > 0L)
+                        // Get the mailbox data.
+                        else if (mailboxes.Length > 0 && ComponentLookupMailBoxData.TryGetComponent(prefab, out Game.Prefabs.MailBoxData mailBoxData))
                         {
-                            // Get used.
-                            long used = mailboxes[i].m_MailAmount;
+                            // There must be capacity.
+                            long capacity = mailBoxData.m_MailCapacity;
+                            if (capacity > 0L)
+                            {
+                                // Get used.
+                                long used = mailboxes[i].m_MailAmount;
 
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
+                            }
                         }
                     }
                 }
@@ -319,55 +334,60 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    // Get entity and prefab.
-                    Entity entity = entities[i];
-                    Entity prefab = prefabRefs[i].m_Prefab;
-
-                    // Building or company must have storage.
-                    bool found = false;
-                    Entity companyEntity = Entity.Null;
-                    if
-                        (
-                            (
-                                // Try to get storage limit data from the prefab of the entity.
-                                TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupStorageLimitData, out Game.Companies.StorageLimitData storageLimitData)
-                            )
-                            ||
-                            (
-                                // Try to get storage limit data from the prefab of the company of the entity.
-                                Game.UI.InGame.CompanyUIUtils.HasCompany(entity, prefab, ref BufferLookupRenter, ref ComponentLookupBuildingPropertyData, ref ComponentLookupCompanyData, out companyEntity) &&
-                                ComponentLookupPrefabRef.TryGetComponent(companyEntity, out Game.Prefabs.PrefabRef companyPrefabRef) &&
-                                ComponentLookupStorageLimitData.TryGetComponent(companyPrefabRef.m_Prefab, out storageLimitData)
-                            )
-                        )
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Storage must have capacity.
-                        long capacity = GetStorageCapacity(entity, prefab, storageLimitData);
-                        if (capacity > 0L)
+                        // Get entity and prefab.
+                        Entity entity = entities[i];
+                        Entity prefab = prefabRefs[i].m_Prefab;
+
+                        // Building or company must have storage.
+                        bool found = false;
+                        Entity companyEntity = Entity.Null;
+                        if
+                            (
+                                (
+                                    // Try to get storage limit data from the prefab of the entity.
+                                    TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupStorageLimitData, out Game.Companies.StorageLimitData storageLimitData)
+                                )
+                                ||
+                                (
+                                    // Try to get storage limit data from the prefab of the company of the entity.
+                                    Game.UI.InGame.CompanyUIUtils.HasCompany(entity, prefab, ref BufferLookupRenter, ref ComponentLookupBuildingPropertyData, ref ComponentLookupCompanyData, out companyEntity) &&
+                                    ComponentLookupPrefabRef.TryGetComponent(companyEntity, out Game.Prefabs.PrefabRef companyPrefabRef) &&
+                                    ComponentLookupStorageLimitData.TryGetComponent(companyPrefabRef.m_Prefab, out storageLimitData)
+                                )
+                            )
                         {
-                            // Building or company has storage and storage has capacity.
-                            found = true;
+                            // Storage must have capacity.
+                            long capacity = GetStorageCapacity(entity, prefab, storageLimitData);
+                            if (capacity > 0L)
+                            {
+                                // Building or company has storage and storage has capacity.
+                                found = true;
 
-                            // Get used from resources.
-                            long used = GetTotalResourceAmount(entity, companyEntity);
-                            used = math.min(math.max(used, 0L), capacity);
+                                // Get used from resources.
+                                long used = GetTotalResourceAmount(entity, companyEntity);
+                                used = math.min(math.max(used, 0L), capacity);
 
-                            // Employee used and capacity are valid.
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
+                                // Employee used and capacity are valid.
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
+                            }
                         }
-                    }
 
-                    // For a company not found, update entity color for 0%.
-                    if (company && !found)
-                    {
-                        UpdateEntityColor(0L, 0L, infomodeActive, infomodeIndex, colors, i);
+                        // For a company not found, update entity color for 0%.
+                        if (company && !found)
+                        {
+                            UpdateEntityColor(0L, 0L, infomodeActive, infomodeIndex, colors, i);
+                        }
                     }
                 }
 

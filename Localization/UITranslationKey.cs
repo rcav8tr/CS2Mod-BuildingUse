@@ -215,20 +215,32 @@ namespace BuildingUse
         public const string InfomodeTooltipProcessingGarbageProcessing         = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProcessingGarbageProcessing]";
         public const string InfomodeTooltipProcessingMailSortingSpeed          = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProcessingMailSortingSpeed]";
 
-        // Infomode general text.
+        // District selector text.
+        public const string EntireCity                                         = "BuildingUse.EntireCity";
+        public const string DistrictSelectorTooltip                            = "BuildingUse.DistrictSelectorTooltip";
+
+        // Select/deselect text.
         public const string SelectAll                                          = "BuildingUse.SelectAll";
         public const string DeselectAll                                        = "BuildingUse.DeselectAll";
         public const string SelectDeselectTooltip                              = "BuildingUse.SelectDeselectTooltip";
+
+        // Vehicles in use/in maintenance text.
         public const string InUse                                              = "BuildingUse.InUse";
         public const string InMaintenance                                      = "BuildingUse.InMaintenance";
         public const string InUseInMaintenanceTooltip                          = "BuildingUse.InUseInMaintenanceTooltip";
+
+        // Max color text.
         public const string MaxColor100Percent                                 = "BuildingUse.MaxColor100Percent";
         public const string MaxColor200Percent                                 = "BuildingUse.MaxColor200Percent";
         public const string MaxColorTooltip                                    = "BuildingUse.MaxColorTooltip";
-        public const string NoBuildings                                        = "BuildingUse.NoBuildings";
+
+        // Unit of measure text.
         public const string UnitOfMeasurePrefixKilo                            = "BuildingUse.UnitOfMeasurePrefixKilo";
         public const string UnitOfMeasurePrefixMega                            = "BuildingUse.UnitOfMeasurePrefixMega";
         public const string GigaWattHour                                       = "BuildingUse.GigaWattHour";
+
+        // General text.
+        public const string NoBuildings                                        = "BuildingUse.NoBuildings";
 
         // Settings.
         public const string SettingTitle                                       = "Options.SECTION[BuildingUse.BuildingUse.Mod]";

@@ -8,6 +8,10 @@ import { ModuleResolver                 } from "moduleResolver";
 import { uiBindingNames, uiEventNames   } from "uiBindings";
 import { UITranslationKey               } from "uiTranslationKey";
 
+// Get data bindings.
+const bindingCountVehiclesInUse         = bindValue<boolean>(mod.id, uiBindingNames.CountVehiclesInUse,         true);
+const bindingCountVehiclesInMaintenance = bindValue<boolean>(mod.id, uiBindingNames.CountVehiclesInMaintenance, true);
+
 // Custom infmode item for vehicles in use/in maintenance check boxes.
 export const VehiclesInUseInMaintenance = () =>
 {
@@ -16,10 +20,6 @@ export const VehiclesInUseInMaintenance = () =>
     const labelInUse                = translate(UITranslationKey.InUse);
     const labelInMaintenance        = translate(UITranslationKey.InMaintenance);
     const tooltipInUseInMaintenance = translate(UITranslationKey.InUseInMaintenanceTooltip);
-
-    // Get data bindings.
-    const bindingCountVehiclesInUse         = bindValue<boolean>(mod.id, uiBindingNames.CountVehiclesInUse,         true);
-    const bindingCountVehiclesInMaintenance = bindValue<boolean>(mod.id, uiBindingNames.CountVehiclesInMaintenance, true);
 
     // Get data values from data bindings.
     const valueCountVehiclesInUse:         boolean = useValue(bindingCountVehiclesInUse);

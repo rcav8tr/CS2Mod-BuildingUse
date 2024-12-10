@@ -160,6 +160,7 @@ namespace BuildingUse
             [ReadOnly] public ComponentTypeHandle<Game.Buildings.   WelfareOffice               > ComponentTypeHandleWelfareOffice;
 
             // Component type handles for miscellaneous.
+            [ReadOnly] public ComponentTypeHandle<Game.Areas.       CurrentDistrict             > ComponentTypeHandleCurrentDistrict;
             [ReadOnly] public ComponentTypeHandle<Game.Common.      Destroyed                   > ComponentTypeHandleDestroyed;
             [ReadOnly] public ComponentTypeHandle<Game.Prefabs.     InfomodeActive              > ComponentTypeHandleInfomodeActive;
             [ReadOnly] public ComponentTypeHandle<Game.Prefabs.     InfoviewBuildingStatusData  > ComponentTypeHandleInfoviewBuildingStatusData;
@@ -187,6 +188,10 @@ namespace BuildingUse
             [ReadOnly] public bool CountVehiclesInUse;
             [ReadOnly] public bool CountVehiclesInMaintenance;
             [ReadOnly] public bool EfficiencyMaxColor200Percent;
+
+            // Selected district.
+            [ReadOnly] public Entity SelectedDistrict;
+            [ReadOnly] public bool SelectedDistrictIsEntireCity;
 
             /// <summary>
             /// Job execution.
@@ -289,6 +294,21 @@ namespace BuildingUse
                         colors[i] = color;
                     }
                 }
+            }
+
+            /// <summary>
+            /// Get whether or not a building is in the selected district.
+            /// </summary>
+            private bool BuildingInSelectedDistrict(Entity buildingDistrict)
+            {
+                // If the selected district is entire city, then building is in the selected district.
+                if (SelectedDistrictIsEntireCity)
+                {
+                    return true;
+                }
+
+                // Return if building is in the selected district.
+                return buildingDistrict == SelectedDistrict;
             }
 
             /// <summary>
@@ -599,6 +619,7 @@ namespace BuildingUse
 
         // Other systems.
         private Game.Tools.ToolSystem _toolSystem;
+        private BuildingUseUISystem _buildingUseUISystem;
 
         // Entity queries.
         private EntityQuery _queryDefault;
@@ -715,6 +736,7 @@ namespace BuildingUse
 
         // Component type handles for miscellaneous.
         private ComponentTypeHandle<Game.Objects.   Attachment                  > _componentTypeHandleAttachment;
+        private ComponentTypeHandle<Game.Areas.     CurrentDistrict             > _componentTypeHandleCurrentDistrict;
         private ComponentTypeHandle<Game.Common.    Destroyed                   > _componentTypeHandleDestroyed;
         private ComponentTypeHandle<Game.Objects.   Elevation                   > _componentTypeHandleElevation;
         private ComponentTypeHandle<Game.Prefabs.   InfomodeActive              > _componentTypeHandleInfomodeActive;
@@ -849,6 +871,7 @@ namespace BuildingUse
 
             // Assign component type handles for miscellaneous.
             _componentTypeHandleAttachment                  = CheckedStateRef.GetComponentTypeHandle<Game.Objects.      Attachment                  >(true);
+            _componentTypeHandleCurrentDistrict             = CheckedStateRef.GetComponentTypeHandle<Game.Areas.        CurrentDistrict             >(true);
             _componentTypeHandleDestroyed                   = CheckedStateRef.GetComponentTypeHandle<Game.Common.       Destroyed                   >(true);
             _componentTypeHandleElevation                   = CheckedStateRef.GetComponentTypeHandle<Game.Objects.      Elevation                   >(true);
             _componentTypeHandleInfomodeActive              = CheckedStateRef.GetComponentTypeHandle<Game.Prefabs.      InfomodeActive              >(true);
@@ -878,7 +901,8 @@ namespace BuildingUse
             _buildingColorSystem = this;
 
             // Get other systems.
-            _toolSystem = base.World.GetOrCreateSystemManaged<Game.Tools.ToolSystem>();
+            _toolSystem          = base.World.GetOrCreateSystemManaged<Game.Tools.ToolSystem>();
+            _buildingUseUISystem = base.World.GetOrCreateSystemManaged<BuildingUseUISystem>();
 
             // Query to get default objects (i.e. every object that has a color).
 		    _queryDefault = GetEntityQuery
@@ -1219,6 +1243,7 @@ namespace BuildingUse
             _componentTypeHandleWaterPumpingStation         .Update(ref CheckedStateRef);  
             _componentTypeHandleWelfareOffice               .Update(ref CheckedStateRef);  
 
+            _componentTypeHandleCurrentDistrict             .Update(ref CheckedStateRef);
             _componentTypeHandleDestroyed                   .Update(ref CheckedStateRef);
             _componentTypeHandleInfomodeActive              .Update(ref CheckedStateRef);
             _componentTypeHandleInfoviewBuildingStatusData  .Update(ref CheckedStateRef);
@@ -1326,6 +1351,7 @@ namespace BuildingUse
                 ComponentTypeHandleWaterPumpingStation          = _componentTypeHandleWaterPumpingStation,
                 ComponentTypeHandleWelfareOffice                = _componentTypeHandleWelfareOffice,
 
+                ComponentTypeHandleCurrentDistrict              = _componentTypeHandleCurrentDistrict,
                 ComponentTypeHandleDestroyed                    = _componentTypeHandleDestroyed,
                 ComponentTypeHandleInfomodeActive               = _componentTypeHandleInfomodeActive,
                 ComponentTypeHandleInfoviewBuildingStatusData   = _componentTypeHandleInfoviewBuildingStatusData,
@@ -1344,6 +1370,9 @@ namespace BuildingUse
                 CountVehiclesInUse                              = Mod.ModSettings.CountVehiclesInUse,
                 CountVehiclesInMaintenance                      = Mod.ModSettings.CountVehiclesInMaintenance,
                 EfficiencyMaxColor200Percent                    = Mod.ModSettings.EfficiencyMaxColor200Percent,
+
+                SelectedDistrict                                = _buildingUseUISystem.selectedDistrict,
+                SelectedDistrictIsEntireCity                    = _buildingUseUISystem.selectedDistrict == BuildingUseUISystem.EntireCity
             };
 
 

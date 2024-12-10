@@ -96,20 +96,25 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each electricity producer (i.e. building).
+                NativeArray<Game.Areas.CurrentDistrict        > districts            = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
                 NativeArray<Game.Buildings.ElectricityProducer> electricityProducers = buildingChunk.GetNativeArray(ref ComponentTypeHandleElectricityProducer);
                 for (int i = 0; i < electricityProducers.Length; i++)
                 {
-                    // Logic adapted from Game.UI.InGame.ElectricitySection.
-                    long capacity = electricityProducers[i].m_Capacity;
-                    long used     = electricityProducers[i].m_LastProduction;
-
-                    // Building must have capacity.
-                    if (capacity > 0L)
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Update entity color and accumulate totals.
-                        UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                        totalUsed     += used;
-                        totalCapacity += capacity;
+                        // Logic adapted from Game.UI.InGame.ElectricitySection.
+                        long capacity = electricityProducers[i].m_Capacity;
+                        long used     = electricityProducers[i].m_LastProduction;
+
+                        // Building must have capacity.
+                        if (capacity > 0L)
+                        {
+                            // Update entity color and accumulate totals.
+                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                            totalUsed     += used;
+                            totalCapacity += capacity;
+                        }
                     }
                 }
 
@@ -135,20 +140,25 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each water pumping station (i.e. building).
+                NativeArray<Game.Areas.CurrentDistrict        > districts            = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
                 NativeArray<Game.Buildings.WaterPumpingStation> waterPumpingStations = buildingChunk.GetNativeArray(ref ComponentTypeHandleWaterPumpingStation);
                 for (int i = 0; i < waterPumpingStations.Length; i++)
                 {
-                    // Logic adapted from Game.UI.InGame.WaterSection.
-                    long capacity = waterPumpingStations[i].m_Capacity;
-                    long used     = waterPumpingStations[i].m_LastProduction;
-
-                    // Building must have capacity.
-                    if (capacity > 0L)
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Update entity color and accumulate totals.
-                        UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                        totalUsed     += used;
-                        totalCapacity += capacity;
+                        // Logic adapted from Game.UI.InGame.WaterSection.
+                        long capacity = waterPumpingStations[i].m_Capacity;
+                        long used     = waterPumpingStations[i].m_LastProduction;
+
+                        // Building must have capacity.
+                        if (capacity > 0L)
+                        {
+                            // Update entity color and accumulate totals.
+                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                            totalUsed     += used;
+                            totalCapacity += capacity;
+                        }
                     }
                 }
 
@@ -173,20 +183,25 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each sewage outlet (i.e. building).
+                NativeArray<Game.Areas.CurrentDistrict > districts     = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
                 NativeArray<Game.Buildings.SewageOutlet> sewageOutlets = buildingChunk.GetNativeArray(ref ComponentTypeHandleSewageOutlet);
                 for (int i = 0; i < sewageOutlets.Length; i++)
                 {
-                    // Logic adapted from Game.UI.InGame.SewageSection.
-                    long capacity = sewageOutlets[i].m_Capacity;
-                    long used     = sewageOutlets[i].m_LastProcessed;
-
-                    // Building must have capacity.
-                    if (capacity > 0L)
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Update entity color and accumulate totals.
-                        UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                        totalUsed     += used;
-                        totalCapacity += capacity;
+                        // Logic adapted from Game.UI.InGame.SewageSection.
+                        long capacity = sewageOutlets[i].m_Capacity;
+                        long used     = sewageOutlets[i].m_LastProcessed;
+
+                        // Building must have capacity.
+                        if (capacity > 0L)
+                        {
+                            // Update entity color and accumulate totals.
+                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                            totalUsed     += used;
+                            totalCapacity += capacity;
+                        }
                     }
                 }
 
@@ -211,41 +226,46 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each deathcare facility (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict      > districts           = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                          > entities            = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef          > prefabRefs          = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 NativeArray<Game.Buildings.DeathcareFacility> deathcareFacilities = buildingChunk.GetNativeArray(ref ComponentTypeHandleDeathcareFacility);
                 for (int i = 0; i < deathcareFacilities.Length; i++)
                 {
-                    // Get entity and prefab.
-                    Entity entity = entities[i];
-                    Entity prefab = prefabRefs[i].m_Prefab;
-
-                    // Logic adapted from Game.UI.InGame.DeathcareSection.
-                    // Get deathcare facility data.
-                    if (TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupDeathcareFacilityData, out Game.Prefabs.DeathcareFacilityData deathcareFacilityData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Capacity (i.e. processing capacity) is processing rate.
-                        long capacity = Mathf.RoundToInt(deathcareFacilityData.m_ProcessingRate);
+                        // Get entity and prefab.
+                        Entity entity = entities[i];
+                        Entity prefab = prefabRefs[i].m_Prefab;
 
-                        // Building must have capacity.
-                        if (capacity > 0L)
+                        // Logic adapted from Game.UI.InGame.DeathcareSection.
+                        // Get deathcare facility data.
+                        if (TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupDeathcareFacilityData, out Game.Prefabs.DeathcareFacilityData deathcareFacilityData))
                         {
-                            // Building has used (i.e. processing speed) only when there are bodies to process.
-                            long used = 0L;
-                            int bodyCount = deathcareFacilities[i].m_LongTermStoredCount + GetDynamicBufferLength(entity, ref BufferLookupPatient);
-                            if (bodyCount > 0)
-                            {
-                                // Used (i.e. processing speed) is processing rate times efficiency.
-                                if (BufferLookupEfficiency.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Efficiency> bufferEfficiency))
-                                {
-                                    used = Mathf.RoundToInt(deathcareFacilityData.m_ProcessingRate * GetBuildingEfficiency(bufferEfficiency));
-                                }
-                            }
+                            // Capacity (i.e. processing capacity) is processing rate.
+                            long capacity = Mathf.RoundToInt(deathcareFacilityData.m_ProcessingRate);
 
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
+                            // Building must have capacity.
+                            if (capacity > 0L)
+                            {
+                                // Building has used (i.e. processing speed) only when there are bodies to process.
+                                long used = 0L;
+                                int bodyCount = deathcareFacilities[i].m_LongTermStoredCount + GetDynamicBufferLength(entity, ref BufferLookupPatient);
+                                if (bodyCount > 0)
+                                {
+                                    // Used (i.e. processing speed) is processing rate times efficiency.
+                                    if (BufferLookupEfficiency.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Efficiency> bufferEfficiency))
+                                    {
+                                        used = Mathf.RoundToInt(deathcareFacilityData.m_ProcessingRate * GetBuildingEfficiency(bufferEfficiency));
+                                    }
+                                }
+
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
+                            }
                         }
                     }
                 }
@@ -271,30 +291,35 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each garbage facility (i.e. building).
+                NativeArray<Game.Areas.CurrentDistrict    > districts         = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
                 NativeArray<Entity                        > entities          = buildingChunk.GetNativeArray(EntityTypeHandle);
                 NativeArray<Game.Prefabs.PrefabRef        > prefabRefs        = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 NativeArray<Game.Buildings.GarbageFacility> garbageFacilities = buildingChunk.GetNativeArray(ref ComponentTypeHandleGarbageFacility);
                 for (int i = 0; i < garbageFacilities.Length; i++)
                 {
-                    // Get entity and prefab.
-                    Entity entity = entities[i];
-                    Entity prefab = prefabRefs[i].m_Prefab;
-
-                    // Logic adapted from Game.UI.InGame.GarbageSection.
-                    // Get processing garbage facility data.
-                    if (TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupGarbageFacilityData, out Game.Prefabs.GarbageFacilityData garbageFacilityData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Building must have capacity.
-                        long capacity = garbageFacilityData.m_ProcessingSpeed;
-                        if (capacity > 0L)
-                        {
-                            // Used is processing rate.
-                            long used = garbageFacilities[i].m_ProcessingRate;
+                        // Get entity and prefab.
+                        Entity entity = entities[i];
+                        Entity prefab = prefabRefs[i].m_Prefab;
 
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
+                        // Logic adapted from Game.UI.InGame.GarbageSection.
+                        // Get processing garbage facility data.
+                        if (TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupGarbageFacilityData, out Game.Prefabs.GarbageFacilityData garbageFacilityData))
+                        {
+                            // Building must have capacity.
+                            long capacity = garbageFacilityData.m_ProcessingSpeed;
+                            if (capacity > 0L)
+                            {
+                                // Used is processing rate.
+                                long used = garbageFacilities[i].m_ProcessingRate;
+
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
+                            }
                         }
                     }
                 }
@@ -320,30 +345,35 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each post facility (i.e. building).
+                NativeArray<Game.Areas.CurrentDistrict > districts      = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
                 NativeArray<Entity                     > entities       = buildingChunk.GetNativeArray(EntityTypeHandle);
                 NativeArray<Game.Prefabs.PrefabRef     > prefabRefs     = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 NativeArray<Game.Buildings.PostFacility> postFacilities = buildingChunk.GetNativeArray(ref ComponentTypeHandlePostFacility);
                 for (int i = 0; i < postFacilities.Length; i++)
                 {
-                    // Get entity and prefab.
-                    Entity entity = entities[i];
-                    Entity prefab = prefabRefs[i].m_Prefab;
-
-                    // Logic adapted from Game.UI.InGame.MailSection.
-                    // Get processing post facility data.
-                    if (TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupPostFacilityData, out Game.Prefabs.PostFacilityData postFacilityData))
+                    // Building must be in selected district.
+                    if (BuildingInSelectedDistrict(districts[i].m_District))
                     {
-                        // Building must have capacity.
-                        long capacity = postFacilityData.m_SortingRate;
-                        if (capacity > 0L)
-                        {
-                            // Used is sorting rate times processing factor
-                            long used = (postFacilityData.m_SortingRate * postFacilities[i].m_ProcessingFactor + 50) / 100;
+                        // Get entity and prefab.
+                        Entity entity = entities[i];
+                        Entity prefab = prefabRefs[i].m_Prefab;
 
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
+                        // Logic adapted from Game.UI.InGame.MailSection.
+                        // Get processing post facility data.
+                        if (TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupPostFacilityData, out Game.Prefabs.PostFacilityData postFacilityData))
+                        {
+                            // Building must have capacity.
+                            long capacity = postFacilityData.m_SortingRate;
+                            if (capacity > 0L)
+                            {
+                                // Used is sorting rate times processing factor
+                                long used = (postFacilityData.m_SortingRate * postFacilities[i].m_ProcessingFactor + 50) / 100;
+
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += used;
+                                totalCapacity += capacity;
+                            }
                         }
                     }
                 }

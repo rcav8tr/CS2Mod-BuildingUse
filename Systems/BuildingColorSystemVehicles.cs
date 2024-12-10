@@ -97,10 +97,17 @@ namespace BuildingUse
                 long totalCapacity = 0L;
 
                 // Do each entity (i.e. building).
-                NativeArray<Entity                > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef> prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
+                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < entities.Length; i++)
                 {
+                    // Building must be in selected district.
+                    if (!BuildingInSelectedDistrict(districts[i].m_District))
+                    {
+                        continue;
+                    }
+
                     // Get entity and prefab.
                     Entity entity = entities[i];
                     Entity prefab = prefabRefs[i].m_Prefab;

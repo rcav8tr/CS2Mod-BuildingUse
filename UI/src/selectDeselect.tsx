@@ -6,7 +6,7 @@ import { ModuleResolver             } from "moduleResolver";
 import   styles                       from "selectDeselect.module.scss";
 import { UITranslationKey           } from "uiTranslationKey";
 
-// Custom infmode item for select all and deselect all button.
+// Custom infomode item for select all and deselect all buttons.
 export const SelectDeselect = () =>
 {
     // Translations.

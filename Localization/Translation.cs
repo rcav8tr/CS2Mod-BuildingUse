@@ -1,4 +1,6 @@
 ﻿using Colossal;
+using Colossal.Localization;
+using Game.SceneFlow;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -138,15 +140,18 @@ namespace BuildingUse
                     return;
                 }
 
-                // Read the lines from the translation CSV file.
-                string[] lines;
+                // Read the text from the translation CSV file.
+                string fileText;
                 using (Stream fileStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(translationFile))
                 {
                     using (StreamReader fileReader = new StreamReader(fileStream, Encoding.UTF8))
                     {
-                        lines = fileReader.ReadToEnd().Split(new string[] { "\n", "\r\n" }, StringSplitOptions.None);
+                        fileText = fileReader.ReadToEnd();
                     }
                 }
+
+                // Split the text into lines.
+                string[] lines = fileText.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.None);
 
                 // First line cannot be blank or a comment.
                 string firstLine = lines[0];
@@ -172,11 +177,26 @@ namespace BuildingUse
                 {
                     translationKeyCount.Add(translationKey, 0);
                 }
+                
+                // Check if file text has any $$ references to game translations.
+                Dictionary<string, LocalizationDictionary> gameTranslations = new Dictionary<string, LocalizationDictionary>();
+                LocalizationManager localizationManager = GameManager.instance.localizationManager;
+                if (fileText.Contains("$$"))
+                {
+                    // Get game translations once here instead of every time a $$ reference is encountered.
+                    string currentLocaleID = localizationManager.activeLocaleId;
+                    foreach (string gameLocaleID in localizationManager.GetSupportedLocales())
+                    {
+                        localizationManager.SetActiveLocale(gameLocaleID);
+                        gameTranslations[gameLocaleID] = localizationManager.activeDictionary;
+                    }
+                    localizationManager.SetActiveLocale(currentLocaleID);
+                }
 
                 // Process each subsequent line.
                 for (int i = 1; i < lines.Length; i++)
                 {
-                    ProcessTranslationLine(lines[i], languages, temporaryTranslations, translationKeys, translationKeyCount);
+                    ProcessTranslationLine(lines[i], languages, temporaryTranslations, gameTranslations, translationKeys, translationKeyCount);
                 }
 
                 // Each translation key must be defined.
@@ -192,7 +212,7 @@ namespace BuildingUse
                 // All the translations were read into the languages variable just for this right here.
                 foreach (string languageCode in languages.Keys)
                 {
-                    Game.SceneFlow.GameManager.instance.localizationManager.AddSource(languageCode, new LocalizationSource(languages[languageCode]));
+                    localizationManager.AddSource(languageCode, new LocalizationSource(languages[languageCode]));
                 }
             }
             catch(Exception ex)
@@ -267,6 +287,7 @@ namespace BuildingUse
             string line,
             Languages languages,
             Languages temporaryTranslations,
+            Dictionary<string, LocalizationDictionary> gameTranslations,
             string[] translationKeys,
             Dictionary<string, int> translationKeyCount
         )
@@ -319,10 +340,6 @@ namespace BuildingUse
                     }
                 }
 
-                // Save active locale ID.
-                Colossal.Localization.LocalizationManager localizationManager = Game.SceneFlow.GameManager.instance.localizationManager;
-                string savedLocaleID = localizationManager.activeLocaleId;
-
                 // Do each language code.
                 foreach (string languageCode in languages.Keys)
                 {
@@ -364,15 +381,22 @@ namespace BuildingUse
                         string gameTranslationKey = translatedText.Substring(2);
 
                         // Get the game's translation for the key.
-                        localizationManager.SetActiveLocale(languageCode);
-                        if (localizationManager.activeDictionary.TryGetValue(gameTranslationKey, out string gameTranslatedText))
+                        if (gameTranslations.ContainsKey(languageCode))
                         {
-                            // Use the game translated text.
-                            translatedText = gameTranslatedText;
+                            if (gameTranslations[languageCode].TryGetValue(gameTranslationKey, out string gameTranslatedText))
+                            {
+                                // Use the game translated text.
+                                translatedText = gameTranslatedText;
+                            }
+                            else
+                            {
+                                LogUtil.Warn($"Game translation key [{gameTranslationKey}] does not exist for language [{languageCode}].");
+                                // Leave the invalid $$ reference in the translated text.
+                            }
                         }
                         else
                         {
-                            LogUtil.Warn($"Game translation key [{gameTranslationKey}] does not exist for language [{languageCode}].");
+                            LogUtil.Warn($"Game does not contain translations for language [{languageCode}] for translation key [{gameTranslationKey}].");
                             // Leave the invalid $$ reference in the translated text.
                         }
                     }
@@ -433,12 +457,6 @@ namespace BuildingUse
                             languages[languageCode][translationKey] = translatedText;
                         }
                     }
-                }
-
-                // Restore saved locale ID.
-                if (localizationManager.activeLocaleId != savedLocaleID)
-                {
-                    localizationManager.SetActiveLocale(savedLocaleID);
                 }
             }
         }
@@ -505,6 +523,39 @@ namespace BuildingUse
 
             // Return the formatted value.
             return formatted;
+        }
+
+        /// <summary>
+        /// Get the translation of the key using the current active language code.
+        /// </summary>
+        public static string Get(string translationKey)
+        {
+            return Get(translationKey, GameManager.instance.localizationManager.activeLocaleId);
+        }
+
+        /// <summary>
+        /// Get the translation of the key using the specified language code.
+        /// </summary>
+        public static string Get(string translationKey, string languageCode)
+        {
+            // If language code is not supported, then use default language code.
+            // This can happen if a language in the base game is not defined in the translation file.
+            // This can happen if a mod adds a language to the game and that language is not defined in the translation file.
+            LocalizationManager localizationManager = GameManager.instance.localizationManager;
+            if (!localizationManager.SupportsLocale(languageCode))
+            {
+                languageCode = DefaultLanguageCode;
+            }
+
+            // Get the translated text for the translation key.
+            if (localizationManager.activeDictionary.TryGetValue(translationKey, out string translatedText))
+            {
+                return translatedText;
+            }
+
+            // Translation key not found.
+            // Return the translation key as the translated text.
+            return translationKey;
         }
     }
 }
