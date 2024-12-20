@@ -180,7 +180,8 @@ namespace BuildingUse
                             if (TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupGarbageFacilityData, out Game.Prefabs.GarbageFacilityData garbageFacilityData))
                             {
                                 capacity = garbageFacilityData.m_VehicleCapacity;
-                                if (CountVehiclesInUse) { used = GetOwnedVehicleCountOneType(entity, ref ComponentLookupGarbageTruck); }
+                                if (CountVehiclesInUse) { used = GetOwnedVehicleCountOneType(entity, ref ComponentLookupGarbageTruck) +
+                                                                 GetOwnedVehicleCountOneType(entity, ref ComponentLookupDeliveryTruck); }
                             }
                             break;
                         
@@ -240,36 +241,43 @@ namespace BuildingUse
                             }
                             break;
 
-                        case BUBuildingStatusType.VehiclesTaxi:
-                            // Taxi depots have TransportDepotData to get capacity.
-                            // But taxi vehicles do not have PublicTransportVehicleData to check transport type like bus, train, tram, subway below.
-                            // Instead use taxi component to get used count.
-                            if (TryGetTransportDepotDataWithUpgrades(entity, prefab, Game.Prefabs.TransportType.Taxi, out Game.Prefabs.TransportDepotData transportDepotData1))
+                        case BUBuildingStatusType.VehiclesBus:
+                            if (TryGetTransportDepotDataWithUpgrades(entity, prefab, Game.Prefabs.TransportType.Bus, out Game.Prefabs.TransportDepotData transportDepotData1))
                             {
                                 capacity = transportDepotData1.m_VehicleCapacity;
-                                if (CountVehiclesInUse) { used = GetOwnedVehicleCountOneType(entity, ref ComponentLookupTaxi); }
+                                if (CountVehiclesInUse) { used = GetOwnedVehicleCountAll(entity); }
                             }
                             break;
 
-                        case BUBuildingStatusType.VehiclesBus:
-                        case BUBuildingStatusType.VehiclesTrain:
-                        case BUBuildingStatusType.VehiclesTram:
-                        case BUBuildingStatusType.VehiclesSubway:
-                            // Get transport type.
-                            Game.Prefabs.TransportType transportType = Game.Prefabs.TransportType.None;
-                            switch(buildingStatusType)
-                            {
-                                case BUBuildingStatusType.VehiclesBus:      transportType = Game.Prefabs.TransportType.Bus;      break;
-                                case BUBuildingStatusType.VehiclesTrain:    transportType = Game.Prefabs.TransportType.Train;    break;
-                                case BUBuildingStatusType.VehiclesTram:     transportType = Game.Prefabs.TransportType.Tram;     break;
-                                case BUBuildingStatusType.VehiclesSubway:   transportType = Game.Prefabs.TransportType.Subway;   break;
-                            }
-
-                            // Get used and capacity based on transport type.
-                            if (TryGetTransportDepotDataWithUpgrades(entity, prefab, transportType, out Game.Prefabs.TransportDepotData transportDepotData2))
+                        case BUBuildingStatusType.VehiclesTaxi:
+                            if (TryGetTransportDepotDataWithUpgrades(entity, prefab, Game.Prefabs.TransportType.Taxi, out Game.Prefabs.TransportDepotData transportDepotData2))
                             {
                                 capacity = transportDepotData2.m_VehicleCapacity;
-                                if (CountVehiclesInUse) { used = GetOwnedVehicleCountTransportType(entity, transportType); }
+                                if (CountVehiclesInUse) { used = GetOwnedVehicleCountAll(entity); }
+                            }
+                            break;
+
+                        case BUBuildingStatusType.VehiclesTrain:
+                            if (TryGetTransportDepotDataWithUpgrades(entity, prefab, Game.Prefabs.TransportType.Train, out Game.Prefabs.TransportDepotData transportDepotData3))
+                            {
+                                capacity = transportDepotData3.m_VehicleCapacity;
+                                if (CountVehiclesInUse) { used = GetOwnedVehicleCountAll(entity); }
+                            }
+                            break;
+
+                        case BUBuildingStatusType.VehiclesTram:
+                            if (TryGetTransportDepotDataWithUpgrades(entity, prefab, Game.Prefabs.TransportType.Tram, out Game.Prefabs.TransportDepotData transportDepotData4))
+                            {
+                                capacity = transportDepotData4.m_VehicleCapacity;
+                                if (CountVehiclesInUse) { used = GetOwnedVehicleCountAll(entity); }
+                            }
+                            break;
+
+                        case BUBuildingStatusType.VehiclesSubway:
+                            if (TryGetTransportDepotDataWithUpgrades(entity, prefab, Game.Prefabs.TransportType.Subway, out Game.Prefabs.TransportDepotData transportDepotData5))
+                            {
+                                capacity = transportDepotData5.m_VehicleCapacity;
+                                if (CountVehiclesInUse) { used = GetOwnedVehicleCountAll(entity); }
                             }
                             break;
 
@@ -318,7 +326,7 @@ namespace BuildingUse
                             buildingStatusType == BUBuildingStatusType.VehiclesIndustrialTruck ||
                             buildingStatusType == BUBuildingStatusType.VehiclesOfficeTruck)
                         {
-                            UpdateEntityColor(0, 0, infomodeActive, infomodeIndex, colors, i);
+                            UpdateEntityColor(0L, 0L, infomodeActive, infomodeIndex, colors, i);
                         }
                     }
                 }
@@ -342,11 +350,15 @@ namespace BuildingUse
                         int count = 0;
                         foreach (Game.Vehicles.OwnedVehicle ownedVehicle in dynamicBuffer)
                         {
-                            // Check if owned vehicle is the vehicle type.
+                            // Owned vehicle must not be parked.
                             Entity vehicle = ownedVehicle.m_Vehicle;
-                            if (vehicleType.HasComponent(vehicle))
+                            if (!ComponentLookupParkedCar.HasComponent(vehicle))
                             {
-                                count++;
+                                // Check if owned vehicle is the vehicle type.
+                                if (vehicleType.HasComponent(vehicle))
+                                {
+                                    count++;
+                                }
                             }
                         }
 
@@ -374,11 +386,15 @@ namespace BuildingUse
                         int count = 0;
                         foreach (Game.Vehicles.OwnedVehicle ownedVehicle in dynamicBuffer)
                         {
-                            // Check if owned vehicle is both vehicle types.
+                            // Owned vehicle must not be parked.
                             Entity vehicle = ownedVehicle.m_Vehicle;
-                            if (vehicleType1.HasComponent(vehicle) && vehicleType2.HasComponent(vehicle))
+                            if (!ComponentLookupParkedCar.HasComponent(vehicle))
                             {
-                                count++;
+                                // Check if owned vehicle is both vehicle types.
+                                if (vehicleType1.HasComponent(vehicle) && vehicleType2.HasComponent(vehicle))
+                                {
+                                    count++;
+                                }
                             }
                         }
 
@@ -406,11 +422,15 @@ namespace BuildingUse
                         int count = 0;
                         foreach (Game.Vehicles.OwnedVehicle ownedVehicle in dynamicBuffer)
                         {
-                            // Check if owned vehicle is vehicle type and not vehicle type.
+                            // Owned vehicle must not be parked.
                             Entity vehicle = ownedVehicle.m_Vehicle;
-                            if (vehicleType.HasComponent(vehicle) && !notVehicleType.HasComponent(vehicle))
+                            if (!ComponentLookupParkedCar.HasComponent(vehicle))
                             {
-                                count++;
+                                // Check if owned vehicle is vehicle type and not vehicle type.
+                                if (vehicleType.HasComponent(vehicle) && !notVehicleType.HasComponent(vehicle))
+                                {
+                                    count++;
+                                }
                             }
                         }
 
@@ -438,39 +458,43 @@ namespace BuildingUse
                         int count = 0;
                         foreach (Game.Vehicles.OwnedVehicle ownedVehicle in dynamicBuffer)
                         {
-                            // Fire engine type to check for.
+                            // Owned vehicle must not be parked.
                             Entity vehicle = ownedVehicle.m_Vehicle;
-                            switch (fireEngineType)
+                            if (!ComponentLookupParkedCar.HasComponent(vehicle))
                             {
-                                case FireEngineType.FireEngine:
-                                    // Fire engine has owned vehicle is fire engine, and is not disaster response, and is not helicopter.
-                                    if (ComponentLookupFireEngine.TryGetComponent(vehicle, out Game.Vehicles.FireEngine fireEngine1) &&
-                                        (fireEngine1.m_State & Game.Vehicles.FireEngineFlags.DisasterResponse) == 0 &&
-                                        !ComponentLookupHelicopter.HasComponent(vehicle))
-                                    {
-                                        count++;
-                                    }
-                                    break;
+                                // Fire engine type to check for.
+                                switch (fireEngineType)
+                                {
+                                    case FireEngineType.FireEngine:
+                                        // Fire engine has owned vehicle is fire engine, and is not disaster response, and is not helicopter.
+                                        if (ComponentLookupFireEngine.TryGetComponent(vehicle, out Game.Vehicles.FireEngine fireEngine1) &&
+                                            (fireEngine1.m_State & Game.Vehicles.FireEngineFlags.DisasterResponse) == 0 &&
+                                            !ComponentLookupHelicopter.HasComponent(vehicle))
+                                        {
+                                            count++;
+                                        }
+                                        break;
 
-                                case FireEngineType.FireHelicopter:
-                                    // Fire helicopter has owned vehicle is fire engine, and is not disaster response, and is helicopter.
-                                    if (ComponentLookupFireEngine.TryGetComponent(vehicle, out Game.Vehicles.FireEngine fireEngine2) &&
-                                        (fireEngine2.m_State & Game.Vehicles.FireEngineFlags.DisasterResponse) == 0 &&
-                                        ComponentLookupHelicopter.HasComponent(vehicle))
-                                    {
-                                        count++;
-                                    }
-                                    break;
+                                    case FireEngineType.FireHelicopter:
+                                        // Fire helicopter has owned vehicle is fire engine, and is not disaster response, and is helicopter.
+                                        if (ComponentLookupFireEngine.TryGetComponent(vehicle, out Game.Vehicles.FireEngine fireEngine2) &&
+                                            (fireEngine2.m_State & Game.Vehicles.FireEngineFlags.DisasterResponse) == 0 &&
+                                            ComponentLookupHelicopter.HasComponent(vehicle))
+                                        {
+                                            count++;
+                                        }
+                                        break;
 
-                                case FireEngineType.DisasterResponse:
-                                    // Disaster response vehicle has owned vehicle is fire engine, and is disaster response, and is not helicopter.
-                                    if (ComponentLookupFireEngine.TryGetComponent(vehicle, out Game.Vehicles.FireEngine fireEngine3) &&
-                                        (fireEngine3.m_State & Game.Vehicles.FireEngineFlags.DisasterResponse) != 0 &&
-                                        !ComponentLookupHelicopter.HasComponent(vehicle))
-                                    {
-                                        count++;
-                                    }
-                                    break;
+                                    case FireEngineType.DisasterResponse:
+                                        // Disaster response vehicle has owned vehicle is fire engine, and is disaster response, and is not helicopter.
+                                        if (ComponentLookupFireEngine.TryGetComponent(vehicle, out Game.Vehicles.FireEngine fireEngine3) &&
+                                            (fireEngine3.m_State & Game.Vehicles.FireEngineFlags.DisasterResponse) != 0 &&
+                                            !ComponentLookupHelicopter.HasComponent(vehicle))
+                                        {
+                                            count++;
+                                        }
+                                        break;
+                                }
                             }
                         }
 
@@ -484,9 +508,9 @@ namespace BuildingUse
             }
 
             /// <summary>
-            /// Get count of owned vehicles that have a transport type.
+            /// Get count of owned vehicles.
             /// </summary>
-            private int GetOwnedVehicleCountTransportType(Entity entity, Game.Prefabs.TransportType transportType)
+            private int GetOwnedVehicleCountAll(Entity entity)
             {
                 // Check if entity has owned vehicle buffer.
                 if (BufferLookupOwnedVehicle.TryGetBuffer(entity, out DynamicBuffer<Game.Vehicles.OwnedVehicle> dynamicBuffer))
@@ -498,18 +522,11 @@ namespace BuildingUse
                         int count = 0;
                         foreach (Game.Vehicles.OwnedVehicle ownedVehicle in dynamicBuffer)
                         {
-                            // Get owned vehicle's prefabref.
-                            if (ComponentLookupPrefabRef.TryGetComponent(ownedVehicle.m_Vehicle, out Game.Prefabs.PrefabRef ownedVehiclePrefabRef))
+                            // Owned vehicle must not be parked.
+                            Entity vehicle = ownedVehicle.m_Vehicle;
+                            if (!ComponentLookupParkedCar.HasComponent(vehicle) && !ComponentLookupParkedTrain.HasComponent(vehicle))
                             {
-                                // Get public transport vehicle data from owned vehicle's prefab.
-                                if (ComponentLookupPublicTransportVehicleData.TryGetComponent(ownedVehiclePrefabRef.m_Prefab, out Game.Prefabs.PublicTransportVehicleData publicTransportVehicleData))
-                                {
-                                    // Check if transport type matches.
-                                    if (publicTransportVehicleData.m_TransportType == transportType)
-                                    {
-                                        count++;
-                                    }
-                                }
+                                count++;
                             }
                         }
 

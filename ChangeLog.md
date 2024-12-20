@@ -1,2 +1,1 @@
-﻿- Add district selector.
-- Fix formatting of description.
+﻿- Fix count of used vehicles.

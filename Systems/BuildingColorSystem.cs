@@ -106,6 +106,7 @@ namespace BuildingUse
             [ReadOnly] public ComponentLookup<Game.Prefabs.         MaintenanceDepotData        > ComponentLookupMaintenanceDepotData;
             [ReadOnly] public ComponentLookup<Game.Vehicles.        MaintenanceVehicle          > ComponentLookupMaintenanceVehicle;
             [ReadOnly] public ComponentLookup<Game.Vehicles.        ParkedCar                   > ComponentLookupParkedCar;
+            [ReadOnly] public ComponentLookup<Game.Vehicles.        ParkedTrain                 > ComponentLookupParkedTrain;
             [ReadOnly] public ComponentLookup<Game.Net.             ParkingLane                 > ComponentLookupParkingLane;
             [ReadOnly] public ComponentLookup<Game.Prefabs.         ParkingLaneData             > ComponentLookupParkingLaneData;
             [ReadOnly] public ComponentLookup<Game.Vehicles.        PoliceCar                   > ComponentLookupPoliceCar;
@@ -679,6 +680,7 @@ namespace BuildingUse
         private ComponentLookup<Game.Vehicles.      MaintenanceVehicle          > _componentLookupMaintenanceVehicle;
         private ComponentLookup<Game.Common.        Owner                       > _componentLookupOwner;
         private ComponentLookup<Game.Vehicles.      ParkedCar                   > _componentLookupParkedCar;
+        private ComponentLookup<Game.Vehicles.      ParkedTrain                 > _componentLookupParkedTrain;
         private ComponentLookup<Game.Net.           ParkingLane                 > _componentLookupParkingLane;
         private ComponentLookup<Game.Prefabs.       ParkingLaneData             > _componentLookupParkingLaneData;
         private ComponentLookup<Game.Vehicles.      PoliceCar                   > _componentLookupPoliceCar;
@@ -815,6 +817,7 @@ namespace BuildingUse
             _componentLookupMaintenanceVehicle              = CheckedStateRef.GetComponentLookup<Game.Vehicles.         MaintenanceVehicle          >(true);
             _componentLookupOwner                           = CheckedStateRef.GetComponentLookup<Game.Common.           Owner                       >(true);
             _componentLookupParkedCar                       = CheckedStateRef.GetComponentLookup<Game.Vehicles.         ParkedCar                   >(true);
+            _componentLookupParkedTrain                     = CheckedStateRef.GetComponentLookup<Game.Vehicles.         ParkedTrain                 >(true);
             _componentLookupParkingLane                     = CheckedStateRef.GetComponentLookup<Game.Net.              ParkingLane                 >(true);
             _componentLookupParkingLaneData                 = CheckedStateRef.GetComponentLookup<Game.Prefabs.          ParkingLaneData             >(true);
             _componentLookupPoliceCar                       = CheckedStateRef.GetComponentLookup<Game.Vehicles.         PoliceCar                   >(true);
@@ -1191,6 +1194,7 @@ namespace BuildingUse
             _componentLookupMaintenanceDepotData            .Update(ref CheckedStateRef);
             _componentLookupMaintenanceVehicle              .Update(ref CheckedStateRef);
             _componentLookupParkedCar                       .Update(ref CheckedStateRef);
+            _componentLookupParkedTrain                     .Update(ref CheckedStateRef);
             _componentLookupParkingLane                     .Update(ref CheckedStateRef);
             _componentLookupParkingLaneData                 .Update(ref CheckedStateRef);
             _componentLookupPoliceCar                       .Update(ref CheckedStateRef);
@@ -1299,6 +1303,7 @@ namespace BuildingUse
                 ComponentLookupMaintenanceDepotData             = _componentLookupMaintenanceDepotData,
                 ComponentLookupMaintenanceVehicle               = _componentLookupMaintenanceVehicle,
                 ComponentLookupParkedCar                        = _componentLookupParkedCar,
+                ComponentLookupParkedTrain                      = _componentLookupParkedTrain,
                 ComponentLookupParkingLane                      = _componentLookupParkingLane,
                 ComponentLookupParkingLaneData                  = _componentLookupParkingLaneData,
                 ComponentLookupPoliceCar                        = _componentLookupPoliceCar,
