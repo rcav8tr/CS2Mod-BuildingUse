@@ -96,6 +96,7 @@ namespace BuildingUse
         EfficiencyDistrict,
         EfficiencySelectDeselect,
         EfficiencyMaxColor,
+        EfficiencyResidential,
         EfficiencyCommercial,
         EfficiencyIndustrial,
         EfficiencyOffice,

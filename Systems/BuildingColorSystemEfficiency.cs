@@ -21,6 +21,8 @@ namespace BuildingUse
             private void GetApplicableBuildingStatusTypesEfficiency(ArchetypeChunk buildingChunk, ref NativeList<BUBuildingStatusType> applicableBuildingStatusTypes)
             {
                 // Add all building status types that apply to this building chunk.
+                if (buildingChunk.Has(ref ComponentTypeHandleResidentialProperty))
+                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyResidential);
                 if (buildingChunk.Has(ref ComponentTypeHandleCommercialProperty))
                     applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyCommercial);
                 if (buildingChunk.Has(ref ComponentTypeHandleIndustrialProperty) && !buildingChunk.Has(ref ComponentTypeHandleOfficeProperty))
@@ -95,103 +97,152 @@ namespace BuildingUse
                         continue;
                     }
 
-                    // Logic adapted from Game.UI.InGame.EfficiencySection.OnProcess().
-
                     // Get entity and prefab.
                     Entity entity = entities[i];
                     Entity prefab = prefabRefs[i].m_Prefab;
 
-                    // Building must have an Efficiency buffer.
-                    if (BufferLookupEfficiency.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Efficiency> bufferEfficiency) &&
-                        bufferEfficiency.IsCreated)
+                    // Special handling for residential happiness.
+                    if (buildingStatusType == BUBuildingStatusType.EfficiencyResidential)
                     {
-                        // Building has an Efficiency buffer.
+                        // Logic adapted from Game.UI.InGame.AverageHappinessSection.CountHappinessJob.TryAddPropertyHappiness().
 
-                        // Zoned buildings must have a renter because zoned buildings can still have efficiency buffer entries without a renter.
-                        // Guessing these efficiency buffer entries are left over from when the building previously had a renter.
-                        bool hasRenter;
-                        if (buildingStatusType == BUBuildingStatusType.EfficiencyCommercial ||
-                            buildingStatusType == BUBuildingStatusType.EfficiencyIndustrial ||
-                            buildingStatusType == BUBuildingStatusType.EfficiencyOffice)
-                        {
-                            // Assume no renters.
-                            hasRenter = false;
-
-                            // Get renters.
-                            if (BufferLookupRenter.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Renter> renters) && renters.Length > 0)
-                            {
-                                // Check each renter for company data.
-                                // Mixed use buildings (e.g. residential and commercial) can have residential renters without a company renter.
-                                for (int j = 0; j < renters.Length; j++)
+                        // Get renters (households) in the building, if any.
+                        int totalHappiness = 0;
+                        int citizenCount = 0;
+		                if (BufferLookupRenter.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Renter> renters))
+		                {
+                            // Do each renter (household).
+			                for (int j = 0; j < renters.Length; j++)
+			                {
+                                // Get citizens in the renter (household), if any.
+                                if (BufferLookupHouseholdCitizen.TryGetBuffer(renters[j].m_Renter, out DynamicBuffer<Game.Citizens.HouseholdCitizen> householdCitizens))
                                 {
-                                    if (ComponentLookupCompanyData.HasComponent(renters[j].m_Renter))
+                                    // Do each citizen.
+                                    for (int k = 0; k < householdCitizens.Length; k++)
                                     {
-                                        hasRenter = true;
-                                        break;
+                                        // Citizen component must exist on the citizen and citizen must not be dead.
+					                    Entity citizen = householdCitizens[k].m_Citizen;
+					                    if (ComponentLookupCitizen.HasComponent(citizen) && !Game.Citizens.CitizenUtils.IsDead(citizen, ref ComponentLookupHealthProblem))
+					                    {
+						                    totalHappiness += ComponentLookupCitizen[citizen].Happiness;
+						                    citizenCount++;
+					                    }
                                     }
                                 }
-                            }
-                        }
-                        else
+			                }
+		                }
+
+                        // Compute happiness percent.
+                        int happinessPercent = 0;
+                        if (citizenCount > 0)
                         {
-                            // Other than zoned buildings are considered to always have a renter.
-                            hasRenter = true;
+                            // Compute average happiness of citizens in this building.
+                            // Citizen happiness neutral is 50.
+                            // Convert citizen happiness to percent where 100% is neutral.
+                            happinessPercent = (int)math.round(2f * totalHappiness / citizenCount);
                         }
 
-                        // Check if building is not zoned or zoned building has a renter.
-                        if (hasRenter)
-                        {
-                            // Start with 100% as the default efficiency.
-                            float tempEfficiency = 1f;
-
-                            // Do each entry in the buffer.
-                            // Note that a building with no efficiency entries will have the default efficiency of 100%, like in the game.
-                            foreach (Game.Buildings.Efficiency item in bufferEfficiency)
-                            {
-                                // Exclude negative efficiencies.
-                                // Note that the efficiency entry for Disabled has an efficiency value of zero.
-                                // So disabled buildings will still be included, but will have 0% efficiency, like in the game.
-                                if (item.m_Efficiency >= 0f)
-                                {
-                                    // Efficiency is multiplicative.
-                                    tempEfficiency *= item.m_Efficiency;
-                                }
-                            }
-
-                            // Convert efficiency to percent.
-              		        int efficiency = (int)math.round(100f * tempEfficiency);
-
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(efficiency, (EfficiencyMaxColor200Percent ? 200L : 100L), infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += efficiency;
-                            totalCapacity += 100L;   // Capacity is always 100%, even if color is based on 200%.
-                        }
-                        else
-                        {
-                            // Zoned buildings with no renter are dislayed as 0%.
-                            UpdateEntityColor(0L, 0L, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += 0L;
-                            totalCapacity += 100L;  // Count the building.
-                        }
+                        // Update entity color and accumulate totals.
+                        UpdateEntityColor(happinessPercent, (EfficiencyMaxColor200Percent ? 200L : 100L), infomodeActive, infomodeIndex, colors, i);
+                        totalUsed     += happinessPercent;
+                        totalCapacity += 100L;   // Capacity is always 100%, even if color is based on 200%.
                     }
                     else
                     {
-                        // Building has no Efficiency buffer.
+                        // Logic adapted from Game.UI.InGame.EfficiencySection.OnProcess().
 
-                        // Check for zoned building
-                        if (buildingStatusType == BUBuildingStatusType.EfficiencyCommercial ||
-                            buildingStatusType == BUBuildingStatusType.EfficiencyIndustrial ||
-                            buildingStatusType == BUBuildingStatusType.EfficiencyOffice)
+                        // Building must have an Efficiency buffer.
+                        if (BufferLookupEfficiency.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Efficiency> bufferEfficiency) &&
+                            bufferEfficiency.IsCreated)
                         {
-                            // Update entity color and accumulate totals for 0%.
-                            UpdateEntityColor(0L, (EfficiencyMaxColor200Percent ? 200L : 100L), infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += 0L;
-                            totalCapacity += 100L;   // Capacity is always 100%, even if color is based on 200%.
+                            // Building has an Efficiency buffer.
+
+                            // Zoned buildings must have a renter because zoned buildings can still have efficiency buffer entries without a renter.
+                            // Guessing these efficiency buffer entries are left over from when the building previously had a renter.
+                            bool hasRenter;
+                            if (buildingStatusType == BUBuildingStatusType.EfficiencyCommercial ||
+                                buildingStatusType == BUBuildingStatusType.EfficiencyIndustrial ||
+                                buildingStatusType == BUBuildingStatusType.EfficiencyOffice)
+                            {
+                                // Assume no renters.
+                                hasRenter = false;
+
+                                // Get renters.
+                                if (BufferLookupRenter.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Renter> renters) && renters.Length > 0)
+                                {
+                                    // Check each renter for company data.
+                                    // Mixed use buildings (e.g. residential and commercial) can have residential renters without a company renter.
+                                    for (int j = 0; j < renters.Length; j++)
+                                    {
+                                        if (ComponentLookupCompanyData.HasComponent(renters[j].m_Renter))
+                                        {
+                                            hasRenter = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Other than zoned buildings are considered to always have a renter.
+                                hasRenter = true;
+                            }
+
+                            // Check if building is not zoned or zoned building has a renter.
+                            if (hasRenter)
+                            {
+                                // Start with 100% as the default efficiency.
+                                float tempEfficiency = 1f;
+
+                                // Do each entry in the buffer.
+                                // Note that a building with no efficiency entries will have the default efficiency of 100%, like in the game.
+                                foreach (Game.Buildings.Efficiency item in bufferEfficiency)
+                                {
+                                    // Exclude negative efficiencies.
+                                    // Note that the efficiency entry for Disabled has an efficiency value of zero.
+                                    // So disabled buildings will still be included, but will have 0% efficiency, like in the game.
+                                    if (item.m_Efficiency >= 0f)
+                                    {
+                                        // Efficiency is multiplicative.
+                                        tempEfficiency *= item.m_Efficiency;
+                                    }
+                                }
+
+                                // Convert efficiency to percent.
+              		            int efficiency = (int)math.round(100f * tempEfficiency);
+
+                                // Update entity color and accumulate totals.
+                                UpdateEntityColor(efficiency, (EfficiencyMaxColor200Percent ? 200L : 100L), infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += efficiency;
+                                totalCapacity += 100L;   // Capacity is always 100%, even if color is based on 200%.
+                            }
+                            else
+                            {
+                                // Zoned buildings with no renter are dislayed as 0%.
+                                UpdateEntityColor(0L, 0L, infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += 0L;
+                                totalCapacity += 100L;  // Count the building.
+                            }
                         }
                         else
                         {
-                            // Not a zoned building.
-                            // Leave default color.
+                            // Building has no Efficiency buffer.
+
+                            // Check for zoned building
+                            if (buildingStatusType == BUBuildingStatusType.EfficiencyCommercial ||
+                                buildingStatusType == BUBuildingStatusType.EfficiencyIndustrial ||
+                                buildingStatusType == BUBuildingStatusType.EfficiencyOffice)
+                            {
+                                // Update entity color and accumulate totals for 0%.
+                                UpdateEntityColor(0L, (EfficiencyMaxColor200Percent ? 200L : 100L), infomodeActive, infomodeIndex, colors, i);
+                                totalUsed     += 0L;
+                                totalCapacity += 100L;   // Capacity is always 100%, even if color is based on 200%.
+                            }
+                            else
+                            {
+                                // Not a zoned building.
+                                // Leave default color.
+                            }
                         }
                     }
                 }

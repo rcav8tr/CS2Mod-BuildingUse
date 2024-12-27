@@ -88,6 +88,7 @@ namespace BuildingUse
         public const string InfomodeTitleVehiclesParkMaintenance               = "Infoviews.INFOMODE[BuildingUseVehiclesParkMaintenance]";
         public const string InfomodeTitleVehiclesPost                          = "Infoviews.INFOMODE[BuildingUseVehiclesPost]";
         public const string InfomodeTitleVehiclesCargoStationTruck             = "Infoviews.INFOMODE[BuildingUseVehiclesCargoStationTruck]";
+        public const string InfomodeTitleEfficiencyResidential                 = "Infoviews.INFOMODE[BuildingUseEfficiencyResidential]";
         public const string InfomodeTitleEfficiencyCommercial                  = "Infoviews.INFOMODE[BuildingUseEfficiencyCommercial]";
         public const string InfomodeTitleEfficiencyIndustrial                  = "Infoviews.INFOMODE[BuildingUseEfficiencyIndustrial]";
         public const string InfomodeTitleEfficiencyOffice                      = "Infoviews.INFOMODE[BuildingUseEfficiencyOffice]";
@@ -186,6 +187,7 @@ namespace BuildingUse
         public const string InfomodeTooltipVehiclesParkMaintenance             = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesParkMaintenance]";
         public const string InfomodeTooltipVehiclesPost                        = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesPost]";
         public const string InfomodeTooltipVehiclesCargoStationTruck           = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesCargoStationTruck]";
+        public const string InfomodeTooltipEfficiencyResidential               = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyResidential]";
         public const string InfomodeTooltipEfficiencyCommercial                = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyCommercial]";
         public const string InfomodeTooltipEfficiencyIndustrial                = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyIndustrial]";
         public const string InfomodeTooltipEfficiencyOffice                    = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyOffice]";

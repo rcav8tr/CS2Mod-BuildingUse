@@ -1,1 +1,1 @@
-﻿- Fix count of used vehicles.
+﻿- Add residential happiness to efficiency info view.

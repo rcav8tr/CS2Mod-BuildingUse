@@ -144,6 +144,8 @@ export const uiBindings: any =
     VehiclesPostCapacity                     : bindValue<number>(mod.id, "VehiclesPostCapacity",                          0),
     VehiclesCargoStationTruckUsed            : bindValue<number>(mod.id, "VehiclesCargoStationTruckUsed",                 0),
     VehiclesCargoStationTruckCapacity        : bindValue<number>(mod.id, "VehiclesCargoStationTruckCapacity",             0),
+    EfficiencyResidentialUsed                : bindValue<number>(mod.id, "EfficiencyResidentialUsed",                     0),
+    EfficiencyResidentialCapacity            : bindValue<number>(mod.id, "EfficiencyResidentialCapacity",                 0),
     EfficiencyCommercialUsed                 : bindValue<number>(mod.id, "EfficiencyCommercialUsed",                      0),
     EfficiencyCommercialCapacity             : bindValue<number>(mod.id, "EfficiencyCommercialCapacity",                  0),
     EfficiencyIndustrialUsed                 : bindValue<number>(mod.id, "EfficiencyIndustrialUsed",                      0),

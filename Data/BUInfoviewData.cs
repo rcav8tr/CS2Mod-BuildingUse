@@ -131,6 +131,7 @@ namespace BuildingUse
                     // The four zone colors are always the same regardless of the setting.
                     // The colors are manually taken from the corresponding zone icons.
                     case BUBuildingStatusType.EmployeesResidential:
+                    case BUBuildingStatusType.EfficiencyResidential:
                         if (Mod.ModSettings.ZonedBuildingColor == ModSettings.ZonedBuildingColorChoice.ThreeColors)
                         {
                             useThreeColors = true;

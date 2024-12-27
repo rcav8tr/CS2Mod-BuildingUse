@@ -95,6 +95,12 @@ All building types for residential, commercial, industrial, and office include b
 
 ### Efficiency Infoview
 - Building efficiency as a percent.
+- For residential buildings, instead of efficiency, building use is the average happiness of citizens in the building:
+  Up to 50% = Depressed;
+  50% - 80% = Sad;
+  80% - 110% = Neutral;
+  110% - 140% = Content;
+  140% or more = Happy
 - Building efficiency can be and often is greater than 100%.
   You can choose to have the building color set for a maximum of 100% or 200%.
   Your selections are saved and restored between infoviews and between games.
@@ -104,7 +110,7 @@ All building types for residential, commercial, industrial, and office include b
   Each building contributes 100% to the total capacity amount for the entire city.
   Therefore, the total efficiency for the entire city for each building type is a simple average over the buildings of that type.
   Small and large buildings contribute equally to the average.
-- Note that the total capacity divided by 100 is the count of buildings of that type.
+- Note that the total capacity divided by 100 is the number of buildings of that type.
 
 ### Processing Infoview
 - Production or processing speed as a percent of the production or processing speed capacity.

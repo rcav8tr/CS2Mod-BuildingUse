@@ -86,6 +86,7 @@ export class UITranslationKey
     public static InfomodeTitleVehiclesParkMaintenance              : string = "Infoviews.INFOMODE[BuildingUseVehiclesParkMaintenance]";
     public static InfomodeTitleVehiclesPost                         : string = "Infoviews.INFOMODE[BuildingUseVehiclesPost]";
     public static InfomodeTitleVehiclesCargoStationTruck            : string = "Infoviews.INFOMODE[BuildingUseVehiclesCargoStationTruck]";
+    public static InfomodeTitleEfficiencyResidential                : string = "Infoviews.INFOMODE[BuildingUseEfficiencyResidential]";
     public static InfomodeTitleEfficiencyCommercial                 : string = "Infoviews.INFOMODE[BuildingUseEfficiencyCommercial]";
     public static InfomodeTitleEfficiencyIndustrial                 : string = "Infoviews.INFOMODE[BuildingUseEfficiencyIndustrial]";
     public static InfomodeTitleEfficiencyOffice                     : string = "Infoviews.INFOMODE[BuildingUseEfficiencyOffice]";
@@ -184,6 +185,7 @@ export class UITranslationKey
     public static InfomodeTooltipVehiclesParkMaintenance            : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesParkMaintenance]";
     public static InfomodeTooltipVehiclesPost                       : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesPost]";
     public static InfomodeTooltipVehiclesCargoStationTruck          : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesCargoStationTruck]";
+    public static InfomodeTooltipEfficiencyResidential              : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyResidential]";
     public static InfomodeTooltipEfficiencyCommercial               : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyCommercial]";
     public static InfomodeTooltipEfficiencyIndustrial               : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyIndustrial]";
     public static InfomodeTooltipEfficiencyOffice                   : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyOffice]";

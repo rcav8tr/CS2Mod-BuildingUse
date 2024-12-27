@@ -87,6 +87,7 @@ namespace BuildingUse
             [ReadOnly] public ComponentLookup<Game.Prefabs.         BatteryData                 > ComponentLookupBatteryData;
             [ReadOnly] public ComponentLookup<Game.Prefabs.         BuildingData                > ComponentLookupBuildingData;
             [ReadOnly] public ComponentLookup<Game.Prefabs.         BuildingPropertyData        > ComponentLookupBuildingPropertyData;
+            [ReadOnly] public ComponentLookup<Game.Citizens.        Citizen                     > ComponentLookupCitizen;
             [ReadOnly] public ComponentLookup<Game.Companies.       CompanyData                 > ComponentLookupCompanyData;
             [ReadOnly] public ComponentLookup<Game.Net.             Curve                       > ComponentLookupCurve;
             [ReadOnly] public ComponentLookup<Game.Prefabs.         DeathcareFacilityData       > ComponentLookupDeathcareFacilityData;
@@ -99,6 +100,7 @@ namespace BuildingUse
             [ReadOnly] public ComponentLookup<Game.Prefabs.         GarbageFacilityData         > ComponentLookupGarbageFacilityData;
             [ReadOnly] public ComponentLookup<Game.Vehicles.        GarbageTruck                > ComponentLookupGarbageTruck;
             [ReadOnly] public ComponentLookup<Game.Areas.           Geometry                    > ComponentLookupGeometry;
+            [ReadOnly] public ComponentLookup<Game.Citizens.        HealthProblem               > ComponentLookupHealthProblem;
             [ReadOnly] public ComponentLookup<Game.Vehicles.        Hearse                      > ComponentLookupHearse;
             [ReadOnly] public ComponentLookup<Game.Vehicles.        Helicopter                  > ComponentLookupHelicopter;
             [ReadOnly] public ComponentLookup<Game.Prefabs.         HospitalData                > ComponentLookupHospitalData;
@@ -659,6 +661,7 @@ namespace BuildingUse
         private ComponentLookup<Game.Buildings.     Building                    > _componentLookupBuilding;
         private ComponentLookup<Game.Prefabs.       BuildingData                > _componentLookupBuildingData;
         private ComponentLookup<Game.Prefabs.       BuildingPropertyData        > _componentLookupBuildingPropertyData;
+        private ComponentLookup<Game.Citizens.      Citizen                     > _componentLookupCitizen;
         private ComponentLookup<Game.Companies.     CompanyData                 > _componentLookupCompanyData;
         private ComponentLookup<Game.Net.           Curve                       > _componentLookupCurve;
         private ComponentLookup<Game.Prefabs.       DeathcareFacilityData       > _componentLookupDeathcareFacilityData;
@@ -672,6 +675,7 @@ namespace BuildingUse
         private ComponentLookup<Game.Prefabs.       GarbageFacilityData         > _componentLookupGarbageFacilityData;
         private ComponentLookup<Game.Vehicles.      GarbageTruck                > _componentLookupGarbageTruck;
         private ComponentLookup<Game.Areas.         Geometry                    > _componentLookupGeometry;
+        private ComponentLookup<Game.Citizens.      HealthProblem               > _componentLookupHealthProblem;
         private ComponentLookup<Game.Vehicles.      Hearse                      > _componentLookupHearse;
         private ComponentLookup<Game.Vehicles.      Helicopter                  > _componentLookupHelicopter;
         private ComponentLookup<Game.Prefabs.       HospitalData                > _componentLookupHospitalData;
@@ -796,6 +800,7 @@ namespace BuildingUse
             _componentLookupBuilding                        = CheckedStateRef.GetComponentLookup<Game.Buildings.        Building                    >(true);
             _componentLookupBuildingData                    = CheckedStateRef.GetComponentLookup<Game.Prefabs.          BuildingData                >(true);
             _componentLookupBuildingPropertyData            = CheckedStateRef.GetComponentLookup<Game.Prefabs.          BuildingPropertyData        >(true);
+            _componentLookupCitizen                         = CheckedStateRef.GetComponentLookup<Game.Citizens.         Citizen                     >(true);
             _componentLookupCompanyData                     = CheckedStateRef.GetComponentLookup<Game.Companies.        CompanyData                 >(true);
             _componentLookupCurve                           = CheckedStateRef.GetComponentLookup<Game.Net.              Curve                       >(true);
             _componentLookupDeathcareFacilityData           = CheckedStateRef.GetComponentLookup<Game.Prefabs.          DeathcareFacilityData       >(true);
@@ -809,6 +814,7 @@ namespace BuildingUse
             _componentLookupGarbageFacilityData             = CheckedStateRef.GetComponentLookup<Game.Prefabs.          GarbageFacilityData         >(true);
             _componentLookupGarbageTruck                    = CheckedStateRef.GetComponentLookup<Game.Vehicles.         GarbageTruck                >(true);
             _componentLookupGeometry                        = CheckedStateRef.GetComponentLookup<Game.Areas.            Geometry                    >(true);
+            _componentLookupHealthProblem                   = CheckedStateRef.GetComponentLookup<Game.Citizens.         HealthProblem               >(true);
             _componentLookupHearse                          = CheckedStateRef.GetComponentLookup<Game.Vehicles.         Hearse                      >(true);
             _componentLookupHelicopter                      = CheckedStateRef.GetComponentLookup<Game.Vehicles.         Helicopter                  >(true);
             _componentLookupHospitalData                    = CheckedStateRef.GetComponentLookup<Game.Prefabs.          HospitalData                >(true);
@@ -1175,6 +1181,7 @@ namespace BuildingUse
             _componentLookupBatteryData                     .Update(ref CheckedStateRef);
             _componentLookupBuildingData                    .Update(ref CheckedStateRef);
             _componentLookupBuildingPropertyData            .Update(ref CheckedStateRef);
+            _componentLookupCitizen                         .Update(ref CheckedStateRef);
             _componentLookupCompanyData                     .Update(ref CheckedStateRef);
             _componentLookupCurve                           .Update(ref CheckedStateRef);
             _componentLookupDeathcareFacilityData           .Update(ref CheckedStateRef);
@@ -1188,6 +1195,7 @@ namespace BuildingUse
             _componentLookupGarbageTruck                    .Update(ref CheckedStateRef);
             _componentLookupGeometry                        .Update(ref CheckedStateRef);
             _componentLookupHospitalData                    .Update(ref CheckedStateRef);
+            _componentLookupHealthProblem                   .Update(ref CheckedStateRef);
             _componentLookupHearse                          .Update(ref CheckedStateRef);
             _componentLookupHelicopter                      .Update(ref CheckedStateRef);
             _componentLookupMailBoxData                     .Update(ref CheckedStateRef);
@@ -1284,6 +1292,7 @@ namespace BuildingUse
                 ComponentLookupBatteryData                      = _componentLookupBatteryData,
                 ComponentLookupBuildingData                     = _componentLookupBuildingData,
                 ComponentLookupBuildingPropertyData             = _componentLookupBuildingPropertyData,
+                ComponentLookupCitizen                          = _componentLookupCitizen,
                 ComponentLookupCompanyData                      = _componentLookupCompanyData,
                 ComponentLookupCurve                            = _componentLookupCurve,
                 ComponentLookupDeathcareFacilityData            = _componentLookupDeathcareFacilityData,
@@ -1296,6 +1305,7 @@ namespace BuildingUse
                 ComponentLookupGarbageFacilityData              = _componentLookupGarbageFacilityData,
                 ComponentLookupGarbageTruck                     = _componentLookupGarbageTruck,
                 ComponentLookupGeometry                         = _componentLookupGeometry,
+                ComponentLookupHealthProblem                    = _componentLookupHealthProblem,
                 ComponentLookupHearse                           = _componentLookupHearse,
                 ComponentLookupHelicopter                       = _componentLookupHelicopter,
                 ComponentLookupHospitalData                     = _componentLookupHospitalData,

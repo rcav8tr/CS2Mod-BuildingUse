@@ -33,6 +33,7 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
     switch (buildingStatusType)
     {
         case BUBuildingStatusType.EmployeesResidential:
+        case BUBuildingStatusType.EfficiencyResidential:
             icon = "Media/Game/Icons/ZoneResidential.svg";
             break;
         
