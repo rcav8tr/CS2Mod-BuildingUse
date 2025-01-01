@@ -1,1 +1,1 @@
-﻿- Add residential happiness to efficiency info view.
+﻿- Prevent an error that can crash the game in a very specific situation.

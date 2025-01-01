@@ -23,19 +23,13 @@ const bindingSelectedDistrict = bindValue<Entity        >(mod.id, uiBindingNames
 // Custom infomode item for selecting a district.
 export const DistrictSelector = () =>
 {
-    // Get district infos and selected district.
-    const districtInfos: DistrictInfo[]  = useValue(bindingDistrictInfos);
-    const selectedDistrictEntity: Entity = useValue(bindingSelectedDistrict)
-
-    // If there are no districts in the city besides the entire city entry, then do not display the district selector.
-    if (districtInfos.length <= 1)
-    {
-        return (<></>);
-    }
-
     // Translations.
     const { translate } = useLocalization();
     const districtSelectorTooltip = translate(UITranslationKey.DistrictSelectorTooltip);
+
+    // Get district infos and selected district.
+    const districtInfos: DistrictInfo[]  = useValue(bindingDistrictInfos);
+    const selectedDistrictEntity: Entity = useValue(bindingSelectedDistrict)
 
     // Create a dropdown item for each district info and get the name of the selected district.
     var selectedDistrictName: string = "";
@@ -73,6 +67,16 @@ export const DistrictSelector = () =>
             );
         }
     );
+
+    // If there are no districts in the city besides the entire city entry, then do not display the district selector.
+    // It is important to let the logic above execute before performing this check.
+    // The logic above actually uses the values from the bindings.
+    // Using the binding values prevents an unhandled React error which crashes the game
+    // when the last district is deleted while the infoview is active.
+    if (districtInfos.length <= 1)
+    {
+        return (<></>);
+    }
 
     // Entire row is a single dropdown of districts.
     return (
