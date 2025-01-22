@@ -18,6 +18,8 @@ namespace BuildingUse
         // Translations are in the Translation.csv file.
         // The translation file is an embedded resource in the mod DLL so that a separate file does not need to be downloaded with the mod.
         // The translation file was created and maintained using LibreOffice Calc.
+        // When opening the file in Libreoffice Calc, be sure the "Format quoted field as text" option is turned on
+        // to preserve the double quotes around all text, not just around the text that needs double quotes.
 
         // Translation file format:
         //      Line 1: blank,language code 1,language code 2,...,language code n

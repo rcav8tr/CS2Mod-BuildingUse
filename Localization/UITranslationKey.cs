@@ -258,6 +258,8 @@ namespace BuildingUse
         public const string SettingServiceBuildingColorChoiceVarious           = "Options.BuildingUse.BuildingUse.Mod.SERVICEBUILDINGCOLORCHOICE[Various]";
         public const string SettingColorSpecializedIndustryLotsLabel           = "Options.OPTION[BuildingUse.BuildingUse.Mod.ModSettings.ColorSpecializedIndustryLots]";
         public const string SettingColorSpecializedIndustryLotsDesc            = "Options.OPTION_DESCRIPTION[BuildingUse.BuildingUse.Mod.ModSettings.ColorSpecializedIndustryLots]";
+        public const string SettingReverseColorsLabel                          = "Options.OPTION[BuildingUse.BuildingUse.Mod.ModSettings.ReverseColors]";
+        public const string SettingReverseColorsDesc                           = "Options.OPTION_DESCRIPTION[BuildingUse.BuildingUse.Mod.ModSettings.ReverseColors]";
         public const string SettingGroupAbout                                  = "Options.GROUP[BuildingUse.BuildingUse.Mod.About]";
         public const string SettingModVersionLabel                             = "Options.OPTION[BuildingUse.BuildingUse.Mod.ModSettings.ModVersion]";
         public const string SettingModVersionDesc                              = "Options.OPTION_DESCRIPTION[BuildingUse.BuildingUse.Mod.ModSettings.ModVersion]";

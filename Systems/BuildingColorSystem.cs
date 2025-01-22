@@ -1523,6 +1523,10 @@ namespace BuildingUse
             // Update building status type data values.
             buildingStatusTypeDatas.UpdateDataValues(totalUsed, totalCapacity);
 
+            // Wait for the "next" job to complete, whichever job that is.
+            // This helps to reduce building flicker.
+            jobHandleNext.Complete();
+
             // This system handled building colors for one of this mod's infoviews.
             // Do not execute the original game logic.
             return false;

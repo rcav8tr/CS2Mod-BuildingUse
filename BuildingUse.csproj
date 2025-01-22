@@ -8,9 +8,9 @@
         <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
         <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
         <Title>Building Use</Title>
-        <Version>1.2.1</Version>
+        <Version>1.3.0</Version>
         <Description>Six new infoviews show the use of buildings as a percent of their capacity.</Description>
-        <Copyright>Copyright © 2024</Copyright>
+        <Copyright>Copyright © 2024-2025</Copyright>
         <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
         <PDXAccountDataPath>$(USERPROFILE)\Documents\Visual Studio Projects\Cities Skylines 2 Mods\My Mods\pdx_account.txt</PDXAccountDataPath>
         <DefaultItemExcludes>UI\node_modules\**;$(DefaultItemExcludes)</DefaultItemExcludes>

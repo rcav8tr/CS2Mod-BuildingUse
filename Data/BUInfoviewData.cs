@@ -435,6 +435,14 @@ namespace BuildingUse
                                                                       (lowColor.b + buildingStatusInfomodePrefab.m_High.b) * 0.5f,
                                                                       1f);
                 }
+
+                // Check for reverse colors.
+                if (Mod.ModSettings.ReverseColors)
+                {
+                    // Reverse low and high colors.
+                    // Medium color stays the same.
+                    (buildingStatusInfomodePrefab.m_High, buildingStatusInfomodePrefab.m_Low) = (buildingStatusInfomodePrefab.m_Low, buildingStatusInfomodePrefab.m_High);
+                }
             }
         }
 

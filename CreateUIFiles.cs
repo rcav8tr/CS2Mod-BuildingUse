@@ -253,6 +253,9 @@ namespace BuildingUse
                     { "SettingColorSpecializedIndustryLotsLabel",       Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ColorSpecializedIndustryLots     )) },
                     { "SettingColorSpecializedIndustryLotsDesc",        Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ColorSpecializedIndustryLots     )) },
                                                                                                                                                                           
+                    { "SettingReverseColorsLabel",                      Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ReverseColors                    )) },
+                    { "SettingReverseColorsDesc",                       Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ReverseColors                    )) },
+                                                                                                                                                                          
                                                                                                                                                                           
                     { "SettingGroupAbout",                              Mod.ModSettings.GetOptionGroupLocaleID(ModSettings.GroupAbout)                                },
                                                                                                                                                                           

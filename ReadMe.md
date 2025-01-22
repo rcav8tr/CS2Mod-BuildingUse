@@ -14,7 +14,8 @@ See the Infoviews section below for more details on each infoview.
 ### Building Colors
 The color of each building indicates the percent use for that building.
 For each building type, the gradient shows the color range for the building use.
-See the settings below for Color of Zoned Buildings and Color of Service Buildings.
+The color on the left of the gradient indicates low building use and the color on the right indicates high building use.
+See the settings below for Color of Zoned Buildings, Color of Service Buildings, and Reverse Colors.
 
 ### Districts
 If your city has districts:
@@ -121,17 +122,17 @@ The following settings are available on the Options screen.
 
 ### Color of Zoned Buildings
 There are two choices for the color of zoned buildings, including signature buildings:
-- 3 Colors (default):  Building colors are red, yellow, green for low, medium, high building use respectively.
+- 3 Colors (default):  Building colors are red, yellow, green for low, medium, high building use respectively (see Reverse Colors below).
   The colors green and red do not necessarily mean good and bad building use.
   You must decide whether low or high building use is good or bad.
 - Zone Color:  Building colors are set according to their respective zone type:
   residential = green, commercial = blue, industrial = yellow, and office = purple.
 
-For Zone Color, building use is indicated by the color brightness:  the lightest color is 0% used and the darkest color is 100% used.
+For Zone Color, building use is indicated by the color brightness:  the lightest color is 0% used and the darkest color is 100% used (see Reverse Colors below).
 
 ### Color of Service Buildings
 There are three choices for the color of service buildings:
-- 3 Colors (default):  Building colors are red, yellow, green for low, medium, high building use respectively.
+- 3 Colors (default):  Building colors are red, yellow, green for low, medium, high building use respectively (see Reverse Colors below).
   The colors green and red do not necessarily mean good and bad building use.
   You must decide whether low or high building use is good or bad.
 - Red:  All service buildings are red.
@@ -141,11 +142,15 @@ There are three choices for the color of service buildings:
   For example, Electricity and Police are the same color because their icons are the same color.
   Some building types with white/gray icons use a different arbitrary color to differentiate them from the default off-white color.
 
-For Red and Various, building use is indicated by the color brightness:  the lightest color is 0% used and the darkest color is 100% used.
+For Red and Various, building use is indicated by the color brightness:  the lightest color is 0% used and the darkest color is 100% used (see Reverse Colors below).
 
 ### Specialized Industry Lots
-- When checked, the color of the attached lot for each specialized industry is set the same as its hub building to make the building use easier to see.
 - When unchecked (default), only the hub building color is set.
+- When checked, the color of the attached lot for each specialized industry is set the same as its hub building to make the building use easier to see.
+
+### Reverse Colors
+- When unchecked (default), low to high building use is represented by lighter to darker colors (or red, yellow, green for 3 Colors).
+- When checked, low to high building use is represented by darker to lighter colors (or green, yellow, red for 3 Colors).
 
 # Compatibility
 The mod is translated into all the languages supported by the base game.

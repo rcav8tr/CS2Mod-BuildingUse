@@ -30,9 +30,10 @@ namespace BuildingUse
         public override void SetDefaults()
         {
             // It is important to set a default for every value.
-            ZonedBuildingColor = ZonedBuildingColorChoice.ThreeColors;
-            ServiceBuildingColor = ServiceBuildingColorChoice.ThreeColors;
+            ZonedBuildingColor           = ZonedBuildingColorChoice.ThreeColors;
+            ServiceBuildingColor         = ServiceBuildingColorChoice.ThreeColors;
             ColorSpecializedIndustryLots = false;
+            ReverseColors                = false;
 
             CountVehiclesInUse           = true;
             CountVehiclesInMaintenance   = true;
@@ -75,6 +76,15 @@ namespace BuildingUse
         // Color specialized industry lots.
         [SettingsUISection(GroupGeneral)]
         public bool ColorSpecializedIndustryLots { get; set; }
+
+        // Whether or not to reverse the colors.
+        private bool _reverseColors;
+        [SettingsUISection(GroupGeneral)]
+        public bool ReverseColors
+        {
+            get { return _reverseColors; }
+            set { _reverseColors = value; BUInfoviewDatas.instance.SetInfomodeColors(); ApplyAndSave(); }
+        }
 
         // Display mod version in settings.
         [SettingsUISection(GroupAbout)]
