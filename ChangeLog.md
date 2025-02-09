@@ -1,1 +1,1 @@
-﻿- Add option to reverse colors.
+﻿- Fix count of deceased at Crematoriums.

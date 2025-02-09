@@ -181,9 +181,6 @@ Here are some possible future enhancements that were thought about during develo
 - By default, the game turns on all infomodes each time an infoview is displayed.
   Save the selections for each infoview to be used the next time the infoview is displayed.
   Possibly do this as a separate mod for all infoviews, not just for the infoviews for this mod.
-- Create resource locator infoviews to show which buildings may hold which resources by:
-  extraction, processing input, processing output, and warehouse.
-  Possibly do this as a separate mod.
 
 # Acknowledgements
 The following mods were used extensively in the development of this mod:
@@ -213,7 +210,7 @@ The following mods were used extensively in the development of this mod:
     <ForumLink Value="https://forum.paradoxplaza.com/forum/threads/building-use.1716181/" />
 
     <!-- Version of the mod.  Copied from assembly Version. -->
-    <ModVersion Value="1.3.0" />
+    <ModVersion Value="1.3.1" />
 
     <!-- Recommended version of the base game to use the mod. -->
     <GameVersion Value="1.*" />
@@ -223,7 +220,7 @@ The following mods were used extensively in the development of this mod:
 
     <!-- Change log.  Copied from ChangeLog.md file.  Supports minimal markdown subset. -->
     <ChangeLog>
-- Add option to reverse colors.
+- Fix count of deceased at Crematoriums.
 </ChangeLog>
 
     <!-- External links. Supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab.  Can be set multiple times. -->

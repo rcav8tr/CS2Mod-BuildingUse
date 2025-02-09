@@ -165,9 +165,6 @@ Here are some possible future enhancements that were thought about during develo
 - By default, the game turns on all infomodes each time an infoview is displayed.
   Save the selections for each infoview to be used the next time the infoview is displayed.
   Possibly do this as a separate mod for all infoviews, not just for the infoviews for this mod.
-- Create resource locator infoviews to show which buildings may hold which resources by:
-  extraction, processing input, processing output, and warehouse.
-  Possibly do this as a separate mod.
 
 # Acknowledgements
 The following mods were used extensively in the development of this mod:

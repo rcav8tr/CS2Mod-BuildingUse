@@ -149,7 +149,7 @@ namespace BuildingUse
             
             /// <summary>
             /// Set building colors for Visitors infoview for deathcare (handles both cemetery and crematorium).
-            /// Logic adapted from HealthcareInfoviewUISystem.UpdateDeathcareJob.
+            /// Logic adapted from Game.UI.InGame.DeathcareSection.OnProcess().
             /// </summary>
             private void SetBuildingColorsVisitorsDeathcare
             (
@@ -184,8 +184,12 @@ namespace BuildingUse
                             // Only cemetery has long term storage.
                             if (deathcareFacilityData.m_LongTermStorage == longTermStorage)
                             {
-                                // Used is long term stored count, for both cemetery and crematorium.
+                                // Used is long term stored count plus patient count, for both cemetery and crematorium.
                                 long used = deathcareFacilities[i].m_LongTermStoredCount;
+                                if (BufferLookupPatient.TryGetBuffer(entities[i], out DynamicBuffer<Game.Buildings.Patient> bufferPatients))
+                                {
+			                        used += bufferPatients.Length;
+                                }
 
                                 // Get capacity.
                                 long capacity = deathcareFacilityData.m_StorageCapacity;
