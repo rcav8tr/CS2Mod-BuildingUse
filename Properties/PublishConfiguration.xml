@@ -3,7 +3,7 @@
 <!-- Make any needed changes in PublishConfiguration.csproj. -->
 
 <Publish>
-    <!-- Mod ID is not required for publishing a mod for the first time.  Mod ID must be set in order to update an existing mod. -->
+    <!-- Mod ID must be 0 for publishing a mod for the first time.  Mod ID must be set in order to update an existing mod. -->
     <ModId Value="94762" />
 
     <!-- Name of the mod to display to players.  Copied from assembly Title. -->
@@ -104,7 +104,7 @@ All building types for residential, commercial, industrial, and office include b
 - The number of vehicles in maintenance is based on the building's efficiency.
   When efficiency is at least 100%, the building will have no vehicles in maintenance.
 - Commercial Truck, Industrial Truck, Office Truck, and Parked Vehicle do not have vehicles in maintenance.
-- Office buildings have capacity for delivery trucks, but they are rarely (if ever) used.
+- Office buildings have capacity for delivery trucks, but they are rarely used.
 - For Fire Stations with a Disaster Response Unit upgrade, the game appears to incorrectly compute vehicles in maintenance.
   So this mod's in maintenance count will not match the game's in maintenance vehicle count.
 - The Airport building has capacity for delivery trucks even if the Airport does not have the Cargo Terminal upgrade.
@@ -210,7 +210,7 @@ The following mods were used extensively in the development of this mod:
     <ForumLink Value="https://forum.paradoxplaza.com/forum/threads/building-use.1716181/" />
 
     <!-- Version of the mod.  Copied from assembly Version. -->
-    <ModVersion Value="1.3.1" />
+    <ModVersion Value="1.3.2" />
 
     <!-- Recommended version of the base game to use the mod. -->
     <GameVersion Value="1.*" />
@@ -218,11 +218,16 @@ The following mods were used extensively in the development of this mod:
     <!-- Dependency for the mod.  Can be set multiple times. -->
     <Dependency Id="" />
 
+    <!-- Required DLC.  Can be set multiple times. -->
+    <!-- Supported values are "Landmark Buildings", "San Fransisco Set", "Beach Properties", "Urban Promenades", "Modern Architecture" -->
+    <RequiredDLC Value="" />
+
     <!-- Change log.  Copied from ChangeLog.md file.  Supports minimal markdown subset. -->
     <ChangeLog>
-- Fix count of deceased at Crematoriums.
+- Update for game version 1.2.5f1.
 </ChangeLog>
 
-    <!-- External links. Supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab.  Can be set multiple times. -->
+    <!-- External links.  Can be set multiple times. -->
+    <!-- Supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab, gofundme. -->
     <ExternalLink Type="github" Url="https://github.com/rcav8tr/CS2Mod-BuildingUse" />
 </Publish>

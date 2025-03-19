@@ -88,7 +88,7 @@ All building types for residential, commercial, industrial, and office include b
 - The number of vehicles in maintenance is based on the building's efficiency.
   When efficiency is at least 100%, the building will have no vehicles in maintenance.
 - Commercial Truck, Industrial Truck, Office Truck, and Parked Vehicle do not have vehicles in maintenance.
-- Office buildings have capacity for delivery trucks, but they are rarely (if ever) used.
+- Office buildings have capacity for delivery trucks, but they are rarely used.
 - For Fire Stations with a Disaster Response Unit upgrade, the game appears to incorrectly compute vehicles in maintenance.
   So this mod's in maintenance count will not match the game's in maintenance vehicle count.
 - The Airport building has capacity for delivery trucks even if the Airport does not have the Cargo Terminal upgrade.
