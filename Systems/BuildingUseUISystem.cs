@@ -200,7 +200,7 @@ namespace BuildingUse
                 Mod.ModSettings.CountVehiclesInMaintenance = true;
             }
 
-            // Update and save.
+            // Update count vehicles.
             UpdateCountVehicles();
         }
         
@@ -218,7 +218,7 @@ namespace BuildingUse
                 Mod.ModSettings.CountVehiclesInUse = true;
             }
 
-            // Update and save.
+            // Update count vehicles.
             UpdateCountVehicles();
         }
 
@@ -231,11 +231,10 @@ namespace BuildingUse
             _bindingCountVehiclesInUse        .Update(Mod.ModSettings.CountVehiclesInUse);
             _bindingCountVehiclesInMaintenance.Update(Mod.ModSettings.CountVehiclesInMaintenance);
 
-            // Update and save.
+            // Update data values immediate.
             UpdateDataValuesImmediate();
-            Mod.ModSettings.ApplyAndSave();
         }
-        
+
         /// <summary>
         /// Event callback for efficiency max color clicked.
         /// </summary>
@@ -244,12 +243,13 @@ namespace BuildingUse
             // Toggle the settings value.
             Mod.ModSettings.EfficiencyMaxColor200Percent = !Mod.ModSettings.EfficiencyMaxColor200Percent;
 
-            // Update and save.
+            // Update binding to UI.
             _bindingEfficiencyMaxColor200Percent.Update(Mod.ModSettings.EfficiencyMaxColor200Percent);
+
+            // Update data values immediate.
             UpdateDataValuesImmediate();
-            Mod.ModSettings.ApplyAndSave();
         }
-        
+
         /// <summary>
         /// Event callback for selected district changed.
         /// </summary>
@@ -369,7 +369,7 @@ namespace BuildingUse
         /// <summary>
         /// Update data values immediately.
         /// </summary>
-        public void UpdateDataValuesImmediate()
+        private void UpdateDataValuesImmediate()
         {
             // An infoview must be active.
             if (_toolSystem.activeInfoview != null)

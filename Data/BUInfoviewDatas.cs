@@ -95,33 +95,29 @@ namespace BuildingUse
         /// </summary>
         public void SetInfomodeColors()
         {
-            // Mod's settings must be initialized because the settings are used to determine infomode colors.
-            if (Mod.ModSettings != null)
+            // Do each of this mod's infoviews.
+            foreach (BUInfoviewData infoviewData in Values)
             {
-                // Do each of this mod's infoviews.
-                foreach (BUInfoviewData infoviewData in Values)
-                {
-                    infoviewData.SetInfomodeColors();
-                }
+                infoviewData.SetInfomodeColors();
+            }
 
-                // Check for an active infoview.
-                World defaultWorld = World.DefaultGameObjectInjectionWorld;
-                ToolSystem toolSystem = defaultWorld.GetOrCreateSystemManaged<ToolSystem>();
-                if (toolSystem.activeInfoview != null)
+            // Check for an active infoview.
+            World defaultWorld = World.DefaultGameObjectInjectionWorld;
+            ToolSystem toolSystem = defaultWorld.GetOrCreateSystemManaged<ToolSystem>();
+            if (toolSystem.activeInfoview != null)
+            {
+                // Check if active infoview is for this mod.
+                BUInfoview activeInfoview = BUInfoviewData.GetInfoview(toolSystem.activeInfoview.name);
+                if (activeInfoview != BUInfoview.None)
                 {
-                    // Check if active infoview is for this mod.
-                    BUInfoview activeInfoview = BUInfoviewData.GetInfoview(toolSystem.activeInfoview.name);
-                    if (activeInfoview != BUInfoview.None)
-                    {
-                        // Get the entity for the active infoview.
-                        Entity entityActiveInfoview = instance[activeInfoview].infoviewPrefabEntity;
+                    // Get the entity for the active infoview.
+                    Entity entityActiveInfoview = instance[activeInfoview].infoviewPrefabEntity;
 
-                        // Set the active infoview to Null and immediately back to the active infoview.
-                        // This causes the infoviews UI system to resend the infomode data to the UI where the new colors will be applied.
-                        InfoviewsUISystem infoviewsUISystem = defaultWorld.GetOrCreateSystemManaged<InfoviewsUISystem>();
-                        infoviewsUISystem.SetActiveInfoview(Entity.Null);
-                        infoviewsUISystem.SetActiveInfoview(entityActiveInfoview);
-                    }
+                    // Set the active infoview to Null and immediately back to the active infoview.
+                    // This causes the infoviews UI system to resend the infomode data to the UI where the new colors will be applied.
+                    InfoviewsUISystem infoviewsUISystem = defaultWorld.GetOrCreateSystemManaged<InfoviewsUISystem>();
+                    infoviewsUISystem.SetActiveInfoview(Entity.Null);
+                    infoviewsUISystem.SetActiveInfoview(entityActiveInfoview);
                 }
             }
         }
