@@ -22,7 +22,7 @@ namespace BuildingUse
         // Constructor.
         public ModSettings(IMod mod) : base(mod)
         {
-            LogUtil.Info($"{nameof(ModSettings)}.{nameof(ModSettings)}");
+            Mod.log.Info($"{nameof(ModSettings)}.{nameof(ModSettings)}");
 
             SetDefaults();
         }

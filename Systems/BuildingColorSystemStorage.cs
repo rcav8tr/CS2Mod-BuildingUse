@@ -432,7 +432,7 @@ namespace BuildingUse
                     )
                 {
                     // Storage capacity is computed from storage limit, spawnabale building data (i.e. building level), and building data (i.e. lot size).
-                    return storageLimitData.GetAdjustedLimit(spawnableBuildingData, buildingData);
+                    return storageLimitData.GetAdjustedLimitForWarehouse(spawnableBuildingData, buildingData);
                 }
                 else
                 {

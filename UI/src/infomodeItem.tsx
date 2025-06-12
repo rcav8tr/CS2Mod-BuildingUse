@@ -25,11 +25,11 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
     // Translations.
     const { translate } = useLocalization();
     const infomodeTitle     = translate("Infoviews.INFOMODE[" + infomode.id + "]");
-    var   infomodeTooltip   = translate("Infoviews.INFOMODE_TOOLTIP[" + infomode.id + "]");
+    let   infomodeTooltip   = translate("Infoviews.INFOMODE_TOOLTIP[" + infomode.id + "]");
     const buildingColor     = translate("Infoviews.INFOMODE_TYPE[BuildingColor]");
 
     // Get icon based on building status type.
-    var icon: string;
+    let icon: string;
     switch (buildingStatusType)
     {
         case BUBuildingStatusType.EmployeesResidential:
@@ -227,8 +227,8 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
     const bindingCapacity = uiBindings[buildingStatusTypeEnumName + "Capacity"];
 
     // Get used and capacity values from data bindings.
-    var used:     number = useValue(bindingUsed);
-    var capacity: number = useValue(bindingCapacity);
+    let used:     number = useValue(bindingUsed);
+    let capacity: number = useValue(bindingCapacity);
 
     // If capacity is more than zero, then the building status type has buildings.
     const hasBuildings: boolean = capacity > 0;
@@ -245,7 +245,7 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
     }
 
     // Get whether max color is 100% or 200%.
-    var maxColorPercent: number = 100;
+    let maxColorPercent: number = 100;
     if (buildingStatusTypeEnumName.startsWith("Efficiency"))
     {
         // Get max color setting.
@@ -293,9 +293,9 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
 
         // For each building status type, get scaling factor, UOM prefix, and UOM text.
         // These cases must match the infomode tooltips that have the UOM placeholder.
-        var scalingFactor: number = 1;
-        var uomPrefix: string | null = null;
-        var uomText: string | null = null;
+        let scalingFactor: number = 1;
+        let uomPrefix: string | null = null;
+        let uomText: string | null = null;
         switch (buildingStatusType)
         {
             case BUBuildingStatusType.StorageCommercial:

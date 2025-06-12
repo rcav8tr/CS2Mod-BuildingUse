@@ -1,4 +1,5 @@
 ﻿using Colossal.IO.AssetDatabase;
+using Colossal.Logging;
 using Colossal.UI;
 using Game;
 using Game.Modding;
@@ -13,6 +14,12 @@ namespace BuildingUse
     /// </summary>
     public class Mod : IMod
     {
+        // Create a new log just for this mod.
+        // This mod will have its own log file in the game's Logs folder.
+        public static readonly ILog log = LogManager.GetLogger(ModAssemblyInfo.Name)
+            .SetShowsErrorsInUI(true)                       // Show message in UI for severity level Error and above.
+            .SetShowsStackTraceAboveLevels(Level.Error);    // Include stack trace for severity level Error and above.
+
         // The global settings for this mod.
         public static ModSettings ModSettings { get; set; }
 
@@ -26,7 +33,7 @@ namespace BuildingUse
         /// </summary>
         public void OnLoad(UpdateSystem updateSystem)
         {
-            LogUtil.Info($"{nameof(Mod)}.{nameof(OnLoad)}");
+            log.Info($"{nameof(Mod)}.{nameof(OnLoad)}");
             
             try
             {
@@ -48,7 +55,7 @@ namespace BuildingUse
                 // Add mod UI images directory to UI resource handler.
                 if (!GameManager.instance.modManager.TryGetExecutableAsset(this, out ExecutableAsset modExecutableAsset))
                 {
-                    LogUtil.Error("Unable to get mod executable asset.");
+                    log.Error("Unable to get mod executable asset.");
                     return;
                 }
                 string assemblyPath = Path.GetDirectoryName(modExecutableAsset.path);
@@ -73,7 +80,7 @@ namespace BuildingUse
                 //        if (keyValue.Value.ToLower().Contains("mwh"))
                 //        //if (keyValue.Value == "MWh")
                 //        {
-                //            LogUtil.Info(keyValue.Key + "\t" + keyValue.Value);
+                //            log.Info(keyValue.Key + "\t" + keyValue.Value);
                 //        }
                 //    }
                 //}
@@ -87,7 +94,7 @@ namespace BuildingUse
                 //    {
                 //        if (keyValue.Key == "Common.VALUE_MEGAWATT_HOURS")
                 //        {
-                //            LogUtil.Info(keyValue.Key + "\t" + localeID + "\t" + keyValue.Value);
+                //            log.Info(keyValue.Key + "\t" + localeID + "\t" + keyValue.Value);
                 //            break;
                 //        }
                 //    }
@@ -103,10 +110,10 @@ namespace BuildingUse
             }
             catch(Exception ex)
             {
-                LogUtil.Exception(ex);
+                log.Error(ex);
             }
 
-            LogUtil.Info($"{nameof(Mod)}.{nameof(OnLoad)} complete.");
+            log.Info($"{nameof(Mod)}.{nameof(OnLoad)} complete.");
         }
 
         /// <summary>
@@ -114,7 +121,7 @@ namespace BuildingUse
         /// </summary>
         public void OnDispose()
         {
-            LogUtil.Info($"{nameof(Mod)}.{nameof(OnDispose)}");
+            log.Info($"{nameof(Mod)}.{nameof(OnDispose)}");
 
             // Unregister mod settings.
             ModSettings?.UnregisterInOptionsUI();

@@ -17,7 +17,7 @@ export const InfomodeItemExtend: ModuleRegistryExtend = (Component: any) =>
         // Get building status type from the infomode.
         const infomode: infoviewTypes.Infomode = props.infomode;
         const buildingStatusTypeName: string = infomode.id;
-        var buildingStatusType: BUBuildingStatusType = BUBuildingStatusType.None;
+        let buildingStatusType: BUBuildingStatusType = BUBuildingStatusType.None;
         if (buildingStatusTypeName && buildingStatusTypeName.startsWith(mod.id))
         {
             const buildingStatusTypeNameSuffix: string = buildingStatusTypeName.substring(mod.id.length);

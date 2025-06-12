@@ -23,7 +23,7 @@ namespace BuildingUse
         /// </summary>
         private void Initialize()
         {
-            LogUtil.Info($"{nameof(BUInfoviewDatas)}.{nameof(Initialize)}");
+            Mod.log.Info($"{nameof(BUInfoviewDatas)}.{nameof(Initialize)}");
             
             try
             {
@@ -33,7 +33,7 @@ namespace BuildingUse
                 InfoviewInitializeSystem infoviewInitializeSystem = defaultWorld.GetOrCreateSystemManaged<InfoviewInitializeSystem>();
                 if (infoviewInitializeSystem == null || infoviewInitializeSystem.infoviews.Count() == 0)
                 {
-                    LogUtil.Error("The game's infoviews must be created before this mod's infoviews.");
+                    Mod.log.Error("The game's infoviews must be created before this mod's infoviews.");
                     return;
                 }
 
@@ -86,7 +86,7 @@ namespace BuildingUse
             }
             catch (Exception ex)
             {
-                LogUtil.Exception(ex);
+                Mod.log.Error(ex);
             }
         }
 

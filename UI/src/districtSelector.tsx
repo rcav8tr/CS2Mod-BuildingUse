@@ -32,7 +32,7 @@ export const DistrictSelector = () =>
     const selectedDistrictEntity: Entity = useValue(bindingSelectedDistrict)
 
     // Create a dropdown item for each district info and get the name of the selected district.
-    var selectedDistrictName: string = "";
+    let selectedDistrictName: string = "";
     const districtDropdownItems: JSX.Element[] = districtInfos.map
     (
         (districtInfo: DistrictInfo) =>

@@ -65,7 +65,7 @@ namespace BuildingUse
         protected override void OnCreate()
         {
             base.OnCreate();
-            LogUtil.Info($"{nameof(BuildingUseUISystem)}.{nameof(OnCreate)}");
+            Mod.log.Info($"{nameof(BuildingUseUISystem)}.{nameof(OnCreate)}");
             
             try
             {
@@ -106,7 +106,7 @@ namespace BuildingUse
             }
             catch (Exception ex)
             {
-                LogUtil.Exception(ex);
+                Mod.log.Error(ex);
             }
         }
         
