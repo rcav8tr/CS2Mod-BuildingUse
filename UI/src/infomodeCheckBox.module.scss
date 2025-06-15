@@ -25,6 +25,8 @@
 }
 
 .buildingUseInfomodeCheckBoxLabel {
+    // Adjust top margin according to font size to better align the label text with the check box.
+    margin-top:                     calc(0rem - 18rem * (var(--fontScale) - 1));
     flex-grow:                      1;
     padding-top:                    2rem;
     margin-left:                    4rem;

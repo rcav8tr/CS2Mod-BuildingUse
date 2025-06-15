@@ -1,15 +1,15 @@
-﻿import { CSSProperties                          } from "react";
+﻿import { CSSProperties                  } from "react";
 
-import { trigger, bindValue, useValue           } from "cs2/api";
-import { infoviewTypes, Gradient, GradientStop  } from "cs2/bindings";
-import { useLocalization, Unit                  } from "cs2/l10n";
+import { trigger, bindValue, useValue   } from "cs2/api";
+import { infoviewTypes                  } from "cs2/bindings";
+import { useLocalization, Unit          } from "cs2/l10n";
 
-import   styles                                   from "infomodeItem.module.scss";
-import   mod                                      from "../mod.json";
-import { ModuleResolver                         } from "moduleResolver";
-import { uiBindings, uiBindingNames             } from "uiBindings";
-import { BUBuildingStatusType                   } from "uiConstants";
-import { UITranslationKey                       } from "uiTranslationKey";
+import   styles                           from "infomodeItem.module.scss";
+import   mod                              from "../mod.json";
+import { ModuleResolver                 } from "moduleResolver";
+import { uiBindings, uiBindingNames     } from "uiBindings";
+import { BUBuildingStatusType           } from "uiConstants";
+import { UITranslationKey               } from "uiTranslationKey";
 
 // Props for InfomodeItem.
 export interface InfomodeItemProps

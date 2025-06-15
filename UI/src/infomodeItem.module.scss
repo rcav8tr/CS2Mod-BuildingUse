@@ -36,29 +36,30 @@
 }
 
 .buildingUseInfomodePointerIcon {
-    width:              18rem;          // This is default width of pointer icon on game's non-infomode gradients.
-    height:             12rem;          // This is default width of pointer icon on game's non-infomode gradients.
+    width:              18rem;          // This is default width  of pointer icon on game's non-infomode gradients.
+    height:             12rem;          // This is default height of pointer icon on game's non-infomode gradients.
     position:           relative;       // Replace absolute position with relative.
     left:               -9rem           // Move icon half its width to the left to center it on its position.
 }
 
 .buildingUseInfomodePercent {
     // Scale percent width so text fits for "100%".
-    // This calculation also ensures widths are the same for all infomodes (i.e. not based on content).
-    // When fontScale is:  1.0  1.1  1.2  1.3  1.4
-    // Then width is:       9%  10%  11%  12%  13%
-    width:              calc(10% * var(--fontScale) - 1%);
+    // Specifying the width also ensures widths are the same for all infomodes (i.e. not based on content).
+    width:              calc(9% + 16% * (var(--fontScale) - 1));
     text-align:         right;
 }
 
 .buildingUseInfomodeValue {
-    // Scale value width so text fits for either:  "999,999" with a unit suffix OR "999,999,999" with no unit suffix.
-    // This calculation also ensures widths are the same for all infomodes (i.e. not based on content).
-    // When fontScale is:  1.0   1.1   1.2   1.3   1.4
-    // Then width is:     20.0% 21.0% 22.0% 23.0% 24.0%
-    width:              calc(10% * var(--fontScale) + 10%);
+    // Scale value width so text fits for "99,999,999".
+    // Specifying the width also ensures widths are the same for all infomodes (i.e. not based on content).
+    width:              calc(18% + 30% * (var(--fontScale) - 1));
     text-align:         right;
 }
+
+// For the largest fontScale of 1.5, the percent width will be: 9+16*(1.5-1) = 17% and each value width will be: 18+30*(1.5-1) = 33%.
+// This is a total of 17 + 33 + 33 = 83% which leaves only 17% for the gradient bar.
+// Having a very small gradient bar is better than having the percent or values cut off with an ellipsis.
+
 
 .buildingUseInfomodeValueNoBuildings {
     width:              100%;
