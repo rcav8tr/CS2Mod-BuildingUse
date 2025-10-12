@@ -1,1 +1,1 @@
-﻿- Better handling of text scaling changes.
+﻿- Improve localization handling.
