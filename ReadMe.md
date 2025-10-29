@@ -159,6 +159,8 @@ There are no known compatibility issues with any other mods.
 
 This mod can be safely disabled or unsubscribed at any time.
 
+To receive an invitation to the Discord server for mod discussion, go to:  [https://discord.gg/HTav7ARPs2](https://discord.gg/HTav7ARPs2)
+
 # Possible Future Enhancements
 Here are some possible future enhancements that were thought about during development but not included initially:
 - Allow the player to locate buildings for selected building types by showing an icon above each building.

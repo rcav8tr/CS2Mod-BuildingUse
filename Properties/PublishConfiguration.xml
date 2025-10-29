@@ -175,6 +175,8 @@ There are no known compatibility issues with any other mods.
 
 This mod can be safely disabled or unsubscribed at any time.
 
+To receive an invitation to the Discord server for mod discussion, go to:  [https://discord.gg/HTav7ARPs2](https://discord.gg/HTav7ARPs2)
+
 # Possible Future Enhancements
 Here are some possible future enhancements that were thought about during development but not included initially:
 - Allow the player to locate buildings for selected building types by showing an icon above each building.
@@ -210,10 +212,10 @@ The following mods were used extensively in the development of this mod:
     <ForumLink Value="https://forum.paradoxplaza.com/forum/threads/building-use.1716181/" />
 
     <!-- Version of the mod.  Copied from assembly Version. -->
-    <ModVersion Value="1.3.6" />
+    <ModVersion Value="1.3.7" />
 
     <!-- Recommended version of the base game to use the mod. -->
-    <GameVersion Value="1.*" />
+    <GameVersion Value="1.3.6*" />
 
     <!-- Dependency for the mod.  Can be set multiple times. -->
     <Dependency Id="" />
@@ -224,10 +226,11 @@ The following mods were used extensively in the development of this mod:
 
     <!-- Change log.  Copied from ChangeLog.md file.  Supports minimal markdown subset. -->
     <ChangeLog>
-- Improve localization handling.
+- Prevent error with game version 1.3.6.
 </ChangeLog>
 
     <!-- External links.  Can be set multiple times. -->
     <!-- Supported types are discord, github, youtube, twitch, x, paypal, patreon, buymeacoffee, kofi, crowdin, gitlab, gofundme. -->
     <ExternalLink Type="github" Url="https://github.com/rcav8tr/CS2Mod-BuildingUse" />
+    <ExternalLink Type="discord" Url="https://discord.com/channels/1024242828114673724/1427010571005460593/1427010571005460593" />
 </Publish>
