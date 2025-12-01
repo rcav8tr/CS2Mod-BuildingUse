@@ -1,4 +1,18 @@
 ﻿using Colossal.Collections;
+using Game;
+using Game.Areas;
+using Game.Buildings;
+using Game.Citizens;
+using Game.Common;
+using Game.Companies;
+using Game.Creatures;
+using Game.Economy;
+using Game.Net;
+using Game.Objects;
+using Game.Prefabs;
+using Game.Rendering;
+using Game.Tools;
+using Game.Vehicles;
 using HarmonyLib;
 using System.Reflection;
 using Unity.Burst;
@@ -10,6 +24,49 @@ using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Scripting;
+using Ambulance             = Game.Vehicles.    Ambulance;
+using Battery               = Game.Buildings.   Battery;
+using BuildingFlags         = Game.Prefabs.     BuildingFlags;
+using Color                 = Game.Objects.     Color;
+using DeathcareFacility     = Game.Buildings.   DeathcareFacility;
+using DeliveryTruck         = Game.Vehicles.    DeliveryTruck;
+using DisasterFacility      = Game.Buildings.   DisasterFacility;
+using Elevation             = Game.Objects.     Elevation;
+using EmergencyShelter      = Game.Buildings.   EmergencyShelter;
+using FireEngine            = Game.Vehicles.    FireEngine;
+using FireStation           = Game.Buildings.   FireStation;
+using GarbageFacility       = Game.Buildings.   GarbageFacility;
+using GarbageTruck          = Game.Vehicles.    GarbageTruck;
+using Hearse                = Game.Vehicles.    Hearse;
+using Hospital              = Game.Buildings.   Hospital;
+using MailBox               = Game.Routes.      MailBox;
+using MaintenanceVehicle    = Game.Vehicles.    MaintenanceVehicle;
+using Object                = Game.Objects.     Object;
+using Park                  = Game.Buildings.   Park;
+using ParkingFacility       = Game.Buildings.   ParkingFacility;
+using ParkingLane           = Game.Net.         ParkingLane;
+using PoliceCar             = Game.Vehicles.    PoliceCar;
+using PoliceStation         = Game.Buildings.   PoliceStation;
+using PostFacility          = Game.Buildings.   PostFacility;
+using PostVan               = Game.Vehicles.    PostVan;
+using Prison                = Game.Buildings.   Prison;
+using ResearchFacility      = Game.Buildings.   ResearchFacility;
+using Resources             = Game.Economy.     Resources;
+using School                = Game.Buildings.   School;
+using SewageOutlet          = Game.Buildings.   SewageOutlet;
+using Student               = Game.Buildings.   Student;
+using SubArea               = Game.Areas.       SubArea;
+using SubLane               = Game.Net.         SubLane;
+using SubNet                = Game.Net.         SubNet;
+using SubObject             = Game.Objects.     SubObject;
+using Taxi                  = Game.Vehicles.    Taxi;
+using TelecomFacility       = Game.Buildings.   TelecomFacility;
+using Transformer           = Game.Buildings.   Transformer;
+using TransportDepot        = Game.Buildings.   TransportDepot;
+using TransportStation      = Game.Buildings.   TransportStation;
+using UtilityObject         = Game.Objects.     UtilityObject;
+using WaterPumpingStation   = Game.Buildings.   WaterPumpingStation;
+using WelfareOffice         = Game.Buildings.   WelfareOffice;
 
 namespace BuildingUse
 {
@@ -18,16 +75,16 @@ namespace BuildingUse
     /// Adapted from Game.Rendering.ObjectColorSystem.
     /// This system replaces the game's ObjectColorSystem logic when one of this mod's infoviews is selected.
     /// </summary>
-    public partial class BuildingColorSystem : Game.GameSystemBase
+    public partial class BuildingColorSystem : GameSystemBase
     {
         /// <summary>
         /// Subtotal of used and capacity data for a building status type.
         /// </summary>
         private struct SubtotalUsedCapacity
         {
-            public BUBuildingStatusType buildingStatusType;
-            public long used;
-            public long capacity;
+            public BUBuildingStatusType BuildingStatusType;
+            public long Used;
+            public long Capacity;
         }
 
         /// <summary>
@@ -38,18 +95,23 @@ namespace BuildingUse
         private partial struct UpdateColorsJobDefault : IJobChunk
         {
             // Color component type to update.
-            public ComponentTypeHandle<Game.Objects.Color> ComponentTypeHandleColor;
+            public ComponentTypeHandle<Color> ComponentTypeHandleColor;
 
             /// <summary>
             /// Job execution.
             /// </summary>
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                // Set color to default for all objects.
-                NativeArray<Game.Objects.Color> colors = chunk.GetNativeArray(ref ComponentTypeHandleColor);
+                // Do all objects.
+                NativeArray<Color> colors = chunk.GetNativeArray(ref ComponentTypeHandleColor);
                 for (int i = 0; i < colors.Length; i++)
                 {
-                    colors[i] = default;
+                    // Set color index and value to default.
+                    // SubColor remains unchanged.
+                    Color color = colors[i];
+                    color.m_Index = 0;
+                    color.m_Value = 0;
+                    colors[i] = color;
                 }
             }
         }
@@ -63,114 +125,114 @@ namespace BuildingUse
         private partial struct UpdateColorsJobMainBuilding : IJobChunk
         {
             // Color component type to update (not ReadOnly).
-            public ComponentTypeHandle<Game.Objects.Color> ComponentTypeHandleColor;
+            public ComponentTypeHandle<Color> ComponentTypeHandleColor;
 
             // Buffer lookups.
-            [ReadOnly] public BufferLookup<Game.Buildings.          Efficiency                  > BufferLookupEfficiency;
-            [ReadOnly] public BufferLookup<Game.Companies.          Employee                    > BufferLookupEmployee;
-            [ReadOnly] public BufferLookup<Game.Citizens.           HouseholdCitizen            > BufferLookupHouseholdCitizen;
-    		[ReadOnly] public BufferLookup<Game.Buildings.          InstalledUpgrade            > BufferLookupInstalledUpgrade;
-            [ReadOnly] public BufferLookup<Game.Net.                LaneObject                  > BufferLookupLaneObject;
-            [ReadOnly] public BufferLookup<Game.Buildings.          Occupant                    > BufferLookupOccupant;
-            [ReadOnly] public BufferLookup<Game.Vehicles.           OwnedVehicle                > BufferLookupOwnedVehicle;
-            [ReadOnly] public BufferLookup<Game.Buildings.          Patient                     > BufferLookupPatient;
-            [ReadOnly] public BufferLookup<Game.Buildings.          Renter                      > BufferLookupRenter;
-            [ReadOnly] public BufferLookup<Game.Economy.            Resources                   > BufferLookupResources;
-            [ReadOnly] public BufferLookup<Game.Buildings.          Student                     > BufferLookupStudent;
-            [ReadOnly] public BufferLookup<Game.Areas.              SubArea                     > BufferLookupSubArea;
-            [ReadOnly] public BufferLookup<Game.Net.                SubLane                     > BufferLookupSubLane;
-            [ReadOnly] public BufferLookup<Game.Net.                SubNet                      > BufferLookupSubNet;
-            [ReadOnly] public BufferLookup<Game.Objects.            SubObject                   > BufferLookupSubObject;
+            [ReadOnly] public BufferLookup<Efficiency       > BufferLookupEfficiency;
+            [ReadOnly] public BufferLookup<Employee         > BufferLookupEmployee;
+            [ReadOnly] public BufferLookup<HouseholdCitizen > BufferLookupHouseholdCitizen;
+            [ReadOnly] public BufferLookup<InstalledUpgrade > BufferLookupInstalledUpgrade;
+            [ReadOnly] public BufferLookup<LaneObject       > BufferLookupLaneObject;
+            [ReadOnly] public BufferLookup<Occupant         > BufferLookupOccupant;
+            [ReadOnly] public BufferLookup<OwnedVehicle     > BufferLookupOwnedVehicle;
+            [ReadOnly] public BufferLookup<Patient          > BufferLookupPatient;
+            [ReadOnly] public BufferLookup<Renter           > BufferLookupRenter;
+            [ReadOnly] public BufferLookup<Resources        > BufferLookupResources;
+            [ReadOnly] public BufferLookup<Student          > BufferLookupStudent;
+            [ReadOnly] public BufferLookup<SubArea          > BufferLookupSubArea;
+            [ReadOnly] public BufferLookup<SubLane          > BufferLookupSubLane;
+            [ReadOnly] public BufferLookup<SubNet           > BufferLookupSubNet;
+            [ReadOnly] public BufferLookup<SubObject        > BufferLookupSubObject;
 
             // Component lookups.
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        Ambulance                   > ComponentLookupAmbulance;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         BatteryData                 > ComponentLookupBatteryData;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         BuildingData                > ComponentLookupBuildingData;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         BuildingPropertyData        > ComponentLookupBuildingPropertyData;
-            [ReadOnly] public ComponentLookup<Game.Citizens.        Citizen                     > ComponentLookupCitizen;
-            [ReadOnly] public ComponentLookup<Game.Companies.       CompanyData                 > ComponentLookupCompanyData;
-            [ReadOnly] public ComponentLookup<Game.Net.             Curve                       > ComponentLookupCurve;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         DeathcareFacilityData       > ComponentLookupDeathcareFacilityData;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        DeliveryTruck               > ComponentLookupDeliveryTruck;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         EmergencyShelterData        > ComponentLookupEmergencyShelterData;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        EvacuatingTransport         > ComponentLookupEvacuatingTransport;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        FireEngine                  > ComponentLookupFireEngine;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         FireStationData             > ComponentLookupFireStationData;
-            [ReadOnly] public ComponentLookup<Game.Net.             GarageLane                  > ComponentLookupGarageLane;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         GarbageFacilityData         > ComponentLookupGarbageFacilityData;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        GarbageTruck                > ComponentLookupGarbageTruck;
-            [ReadOnly] public ComponentLookup<Game.Areas.           Geometry                    > ComponentLookupGeometry;
-            [ReadOnly] public ComponentLookup<Game.Citizens.        HealthProblem               > ComponentLookupHealthProblem;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        Hearse                      > ComponentLookupHearse;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        Helicopter                  > ComponentLookupHelicopter;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         HospitalData                > ComponentLookupHospitalData;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         MailBoxData                 > ComponentLookupMailBoxData;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         MaintenanceDepotData        > ComponentLookupMaintenanceDepotData;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        MaintenanceVehicle          > ComponentLookupMaintenanceVehicle;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        ParkedCar                   > ComponentLookupParkedCar;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        ParkedTrain                 > ComponentLookupParkedTrain;
-            [ReadOnly] public ComponentLookup<Game.Net.             ParkingLane                 > ComponentLookupParkingLane;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         ParkingLaneData             > ComponentLookupParkingLaneData;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        PoliceCar                   > ComponentLookupPoliceCar;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         PoliceStationData           > ComponentLookupPoliceStationData;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         PostFacilityData            > ComponentLookupPostFacilityData;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        PostVan                     > ComponentLookupPostVan;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         PrefabRef                   > ComponentLookupPrefabRef;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         PrisonData                  > ComponentLookupPrisonData;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        PrisonerTransport           > ComponentLookupPrisonerTransport;
-            [ReadOnly] public ComponentLookup<Game.Buildings.       PropertyRenter              > ComponentLookupPropertyRenter;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         PublicTransportVehicleData  > ComponentLookupPublicTransportVehicleData;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         SchoolData                  > ComponentLookupSchoolData;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         SpawnableBuildingData       > ComponentLookupSpawnableBuildingData;
-            [ReadOnly] public ComponentLookup<Game.Areas.           Storage                     > ComponentLookupStorage;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         StorageAreaData             > ComponentLookupStorageAreaData;
-            [ReadOnly] public ComponentLookup<Game.Companies.       StorageLimitData            > ComponentLookupStorageLimitData;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.        Taxi                        > ComponentLookupTaxi;
-            [ReadOnly] public ComponentLookup<Game.Companies.       TransportCompanyData        > ComponentLookupTransportCompanyData;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         TransportDepotData          > ComponentLookupTransportDepotData;
-            [ReadOnly] public ComponentLookup<Game.Prefabs.         WorkplaceData               > ComponentLookupWorkplaceData;
-            [ReadOnly] public ComponentLookup<Game.Companies.       WorkProvider                > ComponentLookupWorkProvider;
+            [ReadOnly] public ComponentLookup<Ambulance                     > ComponentLookupAmbulance;
+            [ReadOnly] public ComponentLookup<BatteryData                   > ComponentLookupBatteryData;
+            [ReadOnly] public ComponentLookup<BuildingData                  > ComponentLookupBuildingData;
+            [ReadOnly] public ComponentLookup<BuildingPropertyData          > ComponentLookupBuildingPropertyData;
+            [ReadOnly] public ComponentLookup<Citizen                       > ComponentLookupCitizen;
+            [ReadOnly] public ComponentLookup<CompanyData                   > ComponentLookupCompanyData;
+            [ReadOnly] public ComponentLookup<Curve                         > ComponentLookupCurve;
+            [ReadOnly] public ComponentLookup<DeathcareFacilityData         > ComponentLookupDeathcareFacilityData;
+            [ReadOnly] public ComponentLookup<DeliveryTruck                 > ComponentLookupDeliveryTruck;
+            [ReadOnly] public ComponentLookup<EmergencyShelterData          > ComponentLookupEmergencyShelterData;
+            [ReadOnly] public ComponentLookup<EvacuatingTransport           > ComponentLookupEvacuatingTransport;
+            [ReadOnly] public ComponentLookup<FireEngine                    > ComponentLookupFireEngine;
+            [ReadOnly] public ComponentLookup<FireStationData               > ComponentLookupFireStationData;
+            [ReadOnly] public ComponentLookup<GarageLane                    > ComponentLookupGarageLane;
+            [ReadOnly] public ComponentLookup<GarbageFacilityData           > ComponentLookupGarbageFacilityData;
+            [ReadOnly] public ComponentLookup<GarbageTruck                  > ComponentLookupGarbageTruck;
+            [ReadOnly] public ComponentLookup<Geometry                      > ComponentLookupGeometry;
+            [ReadOnly] public ComponentLookup<HealthProblem                 > ComponentLookupHealthProblem;
+            [ReadOnly] public ComponentLookup<Hearse                        > ComponentLookupHearse;
+            [ReadOnly] public ComponentLookup<Helicopter                    > ComponentLookupHelicopter;
+            [ReadOnly] public ComponentLookup<HospitalData                  > ComponentLookupHospitalData;
+            [ReadOnly] public ComponentLookup<MailBoxData                   > ComponentLookupMailBoxData;
+            [ReadOnly] public ComponentLookup<MaintenanceDepotData          > ComponentLookupMaintenanceDepotData;
+            [ReadOnly] public ComponentLookup<MaintenanceVehicle            > ComponentLookupMaintenanceVehicle;
+            [ReadOnly] public ComponentLookup<ParkedCar                     > ComponentLookupParkedCar;
+            [ReadOnly] public ComponentLookup<ParkedTrain                   > ComponentLookupParkedTrain;
+            [ReadOnly] public ComponentLookup<ParkingLane                   > ComponentLookupParkingLane;
+            [ReadOnly] public ComponentLookup<ParkingLaneData               > ComponentLookupParkingLaneData;
+            [ReadOnly] public ComponentLookup<PoliceCar                     > ComponentLookupPoliceCar;
+            [ReadOnly] public ComponentLookup<PoliceStationData             > ComponentLookupPoliceStationData;
+            [ReadOnly] public ComponentLookup<PostFacilityData              > ComponentLookupPostFacilityData;
+            [ReadOnly] public ComponentLookup<PostVan                       > ComponentLookupPostVan;
+            [ReadOnly] public ComponentLookup<PrefabRef                     > ComponentLookupPrefabRef;
+            [ReadOnly] public ComponentLookup<PrisonData                    > ComponentLookupPrisonData;
+            [ReadOnly] public ComponentLookup<PrisonerTransport             > ComponentLookupPrisonerTransport;
+            [ReadOnly] public ComponentLookup<PropertyRenter                > ComponentLookupPropertyRenter;
+            [ReadOnly] public ComponentLookup<PublicTransportVehicleData    > ComponentLookupPublicTransportVehicleData;
+            [ReadOnly] public ComponentLookup<SchoolData                    > ComponentLookupSchoolData;
+            [ReadOnly] public ComponentLookup<SpawnableBuildingData         > ComponentLookupSpawnableBuildingData;
+            [ReadOnly] public ComponentLookup<Storage                       > ComponentLookupStorage;
+            [ReadOnly] public ComponentLookup<StorageAreaData               > ComponentLookupStorageAreaData;
+            [ReadOnly] public ComponentLookup<StorageLimitData              > ComponentLookupStorageLimitData;
+            [ReadOnly] public ComponentLookup<Taxi                          > ComponentLookupTaxi;
+            [ReadOnly] public ComponentLookup<TransportCompanyData          > ComponentLookupTransportCompanyData;
+            [ReadOnly] public ComponentLookup<TransportDepotData            > ComponentLookupTransportDepotData;
+            [ReadOnly] public ComponentLookup<WorkplaceData                 > ComponentLookupWorkplaceData;
+            [ReadOnly] public ComponentLookup<WorkProvider                  > ComponentLookupWorkProvider;
 
             // Component type handles for buildings.
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   AdminBuilding               > ComponentTypeHandleAdminBuilding;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   Battery                     > ComponentTypeHandleBattery;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   CommercialProperty          > ComponentTypeHandleCommercialProperty;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   DeathcareFacility           > ComponentTypeHandleDeathcareFacility;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   DisasterFacility            > ComponentTypeHandleDisasterFacility;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   ElectricityProducer         > ComponentTypeHandleElectricityProducer;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   EmergencyShelter            > ComponentTypeHandleEmergencyShelter;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   FireStation                 > ComponentTypeHandleFireStation;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   GarbageFacility             > ComponentTypeHandleGarbageFacility;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   Hospital                    > ComponentTypeHandleHospital;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   IndustrialProperty          > ComponentTypeHandleIndustrialProperty;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   OfficeProperty              > ComponentTypeHandleOfficeProperty;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   Park                        > ComponentTypeHandlePark;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   ParkingFacility             > ComponentTypeHandleParkingFacility;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   ParkMaintenance             > ComponentTypeHandleParkMaintenance;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   PoliceStation               > ComponentTypeHandlePoliceStation;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   PostFacility                > ComponentTypeHandlePostFacility;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   Prison                      > ComponentTypeHandlePrison;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   ResearchFacility            > ComponentTypeHandleResearchFacility;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   ResidentialProperty         > ComponentTypeHandleResidentialProperty;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   RoadMaintenance             > ComponentTypeHandleRoadMaintenance;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   School                      > ComponentTypeHandleSchool;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   SewageOutlet                > ComponentTypeHandleSewageOutlet;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   TelecomFacility             > ComponentTypeHandleTelecomFacility;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   Transformer                 > ComponentTypeHandleTransformer;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   TransportDepot              > ComponentTypeHandleTransportDepot;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   TransportStation            > ComponentTypeHandleTransportStation;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   WaterPumpingStation         > ComponentTypeHandleWaterPumpingStation;
-            [ReadOnly] public ComponentTypeHandle<Game.Buildings.   WelfareOffice               > ComponentTypeHandleWelfareOffice;
+            [ReadOnly] public ComponentTypeHandle<AdminBuilding             > ComponentTypeHandleAdminBuilding;
+            [ReadOnly] public ComponentTypeHandle<Battery                   > ComponentTypeHandleBattery;
+            [ReadOnly] public ComponentTypeHandle<CommercialProperty        > ComponentTypeHandleCommercialProperty;
+            [ReadOnly] public ComponentTypeHandle<DeathcareFacility         > ComponentTypeHandleDeathcareFacility;
+            [ReadOnly] public ComponentTypeHandle<DisasterFacility          > ComponentTypeHandleDisasterFacility;
+            [ReadOnly] public ComponentTypeHandle<ElectricityProducer       > ComponentTypeHandleElectricityProducer;
+            [ReadOnly] public ComponentTypeHandle<EmergencyShelter          > ComponentTypeHandleEmergencyShelter;
+            [ReadOnly] public ComponentTypeHandle<FireStation               > ComponentTypeHandleFireStation;
+            [ReadOnly] public ComponentTypeHandle<GarbageFacility           > ComponentTypeHandleGarbageFacility;
+            [ReadOnly] public ComponentTypeHandle<Hospital                  > ComponentTypeHandleHospital;
+            [ReadOnly] public ComponentTypeHandle<IndustrialProperty        > ComponentTypeHandleIndustrialProperty;
+            [ReadOnly] public ComponentTypeHandle<OfficeProperty            > ComponentTypeHandleOfficeProperty;
+            [ReadOnly] public ComponentTypeHandle<Park                      > ComponentTypeHandlePark;
+            [ReadOnly] public ComponentTypeHandle<ParkingFacility           > ComponentTypeHandleParkingFacility;
+            [ReadOnly] public ComponentTypeHandle<ParkMaintenance           > ComponentTypeHandleParkMaintenance;
+            [ReadOnly] public ComponentTypeHandle<PoliceStation             > ComponentTypeHandlePoliceStation;
+            [ReadOnly] public ComponentTypeHandle<PostFacility              > ComponentTypeHandlePostFacility;
+            [ReadOnly] public ComponentTypeHandle<Prison                    > ComponentTypeHandlePrison;
+            [ReadOnly] public ComponentTypeHandle<ResearchFacility          > ComponentTypeHandleResearchFacility;
+            [ReadOnly] public ComponentTypeHandle<ResidentialProperty       > ComponentTypeHandleResidentialProperty;
+            [ReadOnly] public ComponentTypeHandle<RoadMaintenance           > ComponentTypeHandleRoadMaintenance;
+            [ReadOnly] public ComponentTypeHandle<School                    > ComponentTypeHandleSchool;
+            [ReadOnly] public ComponentTypeHandle<SewageOutlet              > ComponentTypeHandleSewageOutlet;
+            [ReadOnly] public ComponentTypeHandle<TelecomFacility           > ComponentTypeHandleTelecomFacility;
+            [ReadOnly] public ComponentTypeHandle<Transformer               > ComponentTypeHandleTransformer;
+            [ReadOnly] public ComponentTypeHandle<TransportDepot            > ComponentTypeHandleTransportDepot;
+            [ReadOnly] public ComponentTypeHandle<TransportStation          > ComponentTypeHandleTransportStation;
+            [ReadOnly] public ComponentTypeHandle<WaterPumpingStation       > ComponentTypeHandleWaterPumpingStation;
+            [ReadOnly] public ComponentTypeHandle<WelfareOffice             > ComponentTypeHandleWelfareOffice;
 
             // Component type handles for miscellaneous.
-            [ReadOnly] public ComponentTypeHandle<Game.Areas.       CurrentDistrict             > ComponentTypeHandleCurrentDistrict;
-            [ReadOnly] public ComponentTypeHandle<Game.Common.      Destroyed                   > ComponentTypeHandleDestroyed;
-            [ReadOnly] public ComponentTypeHandle<Game.Prefabs.     InfomodeActive              > ComponentTypeHandleInfomodeActive;
-            [ReadOnly] public ComponentTypeHandle<Game.Prefabs.     InfoviewBuildingStatusData  > ComponentTypeHandleInfoviewBuildingStatusData;
-            [ReadOnly] public ComponentTypeHandle<Game.Routes.      MailBox                     > ComponentTypeHandleMailBox;
-            [ReadOnly] public ComponentTypeHandle<Game.Prefabs.     PrefabRef                   > ComponentTypeHandlePrefabRef;
-            [ReadOnly] public ComponentTypeHandle<Game.Companies.   TransportCompany            > ComponentTypeHandleTransportCompany;
-            [ReadOnly] public ComponentTypeHandle<Game.Objects.     UnderConstruction           > ComponentTypeHandleUnderConstruction;
+            [ReadOnly] public ComponentTypeHandle<CurrentDistrict               > ComponentTypeHandleCurrentDistrict;
+            [ReadOnly] public ComponentTypeHandle<Destroyed                     > ComponentTypeHandleDestroyed;
+            [ReadOnly] public ComponentTypeHandle<InfomodeActive                > ComponentTypeHandleInfomodeActive;
+            [ReadOnly] public ComponentTypeHandle<InfoviewBuildingStatusData    > ComponentTypeHandleInfoviewBuildingStatusData;
+            [ReadOnly] public ComponentTypeHandle<MailBox                       > ComponentTypeHandleMailBox;
+            [ReadOnly] public ComponentTypeHandle<PrefabRef                     > ComponentTypeHandlePrefabRef;
+            [ReadOnly] public ComponentTypeHandle<TransportCompany              > ComponentTypeHandleTransportCompany;
+            [ReadOnly] public ComponentTypeHandle<UnderConstruction             > ComponentTypeHandleUnderConstruction;
 
             // Entity type handle.
             [ReadOnly] public EntityTypeHandle EntityTypeHandle;
@@ -181,12 +243,6 @@ namespace BuildingUse
             // List of active building status data chunks.
             [ReadOnly] public NativeList<ArchetypeChunk> ActiveBuildingStatusDataChunks;
 
-            // Array of lists to return total used and capacity to the BuildingColorSystem.
-            // The outer array is one for each possible thread.
-            // The inner list is one for each subtotal computed in that thread.
-            // Even though the outer array is read only, entries can still be added to the inner lists.
-            [ReadOnly] public NativeArray<NativeList<SubtotalUsedCapacity>> TotalUsedCapacity;
-
             // Mod settings used in the job.
             [ReadOnly] public bool CountVehiclesInUse;
             [ReadOnly] public bool CountVehiclesInMaintenance;
@@ -196,13 +252,19 @@ namespace BuildingUse
             [ReadOnly] public Entity SelectedDistrict;
             [ReadOnly] public bool SelectedDistrictIsEntireCity;
 
+            // Array of lists to return total used and capacity to the BuildingColorSystem.
+            // The outer array is one for each possible thread.
+            // The inner list is one for each subtotal computed in that thread.
+            // Even though the outer array is read only, entries can still be added to the inner lists.
+            [ReadOnly] public NativeArray<NativeList<SubtotalUsedCapacity>> TotalUsedCapacity;
+
             /// <summary>
             /// Job execution.
             /// </summary>
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
                 // Get colors to set.
-                NativeArray<Game.Objects.Color> colors = chunk.GetNativeArray(ref ComponentTypeHandleColor);
+                NativeArray<Color> colors = chunk.GetNativeArray(ref ComponentTypeHandleColor);
 
                 // Get applicable building status types based on active infoview.
                 // Because more than one building status type can be applicable to a single building
@@ -233,18 +295,18 @@ namespace BuildingUse
                     foreach (ArchetypeChunk activeBuildingStatusDataChunk in ActiveBuildingStatusDataChunks)
                     {
                         // Do each active building status data.
-                        NativeArray<Game.Prefabs.InfoviewBuildingStatusData> activeBuildingStatusDatas = activeBuildingStatusDataChunk.GetNativeArray(ref ComponentTypeHandleInfoviewBuildingStatusData);
+                        NativeArray<InfoviewBuildingStatusData> activeBuildingStatusDatas = activeBuildingStatusDataChunk.GetNativeArray(ref ComponentTypeHandleInfoviewBuildingStatusData);
                         for (int j = 0; j < activeBuildingStatusDatas.Length; j++)
                         {
                             // Check if the applicable building status type is active.
-                            Game.Prefabs.InfoviewBuildingStatusData activeBuildingStatusData = activeBuildingStatusDatas[j];
+                            InfoviewBuildingStatusData activeBuildingStatusData = activeBuildingStatusDatas[j];
                             BUBuildingStatusType activeBuildingStatusType = (BUBuildingStatusType)activeBuildingStatusData.m_Type;
                             if (applicableBuildingStatusType == activeBuildingStatusType)
                             {
                                 // Get active infomodes.
                                 // Empty     means no    infomode in this building status data chunk is active.
                                 // Non-empty means every infomode in this building status data chunk is active.
-                                NativeArray<Game.Prefabs.InfomodeActive> activeInfomodes = activeBuildingStatusDataChunk.GetNativeArray(ref ComponentTypeHandleInfomodeActive);
+                                NativeArray<InfomodeActive> activeInfomodes = activeBuildingStatusDataChunk.GetNativeArray(ref ComponentTypeHandleInfomodeActive);
 
                                 // Fact that active building status type was found means infomode is active.
                                 infomodeActive = true;
@@ -281,18 +343,18 @@ namespace BuildingUse
 
                 // Check if should set SubColor flag on any colors.
                 // Adapted from Game.Rendering.ObjectColorSystem.CheckColors().
-                NativeArray<Game.Common.Destroyed         > destroyeds           = chunk.GetNativeArray(ref ComponentTypeHandleDestroyed);
-                NativeArray<Game.Objects.UnderConstruction> underConstructions   = chunk.GetNativeArray(ref ComponentTypeHandleUnderConstruction);
-                NativeArray<Game.Prefabs.PrefabRef        > prefabRefs           = chunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Destroyed        > destroyeds         = chunk.GetNativeArray(ref ComponentTypeHandleDestroyed);
+                NativeArray<UnderConstruction> underConstructions = chunk.GetNativeArray(ref ComponentTypeHandleUnderConstruction);
+                NativeArray<PrefabRef        > prefabRefs         = chunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
                 for (int i = 0; i < prefabRefs.Length; i++)
                 {
-                    if ((ComponentLookupBuildingData[prefabRefs[i].m_Prefab].m_Flags & Game.Prefabs.BuildingFlags.ColorizeLot) != 0 || 
-                        (CollectionUtils.TryGet(destroyeds,         i, out Game.Common.Destroyed          destroyed        ) && destroyed.m_Cleared >= 0f) || 
-                        (CollectionUtils.TryGet(underConstructions, i, out Game.Objects.UnderConstruction underConstruction) && underConstruction.m_NewPrefab == Entity.Null))
+                    if ((ComponentLookupBuildingData[prefabRefs[i].m_Prefab].m_Flags & BuildingFlags.ColorizeLot) != 0 || 
+                        (CollectionUtils.TryGet(destroyeds,         i, out Destroyed         destroyed        ) && destroyed.m_Cleared >= 0f) || 
+                        (CollectionUtils.TryGet(underConstructions, i, out UnderConstruction underConstruction) && underConstruction.m_NewPrefab == Entity.Null))
                     {
                         // Set SubColor flag on the color.
                         // Not sure what the SubColor flag does.
-                        Game.Objects.Color color = colors[i];
+                        Color color = colors[i];
                         color.m_SubColor = true;
                         colors[i] = color;
                     }
@@ -324,33 +386,33 @@ namespace BuildingUse
                 Entity prefab,
                 ref ComponentLookup<T> componentLookup,
                 out T componentData
-            ) where T : unmanaged, IComponentData, Game.Prefabs.ICombineData<T>
+            ) where T : unmanaged, IComponentData, ICombineData<T>
             {
                 // Logic adapted from Game.UI.InGame.InfoSectionBase.TryGetComponentWithUpgrades
                 // which simply calls Game.Prefabs.UpgradeUtils.TryGetCombinedComponent.
 
                 // Try to get the component data directly from the prefab.
-		        bool hasComponentData = componentLookup.TryGetComponent(prefab, out componentData);
+                bool hasComponentData = componentLookup.TryGetComponent(prefab, out componentData);
 
-		        // Check if entity has any installed upgrades.
+                // Check if entity has any installed upgrades.
                 // Logic adapted from Game.Prefabs.UpgradeUtils.TryCombineData.
-		        bool hasInstalledUpgrade = false;
-        		if (BufferLookupInstalledUpgrade.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.InstalledUpgrade> installedUpgrades))
+                bool hasInstalledUpgrade = false;
+                if (BufferLookupInstalledUpgrade.TryGetBuffer(entity, out DynamicBuffer<InstalledUpgrade> installedUpgrades))
                 {
                     // Do each installed upgrade.
-		            for (int i = 0; i < installedUpgrades.Length; i++)
-		            {
+                    for (int i = 0; i < installedUpgrades.Length; i++)
+                    {
                         // Installed upgrade must not be inactive and prefab of installed upgrade must have component data type.
-			            Game.Buildings.InstalledUpgrade installedUpgrade = installedUpgrades[i];
-			            if (!Game.Buildings.BuildingUtils.CheckOption(installedUpgrade, Game.Buildings.BuildingOption.Inactive) && 
-                            ComponentLookupPrefabRef.TryGetComponent(installedUpgrade.m_Upgrade, out Game.Prefabs.PrefabRef installedUpgradePrefabRef) && 
+                        InstalledUpgrade installedUpgrade = installedUpgrades[i];
+                        if (!BuildingUtils.CheckOption(installedUpgrade, BuildingOption.Inactive) && 
+                            ComponentLookupPrefabRef.TryGetComponent(installedUpgrade.m_Upgrade, out PrefabRef installedUpgradePrefabRef) && 
                             componentLookup.TryGetComponent(installedUpgradePrefabRef.m_Prefab, out T installedUpgradeComponentData))
-			            {
+                        {
                             // Combine previous component data with component data from the installed upgrade.
-				            componentData.Combine(installedUpgradeComponentData);
-				            hasInstalledUpgrade = true;
-			            }
-		            }
+                            componentData.Combine(installedUpgradeComponentData);
+                            hasInstalledUpgrade = true;
+                        }
+                    }
                 }
                 
                 // Return whether or not there is component data.
@@ -360,7 +422,7 @@ namespace BuildingUse
             /// <summary>
             /// Update entity color.
             /// </summary>
-            private void UpdateEntityColor(long used, long capacity, bool infomodeActive, int infomodeIndex, NativeArray<Game.Objects.Color> colors, int colorsIndex)
+            private void UpdateEntityColor(long used, long capacity, bool infomodeActive, int infomodeIndex, NativeArray<Color> colors, int colorsIndex)
             {
                 // If infomode is active, set color for this entity.
                 // Otherwise, leave entity color as the default color set earlier, which is the grayish/off-white color.
@@ -368,7 +430,7 @@ namespace BuildingUse
                 {
                     // All infomodes for this mod have a range from 0 to 255 which represents 0% to 100%.
                     float useRatio = capacity > 0 ? (float)used / capacity : 0f;
-                    colors[colorsIndex] = new Game.Objects.Color((byte)infomodeIndex, (byte)math.clamp(Mathf.RoundToInt(255f * useRatio), 0, 255)); 
+                    colors[colorsIndex] = new Color((byte)infomodeIndex, (byte)math.clamp(Mathf.RoundToInt(255f * useRatio), 0, 255)); 
                 }
             }
 
@@ -383,7 +445,7 @@ namespace BuildingUse
                     // Add an entry of used and capacity for this thread.
                     // By having a separate entry for each thread, parallel threads will never access the same inner list at the same time.
                     TotalUsedCapacity[JobsUtility.ThreadIndex].Add(
-                        new SubtotalUsedCapacity() { buildingStatusType = buildingStatusType, used = used, capacity = capacity });
+                        new SubtotalUsedCapacity() { BuildingStatusType = buildingStatusType, Used = used, Capacity = capacity });
                 }
             }
 
@@ -410,48 +472,6 @@ namespace BuildingUse
 
 
         /// <summary>
-        /// Job to set the color of each middle building to the color of its owner.
-        /// Middle buildings include sub buildings (i.e. building upgrades placed around the perimeter of the main building).
-        /// Logic is adapted from Game.Rendering.ObjectColorSystem except to handle only buildings and variables are renamed to improve readability.
-        /// </summary>
-        [BurstCompile]
-        private struct UpdateColorsJobMiddleBuilding : IJobChunk
-        {
-            // Color component lookup to update.
-            [NativeDisableParallelForRestriction] public ComponentLookup<Game.Objects.Color> ComponentLookupColor;
-
-            // Component type handles.
-            [ReadOnly] public ComponentTypeHandle<Game.Common.Owner> ComponentTypeHandleOwner;
-
-            // Entity type handle.
-            [ReadOnly] public EntityTypeHandle EntityTypeHandle;
-
-            /// <summary>
-            /// Job execution.
-            /// </summary>
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
-            {
-                // Do each entity.
-                NativeArray<Game.Common.Owner> owners   = chunk.GetNativeArray(ref ComponentTypeHandleOwner);
-                NativeArray<Entity           > entities = chunk.GetNativeArray(EntityTypeHandle);
-                for (int i = 0; i < entities.Length; i++)
-                {
-                    // Get the color of the owner entity.
-                    if (ComponentLookupColor.TryGetComponent(owners[i].m_Owner, out Game.Objects.Color ownerColor))
-                    {
-                        // Set color of this entity to color of owner entity.
-                        Entity entity = entities[i];
-                        Game.Objects.Color color = ComponentLookupColor[entity];
-                        color.m_Index = ownerColor.m_Index;
-                        color.m_Value = ownerColor.m_Value;
-                        ComponentLookupColor[entity] = color;
-                    }
-                }
-            }
-        }
-
-
-        /// <summary>
         /// Job to set the color of each attachment building to the color of the building to which it is attached.
         /// Attachment buildings are the lots attached to specialized industry hubs.
         /// </summary>
@@ -459,10 +479,10 @@ namespace BuildingUse
         private struct UpdateColorsJobAttachmentBuilding : IJobChunk
         {
             // Color component lookup to update.
-            [NativeDisableParallelForRestriction] public ComponentLookup<Game.Objects.Color> ComponentLookupColor;
+            [NativeDisableParallelForRestriction] public ComponentLookup<Color> ComponentLookupColor;
 
             // Component type handles.
-            [ReadOnly] public ComponentTypeHandle<Game.Objects.Attachment> ComponentTypeHandleAttachment;
+            [ReadOnly] public ComponentTypeHandle<Attachment> ComponentTypeHandleAttachment;
 
             // Entity type handle.
             [ReadOnly] public EntityTypeHandle EntityTypeHandle;
@@ -473,20 +493,149 @@ namespace BuildingUse
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
                 // Do each attachment entity.
-                NativeArray<Game.Objects.Attachment> attachments = chunk.GetNativeArray(ref ComponentTypeHandleAttachment);
-                NativeArray<Entity> entities = chunk.GetNativeArray(EntityTypeHandle);
+                NativeArray<Attachment> attachments = chunk.GetNativeArray(ref ComponentTypeHandleAttachment);
+                NativeArray<Entity    > entities    = chunk.GetNativeArray(EntityTypeHandle);
                 for (int i = 0; i < entities.Length; i++)
                 {
                     // Get the color of the attached entity.
-                    if (ComponentLookupColor.TryGetComponent(attachments[i].m_Attached, out Game.Objects.Color attachedColor))
+                    if (ComponentLookupColor.TryGetComponent(attachments[i].m_Attached, out Color attachedColor))
                     {
+
                         // Set color of this attachment entity to the color of the attached entity.
                         Entity entity = entities[i];
-                        Game.Objects.Color color = ComponentLookupColor[entity];
+                        Color color = ComponentLookupColor[entity];
                         color.m_Index = attachedColor.m_Index;
                         color.m_Value = attachedColor.m_Value;
                         ComponentLookupColor[entity] = color;
                     }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Job to set the color of each middle building to the color of its owner.
+        /// Middle buildings include sub buildings (i.e. building upgrades placed around the perimeter of the main building).
+        /// Logic is adapted from Game.Rendering.ObjectColorSystem.UpdateMiddleObjectColorsJob except:
+        ///     Handle only buildings.
+        ///     Handle port middle buildings specially.
+        ///     Variables are renamed to improve readability.
+        /// </summary>
+        [BurstCompile]
+        private struct UpdateColorsJobMiddleBuilding : IJobChunk
+        {
+            // Color component lookup to update.
+            [NativeDisableParallelForRestriction] public ComponentLookup<Color> ComponentLookupColor;
+
+            // Component lookups.
+            [ReadOnly] public ComponentLookup<BuildingData          > ComponentLookupBuildingData;
+            [ReadOnly] public ComponentLookup<GateData              > ComponentLookupGateData;
+            [ReadOnly] public ComponentLookup<PrefabRef             > ComponentLookupPrefabRef;
+            [ReadOnly] public ComponentLookup<StorageCompanyData    > ComponentLookupStorageCompanyData;
+
+            // Component type handles.
+            [ReadOnly] public ComponentTypeHandle<Owner             > ComponentTypeHandleOwner;
+            [ReadOnly] public ComponentTypeHandle<PrefabRef         > ComponentTypeHandlePrefabRef;
+
+            // Entity type handle.
+            [ReadOnly] public EntityTypeHandle EntityTypeHandle;
+
+            /// <summary>
+            /// Job execution.
+            /// </summary>
+            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            {
+                // Do each entity.
+                NativeArray<Owner    > owners     = chunk.GetNativeArray(ref ComponentTypeHandleOwner);
+                NativeArray<PrefabRef> prefabRefs = chunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
+                NativeArray<Entity   > entities   = chunk.GetNativeArray(EntityTypeHandle);
+                for (int i = 0; i < entities.Length; i++)
+                {
+                    // Get the entity and owner for this building.
+                    Entity entity = entities[i];
+                    Entity ownerEntity = owners[i].m_Owner;
+
+                    // Check for port middle building.
+                    // All port middle buildings have an Owner that is the main port gate building.
+                    // A main port gate building's prefab has the GateData component.
+                    if (ComponentLookupPrefabRef.TryGetComponent(ownerEntity, out PrefabRef ownerPrefabRef) &&
+                        ComponentLookupGateData.HasComponent(ownerPrefabRef.m_Prefab))
+                    {
+                        // Set the color of this port middle building.
+                        SetPortBuildingColor(entity, prefabRefs[i].m_Prefab, ownerEntity);
+                    }
+                    else
+                    {
+                        // This is not a port middle building.
+                        // Set this building color same as the owner building.
+                        SetBuildingColorToOwnerColor(entity, ownerEntity);
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Set color for a port middle building.
+            /// </summary>
+            private void SetPortBuildingColor(Entity entity, Entity prefab, Entity ownerEntity)
+            {
+                // Port middle buildings are the port buildings placed in the port's area and include:
+                //      Auxiliary Port Gate.
+                //      Employee Canteen, Port Security, Emergency Response.
+                //      Container Crane.
+                //      Passenger Terminal.
+                //      Intermodal Train Terminal.
+                //      Container Yard, Cargo Warehouse, Tank Farm, Bulk Storage Yard (collectively "storage").
+
+                // Check for auxiliary port gate building.
+                // An auxiliary port gate building's prefab has GateData component.
+                if (ComponentLookupGateData.HasComponent(prefab))
+                {
+                    // Set auxiliary port gate building color same as the main port gate building.
+                    SetBuildingColorToOwnerColor(entity, ownerEntity);
+                    return;
+                }
+
+                // Check for port storage building.
+                // All port storage buildings have a prefab with StorageCompanyData that defines stored resources.
+                // Note that the Container Crane's prefab has StorageCompanyData but does not define stored resources.
+                if (ComponentLookupStorageCompanyData.TryGetComponent(prefab, out StorageCompanyData storageCompanyData) &&
+                    storageCompanyData.m_StoredResources != Resource.NoResource)
+                {
+                    // Set port storage building color same as the main port gate building.
+                    SetBuildingColorToOwnerColor(entity, ownerEntity);
+
+                    // Determine whether or not this building's lot should be colorized.
+                    // This is specified in Color.m_SubColor.
+                    // But for unknown reasons, the Bulk Storage Yards start with m_SubColor = false
+                    // when the Bulk Storage Yards should have m_SubColor = true;
+                    // So need to set m_SubColor here according to the building prefab's ColorizeLot flag.
+                    // For simplicity, set SubColor for all port storage buildings, not just Bulk Storage Yards.
+                    Color color = ComponentLookupColor[entity];
+                    color.m_SubColor =
+                        ComponentLookupBuildingData.TryGetComponent(prefab, out BuildingData buildingData) &&
+                        (buildingData.m_Flags & BuildingFlags.ColorizeLot) != 0;
+                    ComponentLookupColor[entity] = color;
+
+                    return;
+                }
+
+                // If get here without setting building color, then building simply remains default color.
+            }
+
+            /// <summary>
+            /// Set building color same as owner building.
+            /// </summary>
+            private void SetBuildingColorToOwnerColor(Entity entity, Entity ownerEntity)
+            {
+                // Get color of owner building.
+                if (ComponentLookupColor.TryGetComponent(ownerEntity, out Color ownerColor))
+                {
+                    // Set color of this entity to color of owner entity.
+                    // Building's SubColor remains unchanged.
+                    Color color = ComponentLookupColor[entity];
+                    color.m_Index = ownerColor.m_Index;
+                    color.m_Value = ownerColor.m_Value;
+                    ComponentLookupColor[entity] = color;
                 }
             }
         }
@@ -501,10 +650,10 @@ namespace BuildingUse
         private struct UpdateColorsJobTempObject : IJobChunk
         {
             // Color component lookup to update.
-            [NativeDisableParallelForRestriction] public ComponentLookup<Game.Objects.Color> ComponentLookupColor;
+            [NativeDisableParallelForRestriction] public ComponentLookup<Color> ComponentLookupColor;
 
             // Component type handles.
-            [ReadOnly] public ComponentTypeHandle<Game.Tools.Temp> ComponentTypeHandleTemp;
+            [ReadOnly] public ComponentTypeHandle<Temp> ComponentTypeHandleTemp;
 
             // Entity type handle.
             [ReadOnly] public EntityTypeHandle EntityTypeHandle;
@@ -516,10 +665,10 @@ namespace BuildingUse
             {
                 // Set color of object to color of its original.
                 NativeArray<Entity> entities = chunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Tools.Temp> temps = chunk.GetNativeArray(ref ComponentTypeHandleTemp);
+                NativeArray<Temp> temps = chunk.GetNativeArray(ref ComponentTypeHandleTemp);
                 for (int i = 0; i < temps.Length; i++)
                 {
-                    if (ComponentLookupColor.TryGetComponent(temps[i].m_Original, out Game.Objects.Color originalColor))
+                    if (ComponentLookupColor.TryGetComponent(temps[i].m_Original, out Color originalColor))
                     {
                         ComponentLookupColor[entities[i]] = originalColor;
                     }
@@ -538,18 +687,18 @@ namespace BuildingUse
         private struct UpdateColorsJobSubObject : IJobChunk
         {
             // Color component lookup to update.
-            [NativeDisableParallelForRestriction] public ComponentLookup<Game.Objects.Color> ComponentLookupColor;
+            [NativeDisableParallelForRestriction] public ComponentLookup<Color> ComponentLookupColor;
 
             // Component lookups.
-            [ReadOnly] public ComponentLookup<Game.Buildings.   Building    > ComponentLookupBuilding;
-            [ReadOnly] public ComponentLookup<Game.Objects.     Elevation   > ComponentLookupElevation;
-            [ReadOnly] public ComponentLookup<Game.Common.      Owner       > ComponentLookupOwner;
-            [ReadOnly] public ComponentLookup<Game.Vehicles.    Vehicle     > ComponentLookupVehicle;
+            [ReadOnly] public ComponentLookup<Building  > ComponentLookupBuilding;
+            [ReadOnly] public ComponentLookup<Elevation > ComponentLookupElevation;
+            [ReadOnly] public ComponentLookup<Owner     > ComponentLookupOwner;
+            [ReadOnly] public ComponentLookup<Vehicle   > ComponentLookupVehicle;
 
             // Component type handles.
-            [ReadOnly] public ComponentTypeHandle<Game.Objects. Elevation   > ComponentTypeHandleElevation;
-            [ReadOnly] public ComponentTypeHandle<Game.Common.  Owner       > ComponentTypeHandleOwner;
-            [ReadOnly] public ComponentTypeHandle<Game.Objects. Tree        > ComponentTypeHandleTree;
+            [ReadOnly] public ComponentTypeHandle<Elevation > ComponentTypeHandleElevation;
+            [ReadOnly] public ComponentTypeHandle<Owner     > ComponentTypeHandleOwner;
+            [ReadOnly] public ComponentTypeHandle<Tree      > ComponentTypeHandleTree;
 
             // Entity type handle.
             [ReadOnly] public EntityTypeHandle EntityTypeHandle;
@@ -559,19 +708,19 @@ namespace BuildingUse
             /// </summary>
             public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
             {
-                NativeArray<Game.Common.Owner> owners = chunk.GetNativeArray(ref ComponentTypeHandleOwner);
+                NativeArray<Owner> owners = chunk.GetNativeArray(ref ComponentTypeHandleOwner);
                 NativeArray<Entity> entities = chunk.GetNativeArray(EntityTypeHandle);
                 if (chunk.Has(ref ComponentTypeHandleTree))
                 {
-                    NativeArray<Game.Objects.Elevation> elevations = chunk.GetNativeArray(ref ComponentTypeHandleElevation);
+                    NativeArray<Elevation> elevations = chunk.GetNativeArray(ref ComponentTypeHandleElevation);
                     for (int i = 0; i < entities.Length; i++)
                     {
                         Entity entity = entities[i];
-                        Game.Common.Owner owner = owners[i];
-                        Game.Objects.Elevation elevation;
-                        bool flag = CollectionUtils.TryGet(elevations, i, out elevation) && (elevation.m_Flags & Game.Objects.ElevationFlags.OnGround) == 0;
+                        Owner owner = owners[i];
+                        Elevation elevation;
+                        bool flag = CollectionUtils.TryGet(elevations, i, out elevation) && (elevation.m_Flags & ElevationFlags.OnGround) == 0;
                         bool flag2 = flag && !ComponentLookupColor.HasComponent(owner.m_Owner);
-                        Game.Common.Owner newOwner;
+                        Owner newOwner;
                         while (ComponentLookupOwner.TryGetComponent(owner.m_Owner, out newOwner) && !ComponentLookupBuilding.HasComponent(owner.m_Owner) && !ComponentLookupVehicle.HasComponent(owner.m_Owner))
                         {
                             if (flag2)
@@ -582,12 +731,12 @@ namespace BuildingUse
                                 }
                                 else
                                 {
-                                    flag &= ComponentLookupElevation.TryGetComponent(owner.m_Owner, out elevation) && (elevation.m_Flags & Game.Objects.ElevationFlags.OnGround) == 0;
+                                    flag &= ComponentLookupElevation.TryGetComponent(owner.m_Owner, out elevation) && (elevation.m_Flags & ElevationFlags.OnGround) == 0;
                                 }
                             }
                             owner = newOwner;
                         }
-                        if (ComponentLookupColor.TryGetComponent(owner.m_Owner, out Game.Objects.Color color) && (flag || color.m_SubColor))
+                        if (ComponentLookupColor.TryGetComponent(owner.m_Owner, out Color color) && (flag || color.m_SubColor))
                         {
                             ComponentLookupColor[entity] = color;
                         }
@@ -597,13 +746,13 @@ namespace BuildingUse
 
                 for (int j = 0; j < entities.Length; j++)
                 {
-                    Game.Common.Owner owner = owners[j];
-                    Game.Common.Owner newOwner;
+                    Owner owner = owners[j];
+                    Owner newOwner;
                     while (ComponentLookupOwner.TryGetComponent(owner.m_Owner, out newOwner) && !ComponentLookupBuilding.HasComponent(owner.m_Owner) && !ComponentLookupVehicle.HasComponent(owner.m_Owner))
                     {
                         owner = newOwner;
                     }
-                    if (ComponentLookupColor.TryGetComponent(owner.m_Owner, out Game.Objects.Color color))
+                    if (ComponentLookupColor.TryGetComponent(owner.m_Owner, out Color color))
                     {
                         ComponentLookupColor[entities[j]] = color;
                     }
@@ -621,14 +770,14 @@ namespace BuildingUse
         private static BuildingColorSystem  _buildingColorSystem;
 
         // Other systems.
-        private Game.Tools.ToolSystem _toolSystem;
+        private ToolSystem _toolSystem;
         private BuildingUseUISystem _buildingUseUISystem;
 
         // Entity queries.
         private EntityQuery _queryDefault;
         private EntityQuery _queryMainBuilding;
-        private EntityQuery _queryMiddleBuilding;
         private EntityQuery _queryAttachmentBuilding;
+        private EntityQuery _queryMiddleBuilding;
         private EntityQuery _queryTempObject;
         private EntityQuery _querySubObject;
         private EntityQuery _queryActiveBuildingStatusData;
@@ -636,8 +785,10 @@ namespace BuildingUse
         // Harmony ID.
         private const string HarmonyID = "rcav8tr." + ModAssemblyInfo.Name;
 
-        // Max number of thread entries in the previous frame.
-        private int _previousMaxThreadEntries = 8;
+        // Create nested array of lists for used and capacity data.
+        // The outer array is one for each possible thread.
+        // The inner list is one for each subtotal of used and capacity amounts.
+        NativeArray<NativeList<SubtotalUsedCapacity>> _totalUsedCapacity;
 
         /// <summary>
         /// Initialize this system.
@@ -652,77 +803,55 @@ namespace BuildingUse
             _buildingColorSystem = this;
 
             // Get other systems.
-            _toolSystem          = base.World.GetOrCreateSystemManaged<Game.Tools.ToolSystem>();
+            _toolSystem          = base.World.GetOrCreateSystemManaged<ToolSystem>();
             _buildingUseUISystem = base.World.GetOrCreateSystemManaged<BuildingUseUISystem>();
 
             // Query to get default objects (i.e. every object that has a color).
-		    _queryDefault = GetEntityQuery
-            (
-                new EntityQueryDesc
-		        {
-			        All = new ComponentType[]
-			        {
-				        ComponentType.ReadOnly <Game.Objects.   Object>(),
-				        ComponentType.ReadWrite<Game.Objects.   Color>(),
-			        },
-			        None = new ComponentType[]
-			        {
-				        ComponentType.ReadOnly<Game.Tools.      Hidden>(),
-				        ComponentType.ReadOnly<Game.Common.     Deleted>(),
-			        }
-		        }
-            );
-
-            // Query to get main buildings.
-            // Adapted from Game.Rendering.ObjectColorSystem.
-		    _queryMainBuilding = GetEntityQuery
-            (
-                new EntityQueryDesc
-		        {
-			        All = new ComponentType[]
-			        {
-				        ComponentType.ReadOnly <Game.Objects.   Object>(),
-				        ComponentType.ReadWrite<Game.Objects.   Color>(),
-			        },
-                    Any = new ComponentType[]
-                    {
-                        ComponentType.ReadOnly<Game.Buildings.  Building>(),
-                        ComponentType.ReadOnly<Game.Routes.     MailBox>(),
-                    },
-			        None = new ComponentType[]
-			        {
-                        // Do not exclude hidden buildings because they must be included in the total used and capacity data.
-				        //ComponentType.ReadOnly<Hidden>(),
-
-                        ComponentType.ReadOnly<Game.Buildings.  Abandoned>(),   // Exclude abandoned buildings. 
-                        ComponentType.ReadOnly<Game.Buildings.  Condemned>(),   // Exclude condemned buildings.
-				        ComponentType.ReadOnly<Game.Common.     Deleted>(),     // Exclude deleted   buildings.
-                        ComponentType.ReadOnly<Game.Common.     Destroyed>(),   // Exclude destroyed buildings.
-				        ComponentType.ReadOnly<Game.Common.     Owner>(),       // Exclude subbuildings (see middle buildings query below).
-                        ComponentType.ReadOnly<Game.Objects.    Attachment>(),  // Exclude attachments (see attachments query below).
-				        ComponentType.ReadOnly<Game.Tools.      Temp>(),        // Exclude temp (see temp objects query below).
-			        }
-		        }
-            );
-
-            // Query to get middle buildings.
-            // Middle buildings include sub buildings (i.e. building upgrades placed around the perimeter of the main building).
-            // Copied exactly from Game.Rendering.ObjectColorSystem except Vehicles with Controllers and attachments are excluded.
-            _queryMiddleBuilding = GetEntityQuery
+            _queryDefault = GetEntityQuery
             (
                 new EntityQueryDesc
                 {
                     All = new ComponentType[]
                     {
-                        ComponentType.ReadOnly<Game.Buildings.  Building>(),
-                        ComponentType.ReadOnly<Game.Common.     Owner>(),
-                        ComponentType.ReadWrite<Game.Objects.   Color>(),
+                        ComponentType.ReadOnly <Object>(),
+                        ComponentType.ReadWrite<Color>(),
                     },
                     None = new ComponentType[]
                     {
-                        ComponentType.ReadOnly<Game.Objects.    Attachment>(),  // Exclude attachments (see attachment buildings query below).
-                        ComponentType.ReadOnly<Game.Tools.      Hidden>(),
-                        ComponentType.ReadOnly<Game.Common.     Deleted>(),
+                        ComponentType.ReadOnly<Hidden>(),
+                        ComponentType.ReadOnly<Deleted>(),
+                    }
+                }
+            );
+
+            // Query to get main buildings.
+            // Adapted from Game.Rendering.ObjectColorSystem.
+            _queryMainBuilding = GetEntityQuery
+            (
+                new EntityQueryDesc
+                {
+                    All = new ComponentType[]
+                    {
+                        ComponentType.ReadOnly<Object>(),
+                        ComponentType.ReadWrite<Color>(),
+                    },
+                    Any = new ComponentType[]
+                    {
+                        ComponentType.ReadOnly<Building>(),
+                        ComponentType.ReadOnly<MailBox>(),
+                    },
+                    None = new ComponentType[]
+                    {
+                        // Do not exclude hidden buildings because they must be included in the total used and capacity data.
+                        //ComponentType.ReadOnly<Hidden>(),
+
+                        ComponentType.ReadOnly<Abandoned>(),    // Exclude abandoned buildings. 
+                        ComponentType.ReadOnly<Condemned>(),    // Exclude condemned buildings.
+                        ComponentType.ReadOnly<Deleted>(),      // Exclude deleted   buildings.
+                        ComponentType.ReadOnly<Destroyed>(),    // Exclude destroyed buildings.
+                        ComponentType.ReadOnly<Owner>(),        // Exclude subbuildings (see middle buildings query below).
+                        ComponentType.ReadOnly<Attachment>(),   // Exclude attachments (see attachments query below).
+                        ComponentType.ReadOnly<Temp>(),         // Exclude temp (see temp objects query below).
                     }
                 }
             );
@@ -735,15 +864,37 @@ namespace BuildingUse
                 {
                     All = new ComponentType[]
                     {
-                        ComponentType.ReadOnly <Game.Buildings. Building>(),
-                        ComponentType.ReadOnly <Game.Objects.   Attachment>(),
-                        ComponentType.ReadWrite<Game.Objects.   Color>(),
+                        ComponentType.ReadOnly<Building>(),
+                        ComponentType.ReadOnly<Attachment>(),
+                        ComponentType.ReadWrite<Color>(),
                     },
                     None = new ComponentType[]
                     {
-                        ComponentType.ReadOnly<Game.Common.     Owner>(),       // Exclude middle buildings (see middle buildings query above).
-                        ComponentType.ReadOnly<Game.Tools.      Hidden>(),
-                        ComponentType.ReadOnly<Game.Common.     Deleted>(),
+                        ComponentType.ReadOnly<Owner>(),    // Exclude middle buildings (see middle buildings query below).
+                        ComponentType.ReadOnly<Hidden>(),
+                        ComponentType.ReadOnly<Deleted>(),
+                    }
+                }
+            );
+
+            // Query to get middle buildings.
+            // Middle buildings include sub buildings (i.e. building upgrades placed around the perimeter of the main building).
+            // Copied exactly from Game.Rendering.ObjectColorSystem except Vehicles with Controllers and attachments are excluded.
+            _queryMiddleBuilding = GetEntityQuery
+            (
+                new EntityQueryDesc
+                {
+                    All = new ComponentType[]
+                    {
+                        ComponentType.ReadOnly<Building>(),
+                        ComponentType.ReadOnly<Owner>(),
+                        ComponentType.ReadWrite<Color>(),
+                    },
+                    None = new ComponentType[]
+                    {
+                        ComponentType.ReadOnly<Attachment>(),   // Exclude attachments (see attachment buildings query above).
+                        ComponentType.ReadOnly<Hidden>(),
+                        ComponentType.ReadOnly<Deleted>(),
                     }
                 }
             );
@@ -758,14 +909,14 @@ namespace BuildingUse
                 {
                     All = new ComponentType[]
                     {
-                        ComponentType.ReadOnly <Game.Objects.   Object>(),
-                        ComponentType.ReadWrite<Game.Objects.   Color>(),
-                        ComponentType.ReadOnly <Game.Tools.     Temp>(),
+                        ComponentType.ReadOnly<Object>(),
+                        ComponentType.ReadWrite<Color>(),
+                        ComponentType.ReadOnly<Temp>(),
                     },
                     None = new ComponentType[]
                     {
-                        ComponentType.ReadOnly<Game.Tools.      Hidden>(),
-                        ComponentType.ReadOnly<Game.Common.     Deleted>(),
+                        ComponentType.ReadOnly<Hidden>(),
+                        ComponentType.ReadOnly<Deleted>(),
                     }
                 }
             );
@@ -779,19 +930,19 @@ namespace BuildingUse
                 {
                     All = new ComponentType[]
                     {
-                        ComponentType.ReadOnly <Game.Objects.   Object>(),
-                        ComponentType.ReadOnly <Game.Common.    Owner>(),
-                        ComponentType.ReadWrite<Game.Objects.   Color>(),
+                        ComponentType.ReadOnly <Object>(),
+                        ComponentType.ReadOnly <Owner>(),
+                        ComponentType.ReadWrite<Color>(),
                     },
                     None = new ComponentType[]
                     {
                         // Exclude all same things as base game logic.
-                        ComponentType.ReadOnly<Game.Tools.      Hidden>(),
-                        ComponentType.ReadOnly<Game.Common.     Deleted>(),
-                        ComponentType.ReadOnly<Game.Vehicles.   Vehicle>(),
-                        ComponentType.ReadOnly<Game.Creatures.  Creature>(),
-                        ComponentType.ReadOnly<Game.Buildings.  Building>(),
-                        ComponentType.ReadOnly<Game.Objects.    UtilityObject>(),
+                        ComponentType.ReadOnly<Hidden>(),
+                        ComponentType.ReadOnly<Deleted>(),
+                        ComponentType.ReadOnly<Vehicle>(),
+                        ComponentType.ReadOnly<Creature>(),
+                        ComponentType.ReadOnly<Building>(),
+                        ComponentType.ReadOnly<UtilityObject>(),
                     }
                 }
             );
@@ -805,20 +956,30 @@ namespace BuildingUse
                 {
                     All = new ComponentType[]
                     {
-                        ComponentType.ReadOnly<Game.Prefabs.    InfoviewBuildingStatusData>(),
-                        ComponentType.ReadOnly<Game.Prefabs.    InfomodeActive>(),
+                        ComponentType.ReadOnly<InfoviewBuildingStatusData>(),
+                        ComponentType.ReadOnly<InfomodeActive>(),
                     }
                 }
             );
+
+            // Create nested arrays and lists to hold used and capacity amounts.
+            // Arrays and lists are persistent so they do not need to be recreated each time a job runs.
+            int threadCount = JobsUtility.ThreadIndexCount;
+            _totalUsedCapacity = new NativeArray<NativeList<SubtotalUsedCapacity>>(threadCount, Allocator.Persistent);
+            for (int i = 0; i < threadCount; i++)
+            {
+                // Each thread array entry is a list to hold used and capacity subtotals.
+                _totalUsedCapacity[i] = new NativeList<SubtotalUsedCapacity>(32, Allocator.Persistent);
+            }
 
             // Use Harmony to patch ObjectColorSystem.OnUpdate with BuildingColorSystem.OnUpdatePrefix.
             // When one of this mod's infoviews is displayed, it is not necessary to execute ObjectColorSystem.OnUpdate.
             // By using a Harmony prefix, this system can prevent the execution of ObjectColorSystem.OnUpdate.
             // Note that ObjectColorSystem.OnUpdate can be patched, but the jobs in ObjectColorSystem cannot be patched because they are burst compiled.
-            MethodInfo originalMethod = typeof(Game.Rendering.ObjectColorSystem).GetMethod("OnUpdate", BindingFlags.Instance | BindingFlags.NonPublic);
+            MethodInfo originalMethod = typeof(ObjectColorSystem).GetMethod("OnUpdate", BindingFlags.Instance | BindingFlags.NonPublic);
             if (originalMethod == null)
             {
-                Mod.log.Error($"Unable to find original method {nameof(Game.Rendering.ObjectColorSystem)}.OnUpdate.");
+                Mod.log.Error($"Unable to find original method {nameof(ObjectColorSystem)}.OnUpdate.");
                 return;
             }
             MethodInfo prefixMethod = typeof(BuildingColorSystem).GetMethod(nameof(OnUpdatePrefix), BindingFlags.Static | BindingFlags.NonPublic);
@@ -828,6 +989,21 @@ namespace BuildingUse
                 return;
             }
             new Harmony(HarmonyID).Patch(originalMethod, new HarmonyMethod(prefixMethod), null);
+        }
+
+        /// <summary>
+        /// One time system destruction.
+        /// </summary>
+        protected override void OnDestroy()
+        {
+            // Dispose persistent native collections.
+            for (int i = 0; i < _totalUsedCapacity.Length; i++)
+            {
+                _totalUsedCapacity[i].Dispose();
+            }
+            _totalUsedCapacity.Dispose();
+
+            base.OnDestroy();
         }
 
         /// <summary>
@@ -866,186 +1042,188 @@ namespace BuildingUse
             }
 
             // Active infoview is for this mod.
-            // Run jobs to set building colors and get used and capacity data.
 
-
-            // Create a job to update default colors.
-            UpdateColorsJobDefault updateColorsJobDefault = new UpdateColorsJobDefault()
+            // Clear inner lists that hold used and capacity amounts.
+            // When a NativeList is cleared, capacity remains the same.
+            // So once increased, the capacity never decreases, as desired,
+            // so list capacity does not need to be expanded each time OnUpdate runs.
+            for (int i = 0; i < _totalUsedCapacity.Length; i++)
             {
-                ComponentTypeHandleColor = SystemAPI.GetComponentTypeHandle<Game.Objects.Color>(false),
-            };
-
+                _totalUsedCapacity[i].Clear();
+            }
 
             // Define a job to get active building status types.
             NativeList<ArchetypeChunk> activeBuildingStatusDataChunks =
                 _queryActiveBuildingStatusData.ToArchetypeChunkListAsync(Allocator.TempJob, out JobHandle activeBuildingStatusDataJobHandle);
 
-            // Create array for used and capacity data, one entry for each possible parallel job thread.
-            NativeArray<NativeList<SubtotalUsedCapacity>> totalUsedCapacity =
-                new NativeArray<NativeList<SubtotalUsedCapacity>>(JobsUtility.ThreadIndexCount, Allocator.TempJob);
-            for (int i = 0; i < totalUsedCapacity.Length; i++)
+
+            // Create a job to update default colors.
+            UpdateColorsJobDefault updateColorsJobDefault = new UpdateColorsJobDefault()
             {
-                // Each thread array entry is a list to hold used and capacity subtotals.
-                // When the list capacity needs to be expanded because a new entry is added, a new larger block of memory is allocated,
-                // old list is copied there, then old list memory is released.  Doing all this every frame would reduce performance.
-                // Initial list capacity is set to the max number of thread entries from the previous frame.
-                // This is to try to minimize the number of times the list capacity needs to be expanded when adding new entries
-                // while at the same time not using much more memory than is needed for the list.
-                // It appears from empirical testing that:
-                //      The actual initial list capacity is the power of 2 that is at least as large as the initial capacity.
-                //      If the list capacity needs to be increased to add another entry, the list capacity is doubled.
-                //      Therefore, list capacity is always a power of 2.
-                totalUsedCapacity[i] = new NativeList<SubtotalUsedCapacity>(_previousMaxThreadEntries, Allocator.TempJob);
-            }
+                ComponentTypeHandleColor = SystemAPI.GetComponentTypeHandle<Color>(false),
+            };
+
 
             // Create a job to update main building colors.
             // All of the buffers and components are set even though not all of them will be used for the active infoview.
             UpdateColorsJobMainBuilding updateColorsJobMainBuilding = new UpdateColorsJobMainBuilding()
             {
-                ComponentTypeHandleColor                        = SystemAPI.GetComponentTypeHandle<Game.Objects.Color>(false),
+                ComponentTypeHandleColor                        = SystemAPI.GetComponentTypeHandle<Color>(false),
 
-                BufferLookupEfficiency                          = SystemAPI.GetBufferLookup<Game.Buildings.         Efficiency                  >(true),
-                BufferLookupEmployee                            = SystemAPI.GetBufferLookup<Game.Companies.         Employee                    >(true),
-                BufferLookupHouseholdCitizen                    = SystemAPI.GetBufferLookup<Game.Citizens.          HouseholdCitizen            >(true),
-                BufferLookupInstalledUpgrade                    = SystemAPI.GetBufferLookup<Game.Buildings.         InstalledUpgrade            >(true),
-                BufferLookupLaneObject                          = SystemAPI.GetBufferLookup<Game.Net.               LaneObject                  >(true),
-                BufferLookupOccupant                            = SystemAPI.GetBufferLookup<Game.Buildings.         Occupant                    >(true),
-                BufferLookupOwnedVehicle                        = SystemAPI.GetBufferLookup<Game.Vehicles.          OwnedVehicle                >(true),
-                BufferLookupPatient                             = SystemAPI.GetBufferLookup<Game.Buildings.         Patient                     >(true),
-                BufferLookupRenter                              = SystemAPI.GetBufferLookup<Game.Buildings.         Renter                      >(true),
-                BufferLookupResources                           = SystemAPI.GetBufferLookup<Game.Economy.           Resources                   >(true),
-                BufferLookupStudent                             = SystemAPI.GetBufferLookup<Game.Buildings.         Student                     >(true),
-                BufferLookupSubArea                             = SystemAPI.GetBufferLookup<Game.Areas.             SubArea                     >(true),
-                BufferLookupSubLane                             = SystemAPI.GetBufferLookup<Game.Net.               SubLane                     >(true),
-                BufferLookupSubNet                              = SystemAPI.GetBufferLookup<Game.Net.               SubNet                      >(true),
-                BufferLookupSubObject                           = SystemAPI.GetBufferLookup<Game.Objects.           SubObject                   >(true),
+                BufferLookupEfficiency                          = SystemAPI.GetBufferLookup<Efficiency          >(true),
+                BufferLookupEmployee                            = SystemAPI.GetBufferLookup<Employee            >(true),
+                BufferLookupHouseholdCitizen                    = SystemAPI.GetBufferLookup<HouseholdCitizen    >(true),
+                BufferLookupInstalledUpgrade                    = SystemAPI.GetBufferLookup<InstalledUpgrade    >(true),
+                BufferLookupLaneObject                          = SystemAPI.GetBufferLookup<LaneObject          >(true),
+                BufferLookupOccupant                            = SystemAPI.GetBufferLookup<Occupant            >(true),
+                BufferLookupOwnedVehicle                        = SystemAPI.GetBufferLookup<OwnedVehicle        >(true),
+                BufferLookupPatient                             = SystemAPI.GetBufferLookup<Patient             >(true),
+                BufferLookupRenter                              = SystemAPI.GetBufferLookup<Renter              >(true),
+                BufferLookupResources                           = SystemAPI.GetBufferLookup<Resources           >(true),
+                BufferLookupStudent                             = SystemAPI.GetBufferLookup<Student             >(true),
+                BufferLookupSubArea                             = SystemAPI.GetBufferLookup<SubArea             >(true),
+                BufferLookupSubLane                             = SystemAPI.GetBufferLookup<SubLane             >(true),
+                BufferLookupSubNet                              = SystemAPI.GetBufferLookup<SubNet              >(true),
+                BufferLookupSubObject                           = SystemAPI.GetBufferLookup<SubObject           >(true),
                 
-                ComponentLookupAmbulance                        = SystemAPI.GetComponentLookup<Game.Vehicles.       Ambulance                   >(true),
-                ComponentLookupBatteryData                      = SystemAPI.GetComponentLookup<Game.Prefabs.        BatteryData                 >(true),
-                ComponentLookupBuildingData                     = SystemAPI.GetComponentLookup<Game.Prefabs.        BuildingData                >(true),
-                ComponentLookupBuildingPropertyData             = SystemAPI.GetComponentLookup<Game.Prefabs.        BuildingPropertyData        >(true),
-                ComponentLookupCitizen                          = SystemAPI.GetComponentLookup<Game.Citizens.       Citizen                     >(true),
-                ComponentLookupCompanyData                      = SystemAPI.GetComponentLookup<Game.Companies.      CompanyData                 >(true),
-                ComponentLookupCurve                            = SystemAPI.GetComponentLookup<Game.Net.            Curve                       >(true),
-                ComponentLookupDeathcareFacilityData            = SystemAPI.GetComponentLookup<Game.Prefabs.        DeathcareFacilityData       >(true),
-                ComponentLookupDeliveryTruck                    = SystemAPI.GetComponentLookup<Game.Vehicles.       DeliveryTruck               >(true),
-                ComponentLookupEmergencyShelterData             = SystemAPI.GetComponentLookup<Game.Prefabs.        EmergencyShelterData        >(true),
-                ComponentLookupEvacuatingTransport              = SystemAPI.GetComponentLookup<Game.Vehicles.       EvacuatingTransport         >(true),
-                ComponentLookupFireEngine                       = SystemAPI.GetComponentLookup<Game.Vehicles.       FireEngine                  >(true),
-                ComponentLookupFireStationData                  = SystemAPI.GetComponentLookup<Game.Prefabs.        FireStationData             >(true),
-                ComponentLookupGarageLane                       = SystemAPI.GetComponentLookup<Game.Net.            GarageLane                  >(true),
-                ComponentLookupGarbageFacilityData              = SystemAPI.GetComponentLookup<Game.Prefabs.        GarbageFacilityData         >(true),
-                ComponentLookupGarbageTruck                     = SystemAPI.GetComponentLookup<Game.Vehicles.       GarbageTruck                >(true),
-                ComponentLookupGeometry                         = SystemAPI.GetComponentLookup<Game.Areas.          Geometry                    >(true),
-                ComponentLookupHealthProblem                    = SystemAPI.GetComponentLookup<Game.Citizens.       HealthProblem               >(true),
-                ComponentLookupHearse                           = SystemAPI.GetComponentLookup<Game.Vehicles.       Hearse                      >(true),
-                ComponentLookupHelicopter                       = SystemAPI.GetComponentLookup<Game.Vehicles.       Helicopter                  >(true),
-                ComponentLookupHospitalData                     = SystemAPI.GetComponentLookup<Game.Prefabs.        HospitalData                >(true),
-                ComponentLookupMailBoxData                      = SystemAPI.GetComponentLookup<Game.Prefabs.        MailBoxData                 >(true),
-                ComponentLookupMaintenanceDepotData             = SystemAPI.GetComponentLookup<Game.Prefabs.        MaintenanceDepotData        >(true),
-                ComponentLookupMaintenanceVehicle               = SystemAPI.GetComponentLookup<Game.Vehicles.       MaintenanceVehicle          >(true),
-                ComponentLookupParkedCar                        = SystemAPI.GetComponentLookup<Game.Vehicles.       ParkedCar                   >(true),
-                ComponentLookupParkedTrain                      = SystemAPI.GetComponentLookup<Game.Vehicles.       ParkedTrain                 >(true),
-                ComponentLookupParkingLane                      = SystemAPI.GetComponentLookup<Game.Net.            ParkingLane                 >(true),
-                ComponentLookupParkingLaneData                  = SystemAPI.GetComponentLookup<Game.Prefabs.        ParkingLaneData             >(true),
-                ComponentLookupPoliceCar                        = SystemAPI.GetComponentLookup<Game.Vehicles.       PoliceCar                   >(true),
-                ComponentLookupPoliceStationData                = SystemAPI.GetComponentLookup<Game.Prefabs.        PoliceStationData           >(true),
-                ComponentLookupPostFacilityData                 = SystemAPI.GetComponentLookup<Game.Prefabs.        PostFacilityData            >(true),
-                ComponentLookupPostVan                          = SystemAPI.GetComponentLookup<Game.Vehicles.       PostVan                     >(true),
-                ComponentLookupPrefabRef                        = SystemAPI.GetComponentLookup<Game.Prefabs.        PrefabRef                   >(true),
-                ComponentLookupPrisonData                       = SystemAPI.GetComponentLookup<Game.Prefabs.        PrisonData                  >(true),
-                ComponentLookupPrisonerTransport                = SystemAPI.GetComponentLookup<Game.Vehicles.       PrisonerTransport           >(true),
-                ComponentLookupPropertyRenter                   = SystemAPI.GetComponentLookup<Game.Buildings.      PropertyRenter              >(true),
-                ComponentLookupPublicTransportVehicleData       = SystemAPI.GetComponentLookup<Game.Prefabs.        PublicTransportVehicleData  >(true),
-                ComponentLookupSchoolData                       = SystemAPI.GetComponentLookup<Game.Prefabs.        SchoolData                  >(true),
-                ComponentLookupSpawnableBuildingData            = SystemAPI.GetComponentLookup<Game.Prefabs.        SpawnableBuildingData       >(true),
-                ComponentLookupStorage                          = SystemAPI.GetComponentLookup<Game.Areas.          Storage                     >(true),
-                ComponentLookupStorageAreaData                  = SystemAPI.GetComponentLookup<Game.Prefabs.        StorageAreaData             >(true),
-                ComponentLookupStorageLimitData                 = SystemAPI.GetComponentLookup<Game.Companies.      StorageLimitData            >(true),
-                ComponentLookupTaxi                             = SystemAPI.GetComponentLookup<Game.Vehicles.       Taxi                        >(true),
-                ComponentLookupTransportCompanyData             = SystemAPI.GetComponentLookup<Game.Companies.      TransportCompanyData        >(true),
-                ComponentLookupTransportDepotData               = SystemAPI.GetComponentLookup<Game.Prefabs.        TransportDepotData          >(true),
-                ComponentLookupWorkplaceData                    = SystemAPI.GetComponentLookup<Game.Prefabs.        WorkplaceData               >(true),
-                ComponentLookupWorkProvider                     = SystemAPI.GetComponentLookup<Game.Companies.      WorkProvider                >(true),
+                ComponentLookupAmbulance                        = SystemAPI.GetComponentLookup<Ambulance                    >(true),
+                ComponentLookupBatteryData                      = SystemAPI.GetComponentLookup<BatteryData                  >(true),
+                ComponentLookupBuildingData                     = SystemAPI.GetComponentLookup<BuildingData                 >(true),
+                ComponentLookupBuildingPropertyData             = SystemAPI.GetComponentLookup<BuildingPropertyData         >(true),
+                ComponentLookupCitizen                          = SystemAPI.GetComponentLookup<Citizen                      >(true),
+                ComponentLookupCompanyData                      = SystemAPI.GetComponentLookup<CompanyData                  >(true),
+                ComponentLookupCurve                            = SystemAPI.GetComponentLookup<Curve                        >(true),
+                ComponentLookupDeathcareFacilityData            = SystemAPI.GetComponentLookup<DeathcareFacilityData        >(true),
+                ComponentLookupDeliveryTruck                    = SystemAPI.GetComponentLookup<DeliveryTruck                >(true),
+                ComponentLookupEmergencyShelterData             = SystemAPI.GetComponentLookup<EmergencyShelterData         >(true),
+                ComponentLookupEvacuatingTransport              = SystemAPI.GetComponentLookup<EvacuatingTransport          >(true),
+                ComponentLookupFireEngine                       = SystemAPI.GetComponentLookup<FireEngine                   >(true),
+                ComponentLookupFireStationData                  = SystemAPI.GetComponentLookup<FireStationData              >(true),
+                ComponentLookupGarageLane                       = SystemAPI.GetComponentLookup<GarageLane                   >(true),
+                ComponentLookupGarbageFacilityData              = SystemAPI.GetComponentLookup<GarbageFacilityData          >(true),
+                ComponentLookupGarbageTruck                     = SystemAPI.GetComponentLookup<GarbageTruck                 >(true),
+                ComponentLookupGeometry                         = SystemAPI.GetComponentLookup<Geometry                     >(true),
+                ComponentLookupHealthProblem                    = SystemAPI.GetComponentLookup<HealthProblem                >(true),
+                ComponentLookupHearse                           = SystemAPI.GetComponentLookup<Hearse                       >(true),
+                ComponentLookupHelicopter                       = SystemAPI.GetComponentLookup<Helicopter                   >(true),
+                ComponentLookupHospitalData                     = SystemAPI.GetComponentLookup<HospitalData                 >(true),
+                ComponentLookupMailBoxData                      = SystemAPI.GetComponentLookup<MailBoxData                  >(true),
+                ComponentLookupMaintenanceDepotData             = SystemAPI.GetComponentLookup<MaintenanceDepotData         >(true),
+                ComponentLookupMaintenanceVehicle               = SystemAPI.GetComponentLookup<MaintenanceVehicle           >(true),
+                ComponentLookupParkedCar                        = SystemAPI.GetComponentLookup<ParkedCar                    >(true),
+                ComponentLookupParkedTrain                      = SystemAPI.GetComponentLookup<ParkedTrain                  >(true),
+                ComponentLookupParkingLane                      = SystemAPI.GetComponentLookup<ParkingLane                  >(true),
+                ComponentLookupParkingLaneData                  = SystemAPI.GetComponentLookup<ParkingLaneData              >(true),
+                ComponentLookupPoliceCar                        = SystemAPI.GetComponentLookup<PoliceCar                    >(true),
+                ComponentLookupPoliceStationData                = SystemAPI.GetComponentLookup<PoliceStationData            >(true),
+                ComponentLookupPostFacilityData                 = SystemAPI.GetComponentLookup<PostFacilityData             >(true),
+                ComponentLookupPostVan                          = SystemAPI.GetComponentLookup<PostVan                      >(true),
+                ComponentLookupPrefabRef                        = SystemAPI.GetComponentLookup<PrefabRef                    >(true),
+                ComponentLookupPrisonData                       = SystemAPI.GetComponentLookup<PrisonData                   >(true),
+                ComponentLookupPrisonerTransport                = SystemAPI.GetComponentLookup<PrisonerTransport            >(true),
+                ComponentLookupPropertyRenter                   = SystemAPI.GetComponentLookup<PropertyRenter               >(true),
+                ComponentLookupPublicTransportVehicleData       = SystemAPI.GetComponentLookup<PublicTransportVehicleData   >(true),
+                ComponentLookupSchoolData                       = SystemAPI.GetComponentLookup<SchoolData                   >(true),
+                ComponentLookupSpawnableBuildingData            = SystemAPI.GetComponentLookup<SpawnableBuildingData        >(true),
+                ComponentLookupStorage                          = SystemAPI.GetComponentLookup<Storage                      >(true),
+                ComponentLookupStorageAreaData                  = SystemAPI.GetComponentLookup<StorageAreaData              >(true),
+                ComponentLookupStorageLimitData                 = SystemAPI.GetComponentLookup<StorageLimitData             >(true),
+                ComponentLookupTaxi                             = SystemAPI.GetComponentLookup<Taxi                         >(true),
+                ComponentLookupTransportCompanyData             = SystemAPI.GetComponentLookup<TransportCompanyData         >(true),
+                ComponentLookupTransportDepotData               = SystemAPI.GetComponentLookup<TransportDepotData           >(true),
+                ComponentLookupWorkplaceData                    = SystemAPI.GetComponentLookup<WorkplaceData                >(true),
+                ComponentLookupWorkProvider                     = SystemAPI.GetComponentLookup<WorkProvider                 >(true),
                 
-                ComponentTypeHandleAdminBuilding                = SystemAPI.GetComponentTypeHandle<Game.Buildings.  AdminBuilding               >(true),
-                ComponentTypeHandleBattery                      = SystemAPI.GetComponentTypeHandle<Game.Buildings.  Battery                     >(true),
-                ComponentTypeHandleCommercialProperty           = SystemAPI.GetComponentTypeHandle<Game.Buildings.  CommercialProperty          >(true),
-                ComponentTypeHandleDeathcareFacility            = SystemAPI.GetComponentTypeHandle<Game.Buildings.  DeathcareFacility           >(true),
-                ComponentTypeHandleDisasterFacility             = SystemAPI.GetComponentTypeHandle<Game.Buildings.  DisasterFacility            >(true),
-                ComponentTypeHandleElectricityProducer          = SystemAPI.GetComponentTypeHandle<Game.Buildings.  ElectricityProducer         >(true),
-                ComponentTypeHandleEmergencyShelter             = SystemAPI.GetComponentTypeHandle<Game.Buildings.  EmergencyShelter            >(true),
-                ComponentTypeHandleFireStation                  = SystemAPI.GetComponentTypeHandle<Game.Buildings.  FireStation                 >(true),
-                ComponentTypeHandleGarbageFacility              = SystemAPI.GetComponentTypeHandle<Game.Buildings.  GarbageFacility             >(true),
-                ComponentTypeHandleHospital                     = SystemAPI.GetComponentTypeHandle<Game.Buildings.  Hospital                    >(true),
-                ComponentTypeHandleIndustrialProperty           = SystemAPI.GetComponentTypeHandle<Game.Buildings.  IndustrialProperty          >(true),
-                ComponentTypeHandleOfficeProperty               = SystemAPI.GetComponentTypeHandle<Game.Buildings.  OfficeProperty              >(true),
-                ComponentTypeHandlePark                         = SystemAPI.GetComponentTypeHandle<Game.Buildings.  Park                        >(true),
-                ComponentTypeHandleParkingFacility              = SystemAPI.GetComponentTypeHandle<Game.Buildings.  ParkingFacility             >(true),
-                ComponentTypeHandleParkMaintenance              = SystemAPI.GetComponentTypeHandle<Game.Buildings.  ParkMaintenance             >(true),
-                ComponentTypeHandlePoliceStation                = SystemAPI.GetComponentTypeHandle<Game.Buildings.  PoliceStation               >(true),
-                ComponentTypeHandlePostFacility                 = SystemAPI.GetComponentTypeHandle<Game.Buildings.  PostFacility                >(true),
-                ComponentTypeHandlePrison                       = SystemAPI.GetComponentTypeHandle<Game.Buildings.  Prison                      >(true),
-                ComponentTypeHandleResearchFacility             = SystemAPI.GetComponentTypeHandle<Game.Buildings.  ResearchFacility            >(true),
-                ComponentTypeHandleResidentialProperty          = SystemAPI.GetComponentTypeHandle<Game.Buildings.  ResidentialProperty         >(true),
-                ComponentTypeHandleRoadMaintenance              = SystemAPI.GetComponentTypeHandle<Game.Buildings.  RoadMaintenance             >(true),
-                ComponentTypeHandleSchool                       = SystemAPI.GetComponentTypeHandle<Game.Buildings.  School                      >(true),
-                ComponentTypeHandleSewageOutlet                 = SystemAPI.GetComponentTypeHandle<Game.Buildings.  SewageOutlet                >(true),
-                ComponentTypeHandleTelecomFacility              = SystemAPI.GetComponentTypeHandle<Game.Buildings.  TelecomFacility             >(true),
-                ComponentTypeHandleTransformer                  = SystemAPI.GetComponentTypeHandle<Game.Buildings.  Transformer                 >(true),
-                ComponentTypeHandleTransportDepot               = SystemAPI.GetComponentTypeHandle<Game.Buildings.  TransportDepot              >(true),
-                ComponentTypeHandleTransportStation             = SystemAPI.GetComponentTypeHandle<Game.Buildings.  TransportStation            >(true),
-                ComponentTypeHandleWaterPumpingStation          = SystemAPI.GetComponentTypeHandle<Game.Buildings.  WaterPumpingStation         >(true),
-                ComponentTypeHandleWelfareOffice                = SystemAPI.GetComponentTypeHandle<Game.Buildings.  WelfareOffice               >(true),
+                ComponentTypeHandleAdminBuilding                = SystemAPI.GetComponentTypeHandle<AdminBuilding            >(true),
+                ComponentTypeHandleBattery                      = SystemAPI.GetComponentTypeHandle<Battery                  >(true),
+                ComponentTypeHandleCommercialProperty           = SystemAPI.GetComponentTypeHandle<CommercialProperty       >(true),
+                ComponentTypeHandleDeathcareFacility            = SystemAPI.GetComponentTypeHandle<DeathcareFacility        >(true),
+                ComponentTypeHandleDisasterFacility             = SystemAPI.GetComponentTypeHandle<DisasterFacility         >(true),
+                ComponentTypeHandleElectricityProducer          = SystemAPI.GetComponentTypeHandle<ElectricityProducer      >(true),
+                ComponentTypeHandleEmergencyShelter             = SystemAPI.GetComponentTypeHandle<EmergencyShelter         >(true),
+                ComponentTypeHandleFireStation                  = SystemAPI.GetComponentTypeHandle<FireStation              >(true),
+                ComponentTypeHandleGarbageFacility              = SystemAPI.GetComponentTypeHandle<GarbageFacility          >(true),
+                ComponentTypeHandleHospital                     = SystemAPI.GetComponentTypeHandle<Hospital                 >(true),
+                ComponentTypeHandleIndustrialProperty           = SystemAPI.GetComponentTypeHandle<IndustrialProperty       >(true),
+                ComponentTypeHandleOfficeProperty               = SystemAPI.GetComponentTypeHandle<OfficeProperty           >(true),
+                ComponentTypeHandlePark                         = SystemAPI.GetComponentTypeHandle<Park                     >(true),
+                ComponentTypeHandleParkingFacility              = SystemAPI.GetComponentTypeHandle<ParkingFacility          >(true),
+                ComponentTypeHandleParkMaintenance              = SystemAPI.GetComponentTypeHandle<ParkMaintenance          >(true),
+                ComponentTypeHandlePoliceStation                = SystemAPI.GetComponentTypeHandle<PoliceStation            >(true),
+                ComponentTypeHandlePostFacility                 = SystemAPI.GetComponentTypeHandle<PostFacility             >(true),
+                ComponentTypeHandlePrison                       = SystemAPI.GetComponentTypeHandle<Prison                   >(true),
+                ComponentTypeHandleResearchFacility             = SystemAPI.GetComponentTypeHandle<ResearchFacility         >(true),
+                ComponentTypeHandleResidentialProperty          = SystemAPI.GetComponentTypeHandle<ResidentialProperty      >(true),
+                ComponentTypeHandleRoadMaintenance              = SystemAPI.GetComponentTypeHandle<RoadMaintenance          >(true),
+                ComponentTypeHandleSchool                       = SystemAPI.GetComponentTypeHandle<School                   >(true),
+                ComponentTypeHandleSewageOutlet                 = SystemAPI.GetComponentTypeHandle<SewageOutlet             >(true),
+                ComponentTypeHandleTelecomFacility              = SystemAPI.GetComponentTypeHandle<TelecomFacility          >(true),
+                ComponentTypeHandleTransformer                  = SystemAPI.GetComponentTypeHandle<Transformer              >(true),
+                ComponentTypeHandleTransportDepot               = SystemAPI.GetComponentTypeHandle<TransportDepot           >(true),
+                ComponentTypeHandleTransportStation             = SystemAPI.GetComponentTypeHandle<TransportStation         >(true),
+                ComponentTypeHandleWaterPumpingStation          = SystemAPI.GetComponentTypeHandle<WaterPumpingStation      >(true),
+                ComponentTypeHandleWelfareOffice                = SystemAPI.GetComponentTypeHandle<WelfareOffice            >(true),
 
-                ComponentTypeHandleCurrentDistrict              = SystemAPI.GetComponentTypeHandle<Game.Areas.      CurrentDistrict             >(true),
-                ComponentTypeHandleDestroyed                    = SystemAPI.GetComponentTypeHandle<Game.Common.     Destroyed                   >(true),
-                ComponentTypeHandleInfomodeActive               = SystemAPI.GetComponentTypeHandle<Game.Prefabs.    InfomodeActive              >(true),
-                ComponentTypeHandleInfoviewBuildingStatusData   = SystemAPI.GetComponentTypeHandle<Game.Prefabs.    InfoviewBuildingStatusData  >(true),
-                ComponentTypeHandleMailBox                      = SystemAPI.GetComponentTypeHandle<Game.Routes.     MailBox                     >(true),
-                ComponentTypeHandlePrefabRef                    = SystemAPI.GetComponentTypeHandle<Game.Prefabs.    PrefabRef                   >(true),
-                ComponentTypeHandleTransportCompany             = SystemAPI.GetComponentTypeHandle<Game.Companies.  TransportCompany            >(true),
-                ComponentTypeHandleUnderConstruction            = SystemAPI.GetComponentTypeHandle<Game.Objects.    UnderConstruction           >(true),
+                ComponentTypeHandleCurrentDistrict              = SystemAPI.GetComponentTypeHandle<CurrentDistrict              >(true),
+                ComponentTypeHandleDestroyed                    = SystemAPI.GetComponentTypeHandle<Destroyed                    >(true),
+                ComponentTypeHandleInfomodeActive               = SystemAPI.GetComponentTypeHandle<InfomodeActive               >(true),
+                ComponentTypeHandleInfoviewBuildingStatusData   = SystemAPI.GetComponentTypeHandle<InfoviewBuildingStatusData   >(true),
+                ComponentTypeHandleMailBox                      = SystemAPI.GetComponentTypeHandle<MailBox                      >(true),
+                ComponentTypeHandlePrefabRef                    = SystemAPI.GetComponentTypeHandle<PrefabRef                    >(true),
+                ComponentTypeHandleTransportCompany             = SystemAPI.GetComponentTypeHandle<TransportCompany             >(true),
+                ComponentTypeHandleUnderConstruction            = SystemAPI.GetComponentTypeHandle<UnderConstruction            >(true),
                 
                 EntityTypeHandle                                = SystemAPI.GetEntityTypeHandle(),
                 
                 ActiveInfoview                                  = activeInfoview,
                 ActiveBuildingStatusDataChunks                  = activeBuildingStatusDataChunks,
                 
-                TotalUsedCapacity                               = totalUsedCapacity,
-                
                 CountVehiclesInUse                              = Mod.ModSettings.CountVehiclesInUse,
                 CountVehiclesInMaintenance                      = Mod.ModSettings.CountVehiclesInMaintenance,
                 EfficiencyMaxColor200Percent                    = Mod.ModSettings.EfficiencyMaxColor200Percent,
 
                 SelectedDistrict                                = _buildingUseUISystem.selectedDistrict,
-                SelectedDistrictIsEntireCity                    = _buildingUseUISystem.selectedDistrict == BuildingUseUISystem.EntireCity
-            };
-
-
-            // Create a job to update middle building colors.
-            UpdateColorsJobMiddleBuilding updateColorsJobMiddleBuilding = new UpdateColorsJobMiddleBuilding()
-            {
-                ComponentLookupColor        = SystemAPI.GetComponentLookup<Game.Objects.Color>(false),
-                ComponentTypeHandleOwner    = SystemAPI.GetComponentTypeHandle<Game.Common.Owner>(true),
-                EntityTypeHandle            = SystemAPI.GetEntityTypeHandle(),
+                SelectedDistrictIsEntireCity                    = _buildingUseUISystem.selectedDistrict == BuildingUseUISystem.EntireCity,
+                
+                TotalUsedCapacity                               = _totalUsedCapacity,
             };
 
 
             // Create a job to update attachment building colors.
             UpdateColorsJobAttachmentBuilding updateColorsJobAttachmentBuilding = new UpdateColorsJobAttachmentBuilding()
             {
-                ComponentLookupColor            = SystemAPI.GetComponentLookup<Game.Objects.Color>(false),
-                ComponentTypeHandleAttachment   = SystemAPI.GetComponentTypeHandle<Game.Objects.Attachment>(true),
+                ComponentLookupColor            = SystemAPI.GetComponentLookup<Color>(false),
+                
+                ComponentTypeHandleAttachment   = SystemAPI.GetComponentTypeHandle<Attachment>(true),
+                
                 EntityTypeHandle                = SystemAPI.GetEntityTypeHandle(),
+            };
+
+
+            // Create a job to update middle building colors.
+            UpdateColorsJobMiddleBuilding updateColorsJobMiddleBuilding = new UpdateColorsJobMiddleBuilding()
+            {
+                ComponentLookupColor                = SystemAPI.GetComponentLookup<Color                >(false),
+
+                ComponentLookupBuildingData         = SystemAPI.GetComponentLookup<BuildingData         >(true),
+                ComponentLookupGateData             = SystemAPI.GetComponentLookup<GateData             >(true),
+                ComponentLookupPrefabRef            = SystemAPI.GetComponentLookup<PrefabRef            >(true),
+                ComponentLookupStorageCompanyData   = SystemAPI.GetComponentLookup<StorageCompanyData   >(true),
+                
+                ComponentTypeHandleOwner            = SystemAPI.GetComponentTypeHandle<Owner            >(true),
+                ComponentTypeHandlePrefabRef        = SystemAPI.GetComponentTypeHandle<PrefabRef        >(true),
+
+                EntityTypeHandle                    = SystemAPI.GetEntityTypeHandle(),
             };
 
 
             // Create a job to update temp object colors.
             UpdateColorsJobTempObject updateColorsJobTempObject = new UpdateColorsJobTempObject()
             {
-                ComponentLookupColor    = SystemAPI.GetComponentLookup<Game.Objects.Color>(false),
-                ComponentTypeHandleTemp = SystemAPI.GetComponentTypeHandle<Game.Tools.Temp>(true),
+                ComponentLookupColor    = SystemAPI.GetComponentLookup<Color>(false),
+                
+                ComponentTypeHandleTemp = SystemAPI.GetComponentTypeHandle<Temp>(true),
+                
                 EntityTypeHandle        = SystemAPI.GetEntityTypeHandle(),
             };
 
@@ -1053,14 +1231,17 @@ namespace BuildingUse
             // Create a job to update sub object colors.
             UpdateColorsJobSubObject updateColorsJobSubObject = new UpdateColorsJobSubObject()
             {
-                ComponentLookupColor            = SystemAPI.GetComponentLookup<Game.Objects.Color>(false),
-                ComponentLookupBuilding         = SystemAPI.GetComponentLookup<Game.Buildings.      Building    >(true),
-                ComponentLookupElevation        = SystemAPI.GetComponentLookup<Game.Objects.        Elevation   >(true),
-                ComponentLookupOwner            = SystemAPI.GetComponentLookup<Game.Common.         Owner       >(true),
-                ComponentLookupVehicle          = SystemAPI.GetComponentLookup<Game.Vehicles.       Vehicle     >(true),
-                ComponentTypeHandleElevation    = SystemAPI.GetComponentTypeHandle<Game.Objects.    Elevation   >(true),
-                ComponentTypeHandleOwner        = SystemAPI.GetComponentTypeHandle<Game.Common.     Owner       >(true),
-                ComponentTypeHandleTree         = SystemAPI.GetComponentTypeHandle<Game.Objects.    Tree        >(true),
+                ComponentLookupColor            = SystemAPI.GetComponentLookup<Color>(false),
+                
+                ComponentLookupBuilding         = SystemAPI.GetComponentLookup<Building         >(true),
+                ComponentLookupElevation        = SystemAPI.GetComponentLookup<Elevation        >(true),
+                ComponentLookupOwner            = SystemAPI.GetComponentLookup<Owner            >(true),
+                ComponentLookupVehicle          = SystemAPI.GetComponentLookup<Vehicle          >(true),
+                
+                ComponentTypeHandleElevation    = SystemAPI.GetComponentTypeHandle<Elevation    >(true),
+                ComponentTypeHandleOwner        = SystemAPI.GetComponentTypeHandle<Owner        >(true),
+                ComponentTypeHandleTree         = SystemAPI.GetComponentTypeHandle<Tree         >(true),
+                
                 EntityTypeHandle                = SystemAPI.GetEntityTypeHandle(),
             };
 
@@ -1068,15 +1249,16 @@ namespace BuildingUse
             // Schedule the jobs with dependencies so the jobs run in order.
             // Schedule each job to execute in parallel (i.e. job uses multiple threads, if available).
             // Parallel threads execute much faster than a single thread.
+            // Do attachment buildings before middle buildings because some middle buildings have an attachment building as owner.
             JobHandle jobHandleDefault            = JobChunkExtensions.ScheduleParallel(updateColorsJobDefault,            _queryDefault,            base.Dependency);
             JobHandle jobHandleMainBuilding       = JobChunkExtensions.ScheduleParallel(updateColorsJobMainBuilding,       _queryMainBuilding,       JobHandle.CombineDependencies(jobHandleDefault, activeBuildingStatusDataJobHandle));
-            JobHandle jobHandleMiddleBuilding     = JobChunkExtensions.ScheduleParallel(updateColorsJobMiddleBuilding,     _queryMiddleBuilding,     jobHandleMainBuilding);
-            JobHandle jobHandleNext = jobHandleMiddleBuilding;
+            JobHandle jobHandleNext = jobHandleMainBuilding;
             if (Mod.ModSettings.ColorSpecializedIndustryLots)
             {
-                jobHandleNext                     = JobChunkExtensions.ScheduleParallel(updateColorsJobAttachmentBuilding, _queryAttachmentBuilding, jobHandleMiddleBuilding);
+                jobHandleNext                     = JobChunkExtensions.ScheduleParallel(updateColorsJobAttachmentBuilding, _queryAttachmentBuilding, jobHandleMainBuilding);
             }
-            JobHandle jobHandleTempObject         = JobChunkExtensions.ScheduleParallel(updateColorsJobTempObject,         _queryTempObject,         jobHandleNext);
+            JobHandle jobHandleMiddleBuilding     = JobChunkExtensions.ScheduleParallel(updateColorsJobMiddleBuilding,     _queryMiddleBuilding,     jobHandleNext);
+            JobHandle jobHandleTempObject         = JobChunkExtensions.ScheduleParallel(updateColorsJobTempObject,         _queryTempObject,         jobHandleMiddleBuilding);
             JobHandle jobHandleSubObject          = JobChunkExtensions.ScheduleParallel(updateColorsJobSubObject,          _querySubObject,          jobHandleTempObject);
 
             // Prevent these jobs from running again until last job is complete.
@@ -1100,46 +1282,29 @@ namespace BuildingUse
             // Compute total used and capacity by building status type.
             // Totals are double because some data values can exceed the max value of an int.
             // Do each thread entry in the total used and capacity array.
-            _previousMaxThreadEntries = 0;
             double[] totalUsed     = new double[buildingStatusTypeDatas.Count];
             double[] totalCapacity = new double[buildingStatusTypeDatas.Count];
-            for (int i = 0; i < totalUsedCapacity.Length; i++)
+            for (int i = 0; i < _totalUsedCapacity.Length; i++)
             {
-                // Get the thread entry, which is a list of subtotals.
-                NativeList<SubtotalUsedCapacity> subtotalList = totalUsedCapacity[i];
-
-                // Set new maximum thread entries.
-                int subtotalListLength = subtotalList.Length;
-                if (subtotalListLength > _previousMaxThreadEntries)
-                {
-                    _previousMaxThreadEntries = subtotalListLength;
-                }
-
                 // Do each used and capacity subtotal entry in the subtotal list.
-                for (int j = 0; j < subtotalListLength; j++)
+                NativeList<SubtotalUsedCapacity> subtotalList = _totalUsedCapacity[i];
+                for (int j = 0; j < subtotalList.Length; j++)
                 {
                     // Add used and capacity from this entry to totals.
                     // Index into the total arrays is the building status type minus the first building status type.
                     // This assumes the building status types are in sequential numerical order in the enum, which they should always be.
                     SubtotalUsedCapacity subtotalUsedCapacity = subtotalList[j];
-                    int totalIndex = subtotalUsedCapacity.buildingStatusType - buildingStatusTypeFirst;
-                    totalUsed    [totalIndex] += subtotalUsedCapacity.used;
-                    totalCapacity[totalIndex] += subtotalUsedCapacity.capacity;
+                    int totalIndex = subtotalUsedCapacity.BuildingStatusType - buildingStatusTypeFirst;
+                    totalUsed    [totalIndex] += subtotalUsedCapacity.Used;
+                    totalCapacity[totalIndex] += subtotalUsedCapacity.Capacity;
                 }
-
-                // This subtotal list is no longer needed.
-                subtotalList.Dispose();
             }
-
-            // The total array is no longer needed.
-            totalUsedCapacity.Dispose();
 
             // Update building status type data values.
             buildingStatusTypeDatas.UpdateDataValues(totalUsed, totalCapacity);
 
-            // Wait for the "next" job to complete, whichever job that is.
-            // This helps to reduce building flicker.
-            jobHandleNext.Complete();
+            // Wait for the middle building job to complete to help reduce building flicker.
+            jobHandleMiddleBuilding.Complete();
 
             // This system handled building colors for one of this mod's infoviews.
             // Do not execute the original game logic.

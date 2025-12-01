@@ -257,7 +257,7 @@ namespace BuildingUse
                                     // Used (i.e. processing speed) is processing rate times efficiency.
                                     if (BufferLookupEfficiency.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Efficiency> bufferEfficiency))
                                     {
-                                        used = Mathf.RoundToInt(deathcareFacilityData.m_ProcessingRate * GetBuildingEfficiency(bufferEfficiency));
+                                        used = Mathf.RoundToInt(deathcareFacilityData.m_ProcessingRate * Game.Buildings.BuildingUtils.GetEfficiency(bufferEfficiency));
                                     }
                                 }
 

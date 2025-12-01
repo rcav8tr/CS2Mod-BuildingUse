@@ -6,6 +6,7 @@ using Game.Modding;
 using Game.SceneFlow;
 using System;
 using System.IO;
+using Unity.Entities;
 
 namespace BuildingUse
 {
@@ -65,9 +66,12 @@ namespace BuildingUse
                 // Initialize infomode colors.
                 BUInfoviewDatas.instance.SetInfomodeColors();
 
-                // Create and activate this mod's systems.
+                // Create the building color system.
+                // This sytem does not need to be activated because it uses Harmony to run when ObjectColorsystem.OnUpdate() runs.
+                World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<BuildingColorSystem>();
+
+                // Create and activate this mod's UI system.
                 updateSystem.UpdateAt<BuildingUseUISystem>(SystemUpdatePhase.UIUpdate);
-                updateSystem.UpdateAt<BuildingColorSystem>(SystemUpdatePhase.Rendering);
             
 #if DEBUG
                 // Get localized text from the game where the value is or contains specific text.

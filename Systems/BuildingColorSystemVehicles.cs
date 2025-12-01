@@ -593,7 +593,8 @@ namespace BuildingUse
                 float efficiency = 0f;
 		        if (BufferLookupEfficiency.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Efficiency> bufferEfficiency) && bufferEfficiency.IsCreated)
 		        {
-                    efficiency = Mathf.Min(GetBuildingEfficiency(bufferEfficiency), 1f);
+                    efficiency = Mathf.Min(Game.Buildings.BuildingUtils.GetEfficiency(bufferEfficiency), 1f);
+    				efficiency = Mathf.Min(Game.Buildings.BuildingUtils.GetImmediateEfficiency(bufferEfficiency), efficiency);
 		        }
 
                 // Logic to get available vehicles is adapted from Game.UI.InGame.VehicleUIUtils.GetAvailableVehicles(),
@@ -607,34 +608,6 @@ namespace BuildingUse
                 // It is unclear why this is vehicles in maintenance.
                 // Note than when efficiency is at least 100%, in maintenance vehicles will be zero.
                 return capacity - availableVehicles;
-            }
-
-            /// <summary>
-            /// Get building efficiency from buffer.
-            /// </summary>
-            private float GetBuildingEfficiency(DynamicBuffer<Game.Buildings.Efficiency> bufferEfficiency)
-            {
-                // Logic to get building efficiency is adapted from overloaded method BuildingUtils.GetEfficiency() for a buffer of Efficiency.
-                // BuildingUtils.GetEfficiency() cannot be used directly because one of the overloads references Span<float>,
-                // which for unknown reasons cannot be resolved by Visual Studio.
-                // This unresolved overload causes a compile error, even though that is not the overload which would actually be used.
-
-                // Do each efficiency in the buffer.
-                float efficiency = 1f;
-                foreach (Game.Buildings.Efficiency item in bufferEfficiency)
-                {
-                    // Efficiency is multiplicative.
-                    efficiency *= math.max(0f, item.m_Efficiency);
-                }
-
-                // If efficiency is zero, return zero.
-                if (efficiency == 0f)
-                {
-                    return 0f;
-                }
-
-                // Round efficiency to 2 decimal places and make sure it is at least 0.01 (i.e. 1%).
-                return math.max(0.01f, math.round(100f * efficiency) / 100f);
             }
 
             /// <summary>

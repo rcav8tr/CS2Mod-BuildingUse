@@ -1,1 +1,1 @@
-﻿- Prevent error with game version 1.3.6.
+﻿- Update for game version 1.4.2.
