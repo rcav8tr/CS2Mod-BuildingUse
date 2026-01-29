@@ -16,6 +16,7 @@ export class UITranslationKey
     public static InfoviewTitleVehicles                             : string = "Infoviews.INFOVIEW[BuildingUseVehicles]";
     public static InfoviewTitleEfficiency                           : string = "Infoviews.INFOVIEW[BuildingUseEfficiency]";
     public static InfoviewTitleProcessing                           : string = "Infoviews.INFOVIEW[BuildingUseProcessing]";
+    public static InfoviewTitleProduction                           : string = "Infoviews.INFOVIEW[BuildingUseProduction]";
 
     // Infomode titles.
     public static InfomodeTitleEmployeesResidential                 : string = "Infoviews.INFOMODE[BuildingUseEmployeesResidential]";
@@ -62,10 +63,14 @@ export class UITranslationKey
     public static InfomodeTitleStorageEmergencyShelter              : string = "Infoviews.INFOMODE[BuildingUseStorageEmergencyShelter]";
     public static InfomodeTitleStorageCargoTransportation           : string = "Infoviews.INFOMODE[BuildingUseStorageCargoTransportation]";
     public static InfomodeTitleStoragePost                          : string = "Infoviews.INFOMODE[BuildingUseStoragePost]";
+    public static InfomodeTitleStorageMailbox                       : string = "Infoviews.INFOMODE[BuildingUseStorageMailbox]";
+    public static InfomodeTitleVehiclesResidentialCar               : string = "Infoviews.INFOMODE[BuildingUseVehiclesResidentialCar]";
     public static InfomodeTitleVehiclesCommercialTruck              : string = "Infoviews.INFOMODE[BuildingUseVehiclesCommercialTruck]";
     public static InfomodeTitleVehiclesIndustrialTruck              : string = "Infoviews.INFOMODE[BuildingUseVehiclesIndustrialTruck]";
     public static InfomodeTitleVehiclesOfficeTruck                  : string = "Infoviews.INFOMODE[BuildingUseVehiclesOfficeTruck]";
-    public static InfomodeTitleVehiclesParked                       : string = "Infoviews.INFOMODE[BuildingUseVehiclesParked]";
+    public static InfomodeTitleVehiclesParkedCar                    : string = "Infoviews.INFOMODE[BuildingUseVehiclesParkedCar]";
+    public static InfomodeTitleVehiclesParkedBike                   : string = "Infoviews.INFOMODE[BuildingUseVehiclesParkedBike]";
+    public static InfomodeTitleVehiclesParkedOther                  : string = "Infoviews.INFOMODE[BuildingUseVehiclesParkedOther]";
     public static InfomodeTitleVehiclesRoadMaintenance              : string = "Infoviews.INFOMODE[BuildingUseVehiclesRoadMaintenance]";
     public static InfomodeTitleVehiclesAmbulance                    : string = "Infoviews.INFOMODE[BuildingUseVehiclesAmbulance]";
     public static InfomodeTitleVehiclesMedicalHelicopter            : string = "Infoviews.INFOMODE[BuildingUseVehiclesMedicalHelicopter]";
@@ -83,6 +88,7 @@ export class UITranslationKey
     public static InfomodeTitleVehiclesTrain                        : string = "Infoviews.INFOMODE[BuildingUseVehiclesTrain]";
     public static InfomodeTitleVehiclesTram                         : string = "Infoviews.INFOMODE[BuildingUseVehiclesTram]";
     public static InfomodeTitleVehiclesSubway                       : string = "Infoviews.INFOMODE[BuildingUseVehiclesSubway]";
+    public static InfomodeTitleVehiclesFerry                        : string = "Infoviews.INFOMODE[BuildingUseVehiclesFerry]";
     public static InfomodeTitleVehiclesParkMaintenance              : string = "Infoviews.INFOMODE[BuildingUseVehiclesParkMaintenance]";
     public static InfomodeTitleVehiclesPost                         : string = "Infoviews.INFOMODE[BuildingUseVehiclesPost]";
     public static InfomodeTitleVehiclesCargoStationTruck            : string = "Infoviews.INFOMODE[BuildingUseVehiclesCargoStationTruck]";
@@ -115,6 +121,38 @@ export class UITranslationKey
     public static InfomodeTitleProcessingCrematoriumProcessing      : string = "Infoviews.INFOMODE[BuildingUseProcessingCrematoriumProcessing]";
     public static InfomodeTitleProcessingGarbageProcessing          : string = "Infoviews.INFOMODE[BuildingUseProcessingGarbageProcessing]";
     public static InfomodeTitleProcessingMailSortingSpeed           : string = "Infoviews.INFOMODE[BuildingUseProcessingMailSortingSpeed]";
+    public static InfomodeTitleProductionWood                       : string = "Infoviews.INFOMODE[BuildingUseProductionWood]";
+    public static InfomodeTitleProductionGrain                      : string = "Infoviews.INFOMODE[BuildingUseProductionGrain]";
+    public static InfomodeTitleProductionLivestock                  : string = "Infoviews.INFOMODE[BuildingUseProductionLivestock]";
+    public static InfomodeTitleProductionFish                       : string = "Infoviews.INFOMODE[BuildingUseProductionFish]";
+    public static InfomodeTitleProductionVegetables                 : string = "Infoviews.INFOMODE[BuildingUseProductionVegetables]";
+    public static InfomodeTitleProductionCotton                     : string = "Infoviews.INFOMODE[BuildingUseProductionCotton]";
+    public static InfomodeTitleProductionOil                        : string = "Infoviews.INFOMODE[BuildingUseProductionOil]";
+    public static InfomodeTitleProductionOre                        : string = "Infoviews.INFOMODE[BuildingUseProductionOre]";
+    public static InfomodeTitleProductionCoal                       : string = "Infoviews.INFOMODE[BuildingUseProductionCoal]";
+    public static InfomodeTitleProductionStone                      : string = "Infoviews.INFOMODE[BuildingUseProductionStone]";
+    public static InfomodeTitleProductionMetals                     : string = "Infoviews.INFOMODE[BuildingUseProductionMetals]";
+    public static InfomodeTitleProductionSteel                      : string = "Infoviews.INFOMODE[BuildingUseProductionSteel]";
+    public static InfomodeTitleProductionMinerals                   : string = "Infoviews.INFOMODE[BuildingUseProductionMinerals]";
+    public static InfomodeTitleProductionConcrete                   : string = "Infoviews.INFOMODE[BuildingUseProductionConcrete]";
+    public static InfomodeTitleProductionMachinery                  : string = "Infoviews.INFOMODE[BuildingUseProductionMachinery]";
+    public static InfomodeTitleProductionPetrochemicals             : string = "Infoviews.INFOMODE[BuildingUseProductionPetrochemicals]";
+    public static InfomodeTitleProductionChemicals                  : string = "Infoviews.INFOMODE[BuildingUseProductionChemicals]";
+    public static InfomodeTitleProductionPlastics                   : string = "Infoviews.INFOMODE[BuildingUseProductionPlastics]";
+    public static InfomodeTitleProductionPharmaceuticals            : string = "Infoviews.INFOMODE[BuildingUseProductionPharmaceuticals]";
+    public static InfomodeTitleProductionElectronics                : string = "Infoviews.INFOMODE[BuildingUseProductionElectronics]";
+    public static InfomodeTitleProductionVehicles                   : string = "Infoviews.INFOMODE[BuildingUseProductionVehicles]";
+    public static InfomodeTitleProductionBeverages                  : string = "Infoviews.INFOMODE[BuildingUseProductionBeverages]";
+    public static InfomodeTitleProductionConvenienceFood            : string = "Infoviews.INFOMODE[BuildingUseProductionConvenienceFood]";
+    public static InfomodeTitleProductionFood                       : string = "Infoviews.INFOMODE[BuildingUseProductionFood]";
+    public static InfomodeTitleProductionTextiles                   : string = "Infoviews.INFOMODE[BuildingUseProductionTextiles]";
+    public static InfomodeTitleProductionTimber                     : string = "Infoviews.INFOMODE[BuildingUseProductionTimber]";
+    public static InfomodeTitleProductionPaper                      : string = "Infoviews.INFOMODE[BuildingUseProductionPaper]";
+    public static InfomodeTitleProductionFurniture                  : string = "Infoviews.INFOMODE[BuildingUseProductionFurniture]";
+    public static InfomodeTitleProductionSoftware                   : string = "Infoviews.INFOMODE[BuildingUseProductionSoftware]";
+    public static InfomodeTitleProductionTelecom                    : string = "Infoviews.INFOMODE[BuildingUseProductionTelecom]";
+    public static InfomodeTitleProductionFinancial                  : string = "Infoviews.INFOMODE[BuildingUseProductionFinancial]";
+    public static InfomodeTitleProductionMedia                      : string = "Infoviews.INFOMODE[BuildingUseProductionMedia]";
 
     // Infomode tooltips.
     public static InfomodeTooltipEmployeesResidential               : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEmployeesResidential]";
@@ -161,10 +199,14 @@ export class UITranslationKey
     public static InfomodeTooltipStorageEmergencyShelter            : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStorageEmergencyShelter]";
     public static InfomodeTooltipStorageCargoTransportation         : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStorageCargoTransportation]";
     public static InfomodeTooltipStoragePost                        : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStoragePost]";
+    public static InfomodeTooltipStorageMailbox                     : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStorageMailbox]";
+    public static InfomodeTooltipVehiclesResidentialCar             : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesResidentialCar]";
     public static InfomodeTooltipVehiclesCommercialTruck            : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesCommercialTruck]";
     public static InfomodeTooltipVehiclesIndustrialTruck            : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesIndustrialTruck]";
     public static InfomodeTooltipVehiclesOfficeTruck                : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesOfficeTruck]";
-    public static InfomodeTooltipVehiclesParked                     : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesParked]";
+    public static InfomodeTooltipVehiclesParkedCar                  : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesParkedCar]";
+    public static InfomodeTooltipVehiclesParkedBike                 : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesParkedBike]";
+    public static InfomodeTooltipVehiclesParkedOther                : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesParkedOther]";
     public static InfomodeTooltipVehiclesRoadMaintenance            : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesRoadMaintenance]";
     public static InfomodeTooltipVehiclesAmbulance                  : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesAmbulance]";
     public static InfomodeTooltipVehiclesMedicalHelicopter          : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesMedicalHelicopter]";
@@ -182,6 +224,7 @@ export class UITranslationKey
     public static InfomodeTooltipVehiclesTrain                      : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesTrain]";
     public static InfomodeTooltipVehiclesTram                       : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesTram]";
     public static InfomodeTooltipVehiclesSubway                     : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesSubway]";
+    public static InfomodeTooltipVehiclesFerry                      : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesFerry]";
     public static InfomodeTooltipVehiclesParkMaintenance            : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesParkMaintenance]";
     public static InfomodeTooltipVehiclesPost                       : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesPost]";
     public static InfomodeTooltipVehiclesCargoStationTruck          : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesCargoStationTruck]";
@@ -214,6 +257,38 @@ export class UITranslationKey
     public static InfomodeTooltipProcessingCrematoriumProcessing    : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProcessingCrematoriumProcessing]";
     public static InfomodeTooltipProcessingGarbageProcessing        : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProcessingGarbageProcessing]";
     public static InfomodeTooltipProcessingMailSortingSpeed         : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProcessingMailSortingSpeed]";
+    public static InfomodeTooltipProductionWood                     : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionWood]";
+    public static InfomodeTooltipProductionGrain                    : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionGrain]";
+    public static InfomodeTooltipProductionLivestock                : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionLivestock]";
+    public static InfomodeTooltipProductionFish                     : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionFish]";
+    public static InfomodeTooltipProductionVegetables               : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionVegetables]";
+    public static InfomodeTooltipProductionCotton                   : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionCotton]";
+    public static InfomodeTooltipProductionOil                      : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionOil]";
+    public static InfomodeTooltipProductionOre                      : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionOre]";
+    public static InfomodeTooltipProductionCoal                     : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionCoal]";
+    public static InfomodeTooltipProductionStone                    : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionStone]";
+    public static InfomodeTooltipProductionMetals                   : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionMetals]";
+    public static InfomodeTooltipProductionSteel                    : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionSteel]";
+    public static InfomodeTooltipProductionMinerals                 : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionMinerals]";
+    public static InfomodeTooltipProductionConcrete                 : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionConcrete]";
+    public static InfomodeTooltipProductionMachinery                : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionMachinery]";
+    public static InfomodeTooltipProductionPetrochemicals           : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionPetrochemicals]";
+    public static InfomodeTooltipProductionChemicals                : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionChemicals]";
+    public static InfomodeTooltipProductionPlastics                 : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionPlastics]";
+    public static InfomodeTooltipProductionPharmaceuticals          : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionPharmaceuticals]";
+    public static InfomodeTooltipProductionElectronics              : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionElectronics]";
+    public static InfomodeTooltipProductionVehicles                 : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionVehicles]";
+    public static InfomodeTooltipProductionBeverages                : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionBeverages]";
+    public static InfomodeTooltipProductionConvenienceFood          : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionConvenienceFood]";
+    public static InfomodeTooltipProductionFood                     : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionFood]";
+    public static InfomodeTooltipProductionTextiles                 : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionTextiles]";
+    public static InfomodeTooltipProductionTimber                   : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionTimber]";
+    public static InfomodeTooltipProductionPaper                    : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionPaper]";
+    public static InfomodeTooltipProductionFurniture                : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionFurniture]";
+    public static InfomodeTooltipProductionSoftware                 : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionSoftware]";
+    public static InfomodeTooltipProductionTelecom                  : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionTelecom]";
+    public static InfomodeTooltipProductionFinancial                : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionFinancial]";
+    public static InfomodeTooltipProductionMedia                    : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseProductionMedia]";
 
     // District selector text.
     public static EntireCity                                        : string = "BuildingUse.EntireCity";

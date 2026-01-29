@@ -1,10 +1,10 @@
 ﻿import { bindValue, useValue            } from "cs2/api";
 import { useLocalization                } from "cs2/l10n";
+import { FormattedParagraphs, Tooltip   } from "cs2/ui";
 
 import { InfomodeCheckBox               } from "infomodeCheckBox";
 import   styles                           from "infomodeCheckBoxRow.module.scss";
 import   mod                              from "../mod.json";
-import { ModuleResolver                 } from "moduleResolver";
 import { uiBindingNames, uiEventNames   } from "uiBindings";
 import { UITranslationKey               } from "uiTranslationKey";
 
@@ -27,17 +27,11 @@ export const VehiclesInUseInMaintenance = () =>
 
     // A row with two check boxes.
     return (
-        <ModuleResolver.instance.Tooltip
-            direction="right"
-            tooltip={<ModuleResolver.instance.FormattedParagraphs children={tooltipInUseInMaintenance} />}
-            theme={ModuleResolver.instance.TooltipClasses}
-            children=
-            {
-                <div className={styles.buildingUseInfomodeCheckBoxRow}>
-                    <InfomodeCheckBox onClickEventName={uiEventNames.CountVehiclesInUseClicked        } isChecked={valueCountVehiclesInUse        } label={labelInUse        } />
-                    <InfomodeCheckBox onClickEventName={uiEventNames.CountVehiclesInMaintenanceClicked} isChecked={valueCountVehiclesInMaintenance} label={labelInMaintenance} />
-                </div>
-            }
-        />
+        <Tooltip direction="right" tooltip={<FormattedParagraphs children={tooltipInUseInMaintenance} />} >
+            <div className={styles.buildingUseInfomodeCheckBoxRow}>
+                <InfomodeCheckBox onClickEventName={uiEventNames.CountVehiclesInUseClicked        } isChecked={valueCountVehiclesInUse        } label={labelInUse        } />
+                <InfomodeCheckBox onClickEventName={uiEventNames.CountVehiclesInMaintenanceClicked} isChecked={valueCountVehiclesInMaintenance} label={labelInMaintenance} />
+            </div>
+        </Tooltip>
     );
 }

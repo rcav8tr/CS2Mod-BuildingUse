@@ -111,7 +111,7 @@ namespace BuildingUse
                 if (activeInfoview != BUInfoview.None)
                 {
                     // Get the entity for the active infoview.
-                    Entity entityActiveInfoview = instance[activeInfoview].infoviewPrefabEntity;
+                    Entity entityActiveInfoview = instance[activeInfoview].InfoviewPrefabEntity;
 
                     // Set the active infoview to Null and immediately back to the active infoview.
                     // This causes the infoviews UI system to resend the infomode data to the UI where the new colors will be applied.

@@ -2,8 +2,9 @@
 import { ModuleRegistryExtend       } from "cs2/modding";
 
 import { DistrictSelector           } from "districtSelector";
-import { EfficiencyMaxColor         } from "efficiencyMaxColor";
+import { Heading                    } from "heading";
 import { InfomodeItem               } from "infomodeItem";
+import { MaxColorSelection          } from "maxColorSelection";
 import   mod                          from "../mod.json";
 import { SelectDeselect             } from "selectDeselect";
 import { BUBuildingStatusType       } from "uiConstants";
@@ -47,10 +48,19 @@ export const InfomodeItemExtend: ModuleRegistryExtend = (Component: any) =>
                 return (<VehiclesInUseInMaintenance />);
             }
 
-            // Check for special case for efficiency max color.
-            if (buildingStatusType === BUBuildingStatusType.EfficiencyMaxColor)
+            // Check for special case for max color selection.
+            if (buildingStatusType === BUBuildingStatusType.EfficiencyMaxColor ||
+                buildingStatusType === BUBuildingStatusType.ProductionMaxColor)
             {
-                return (<EfficiencyMaxColor />);
+                return (<MaxColorSelection buildingStatusType={buildingStatusType} />);
+            }
+
+            // Check for special case for headings.
+            if (buildingStatusType === BUBuildingStatusType.ProductionHeadingRawMaterials   ||
+                buildingStatusType === BUBuildingStatusType.ProductionHeadingProcessedGoods ||
+                buildingStatusType === BUBuildingStatusType.ProductionHeadingImmaterialGoods)
+            {
+                return (<Heading buildingStatusType={buildingStatusType} />);
             }
 
             // Not a special case.

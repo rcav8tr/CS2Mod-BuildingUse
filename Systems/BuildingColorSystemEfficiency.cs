@@ -1,4 +1,8 @@
-﻿using Unity.Collections;
+﻿using Game;
+using Game.Buildings;
+using Game.Citizens;
+using Game.Objects;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -7,7 +11,7 @@ namespace BuildingUse
     /// <summary>
     /// Partial system to set building colors for Employees infoview.
     /// </summary>
-    public partial class BuildingColorSystem : Game.GameSystemBase
+    public partial class BuildingColorSystem : GameSystemBase
     {
         /// <summary>
         /// Partial job struct to set the color of each main building for Efficiency infoview.
@@ -16,239 +20,225 @@ namespace BuildingUse
         private partial struct UpdateColorsJobMainBuilding : IJobChunk
         {
             /// <summary>
-            /// Get building status types applicable to the building chunk for Efficiency infoview.
+            /// Do a main building for Efficiency infoview.
             /// </summary>
-            private void GetApplicableBuildingStatusTypesEfficiency(ArchetypeChunk buildingChunk, ref NativeList<BUBuildingStatusType> applicableBuildingStatusTypes)
+            private void DoBuildingEfficiency(in NativeList<EntityPrefab> mainBuildingAndUpgrades, ref Color color)
             {
-                // Add all building status types that apply to this building chunk.
-                if (buildingChunk.Has(ref ComponentTypeHandleResidentialProperty))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyResidential);
-                if (buildingChunk.Has(ref ComponentTypeHandleCommercialProperty))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyCommercial);
-                if (buildingChunk.Has(ref ComponentTypeHandleIndustrialProperty) && !buildingChunk.Has(ref ComponentTypeHandleOfficeProperty))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyIndustrial);
-                if (buildingChunk.Has(ref ComponentTypeHandleOfficeProperty))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyOffice);
-                if (buildingChunk.Has(ref ComponentTypeHandleParkingFacility))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyParking);
-                if (buildingChunk.Has(ref ComponentTypeHandleRoadMaintenance))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyRoadMaintenance);
-                if (buildingChunk.Has(ref ComponentTypeHandleElectricityProducer) || buildingChunk.Has(ref ComponentTypeHandleBattery) || buildingChunk.Has(ref ComponentTypeHandleTransformer))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyElectricity);
-                if (buildingChunk.Has(ref ComponentTypeHandleWaterPumpingStation))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyWater);
-                if (buildingChunk.Has(ref ComponentTypeHandleSewageOutlet))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencySewage);
-                if (buildingChunk.Has(ref ComponentTypeHandleHospital))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyHealthcare);
-                if (buildingChunk.Has(ref ComponentTypeHandleDeathcareFacility))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyDeathcare);
-                if (buildingChunk.Has(ref ComponentTypeHandleGarbageFacility))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyGarbageManagement);
-                if (buildingChunk.Has(ref ComponentTypeHandleSchool))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyEducation);
-                if (buildingChunk.Has(ref ComponentTypeHandleResearchFacility))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyResearch);
-                if (buildingChunk.Has(ref ComponentTypeHandleFireStation))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyFireRescue);
-                if (buildingChunk.Has(ref ComponentTypeHandleEmergencyShelter) || buildingChunk.Has(ref ComponentTypeHandleDisasterFacility))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyDisasterControl);
-                if (buildingChunk.Has(ref ComponentTypeHandlePoliceStation) || buildingChunk.Has(ref ComponentTypeHandlePrison))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyPolice);
-                if (buildingChunk.Has(ref ComponentTypeHandleAdminBuilding) || buildingChunk.Has(ref ComponentTypeHandleWelfareOffice))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyAdministration);
-                if (buildingChunk.Has(ref ComponentTypeHandleTransportDepot) || buildingChunk.Has(ref ComponentTypeHandleTransportStation))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyTransportation);
-                if (buildingChunk.Has(ref ComponentTypeHandleParkMaintenance))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyParkMaintenance);
-                if (buildingChunk.Has(ref ComponentTypeHandlePark))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyParksRecreation);
-                if (buildingChunk.Has(ref ComponentTypeHandlePostFacility))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyPost);
-                if (buildingChunk.Has(ref ComponentTypeHandleTelecomFacility))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.EfficiencyTelecom);
+                // Do building status types for non-residential first.
+                DoBuildingEfficiencyNonResidential(in mainBuildingAndUpgrades, ref color);
+
+                // Do building status types for residential last.
+                DoBuildingEfficiencyResidential(in mainBuildingAndUpgrades, ref color);
             }
 
             /// <summary>
-            /// Set building colors for Efficiency infoview.
+            /// Do a main building and upgrades for Efficiency infoview for a residential building.
             /// </summary>
-            private void SetBuildingColorsEfficiency
-            (
-                ArchetypeChunk buildingChunk,
-                bool infomodeActive,
-                int infomodeIndex,
-                NativeArray<Game.Objects.Color> colors,
-                BUBuildingStatusType buildingStatusType
-            )
+            private void DoBuildingEfficiencyResidential(in NativeList<EntityPrefab> mainBuildingAndUpgrades, ref Color color)
             {
-                // Initialize total used and capacity.
-                long totalUsed     = 0L;
-                long totalCapacity = 0L;
-
-                // Do each entity (i.e. building).
-                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
-                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
-                for (int i = 0; i < entities.Length; i++)
+                // Get total happiness and citizen count from main building and upgrades.
+                int totalHappiness = 0;
+                int citizenCount   = 0;
+                bool hasResidential = false;
+                foreach (EntityPrefab mainBuildingOrUpgrade in mainBuildingAndUpgrades)
                 {
-                    // Building must be in selected district.
-                    if (!BuildingInSelectedDistrict(districts[i].m_District))
+                    hasResidential |= DoBuildingEfficiencyResidentialDetail(mainBuildingOrUpgrade.Entity, ref totalHappiness, ref citizenCount);
+                }
+
+                // Main building plus upgrades must have residential.
+                if (hasResidential)
+                {
+                    // Compute average happiness percent.
+                    // Citizen happiness neutral is 50.
+                    // Convert citizen happiness to percent where 100% is neutral.
+                    int happinessPercent = 0;
+                    if (citizenCount > 0)
                     {
-                        continue;
+                        happinessPercent = (int)math.round(2f * totalHappiness / citizenCount);
                     }
 
-                    // Get entity and prefab.
-                    Entity entity = entities[i];
-                    Entity prefab = prefabRefs[i].m_Prefab;
+                    // Update entity color according to the efficiency max color setting.
+                    UpdateEntityColor(BUBuildingStatusType.EfficiencyResidential, happinessPercent, (EfficiencyMaxColor200Percent ? 200L : 100L), ref color);
 
-                    // Special handling for residential happiness.
-                    if (buildingStatusType == BUBuildingStatusType.EfficiencyResidential)
+                    // Update total used and capacity.
+                    // Capacity is always 100% even if entity color is based on 200%.
+                    UpdateTotalUsedCapacity(BUBuildingStatusType.EfficiencyResidential, happinessPercent, 100L);
+                }
+            }
+
+            /// <summary>
+            /// Do a main building or upgrade for Efficiency infoview for a residential building to get details.
+            /// </summary>
+            private bool DoBuildingEfficiencyResidentialDetail(Entity entity, ref int totalHappiness, ref int citizenCount)
+            {
+                // Building must have residential and Renter buffer.
+                if (BuildingHasResidential(entity) &&
+                    BufferLookupRenter.TryGetBuffer(entity, out DynamicBuffer<Renter> renters) &&
+                    renters.IsCreated)
+                {
+                    // Do each renter (household).
+                    for (int i = 0; i < renters.Length; i++)
                     {
-                        // Logic adapted from Game.UI.InGame.AverageHappinessSection.CountHappinessJob.TryAddPropertyHappiness().
-
-                        // Get renters (households) in the building, if any.
-                        int totalHappiness = 0;
-                        int citizenCount = 0;
-		                if (BufferLookupRenter.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Renter> renters))
-		                {
-                            // Do each renter (household).
-			                for (int j = 0; j < renters.Length; j++)
-			                {
-                                // Get citizens in the renter (household), if any.
-                                if (BufferLookupHouseholdCitizen.TryGetBuffer(renters[j].m_Renter, out DynamicBuffer<Game.Citizens.HouseholdCitizen> householdCitizens))
-                                {
-                                    // Do each citizen.
-                                    for (int k = 0; k < householdCitizens.Length; k++)
-                                    {
-                                        // Citizen component must exist on the citizen and citizen must not be dead.
-					                    Entity citizen = householdCitizens[k].m_Citizen;
-					                    if (ComponentLookupCitizen.HasComponent(citizen) && !Game.Citizens.CitizenUtils.IsDead(citizen, ref ComponentLookupHealthProblem))
-					                    {
-						                    totalHappiness += ComponentLookupCitizen[citizen].Happiness;
-						                    citizenCount++;
-					                    }
-                                    }
-                                }
-			                }
-		                }
-
-                        // Compute happiness percent.
-                        int happinessPercent = 0;
-                        if (citizenCount > 0)
+                        // Get citizens in the renter (household), if any.
+                        if (BufferLookupHouseholdCitizen.TryGetBuffer(renters[i].m_Renter, out DynamicBuffer<HouseholdCitizen> householdCitizens) &&
+                            householdCitizens.IsCreated)
                         {
-                            // Compute average happiness of citizens in this building.
-                            // Citizen happiness neutral is 50.
-                            // Convert citizen happiness to percent where 100% is neutral.
-                            happinessPercent = (int)math.round(2f * totalHappiness / citizenCount);
+                            // Do each citizen.
+                            for (int j = 0; j < householdCitizens.Length; j++)
+                            {
+                                // Citizen component must exist on the citizen and citizen must not be dead.
+                                Entity citizenEntity = householdCitizens[j].m_Citizen;
+                                if (ComponentLookupCitizen.TryGetComponent(citizenEntity, out Citizen citizen) &&
+                                    !CitizenUtils.IsDead(citizenEntity, ref ComponentLookupHealthProblem))
+                                {
+                                    totalHappiness += citizen.Happiness;
+                                    citizenCount++;
+                                }
+                            }
                         }
-
-                        // Update entity color and accumulate totals.
-                        UpdateEntityColor(happinessPercent, (EfficiencyMaxColor200Percent ? 200L : 100L), infomodeActive, infomodeIndex, colors, i);
-                        totalUsed     += happinessPercent;
-                        totalCapacity += 100L;   // Capacity is always 100%, even if color is based on 200%.
                     }
-                    else
+
+                    // Building has residential, even if renters buffer is empty.
+                    return true;
+                }
+
+                // Building does not have residential.
+                return false;
+            }
+
+            /// <summary>
+            /// Do a main building and upgrades for Efficiency infoview for a non-residential building.
+            /// </summary>
+            private void DoBuildingEfficiencyNonResidential(in NativeList<EntityPrefab> mainBuildingAndUpgrades, ref Color color)
+            {
+                // Main building is always the first entry.
+                Entity mainBuildingEntity = mainBuildingAndUpgrades[0].Entity;
+
+                // Main building must have an Efficiency buffer.
+                if (BufferLookupEfficiency.TryGetBuffer(mainBuildingEntity, out DynamicBuffer<Efficiency> bufferEfficiency) &&
+                    bufferEfficiency.IsCreated)
+                {
+                    // Main building has an Efficiency buffer.
+
+                    // Used is efficiency percent from the buffer.
+                    // Start with 100% as the default efficiency.
+                    // A building with no efficiency buffer entries will have the default efficiency of 100%, like in the game.
+                    float tempEfficiency = 1f;
+                    foreach (Efficiency efficiency in bufferEfficiency)
                     {
-                        // Logic adapted from Game.UI.InGame.EfficiencySection.OnProcess().
-
-                        // Building must have an Efficiency buffer.
-                        if (BufferLookupEfficiency.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Efficiency> bufferEfficiency) &&
-                            bufferEfficiency.IsCreated)
+                        // Exclude negative efficiencies.
+                        // Note that the efficiency entry for Disabled has an efficiency value of zero.
+                        // So disabled buildings will still be included, but will have 0% efficiency, like in the game.
+                        if (efficiency.m_Efficiency >= 0f)
                         {
-                            // Building has an Efficiency buffer.
+                            // Efficiency is multiplicative.
+                            tempEfficiency *= efficiency.m_Efficiency;
+                        }
+                    }
+                    long mainBuildingEfficiency = (int)math.round(100f * tempEfficiency);
 
-                            // Zoned buildings must have a renter because zoned buildings can still have efficiency buffer entries without a renter.
-                            // Guessing these efficiency buffer entries are left over from when the building previously had a renter.
-                            bool hasRenter;
-                            if (buildingStatusType == BUBuildingStatusType.EfficiencyCommercial ||
-                                buildingStatusType == BUBuildingStatusType.EfficiencyIndustrial ||
-                                buildingStatusType == BUBuildingStatusType.EfficiencyOffice)
+                    // Get building status types for the main building and upgrades.
+                    NativeList<BUBuildingStatusType> buildingStatusTypes = new(4, Allocator.Temp);
+                    foreach (EntityPrefab mainBuildingOrUpgrade in mainBuildingAndUpgrades)
+                    {
+                        DoBuildingEfficiencyNonResidentialDetail(mainBuildingOrUpgrade.Entity, mainBuildingOrUpgrade.Prefab, buildingStatusTypes);
+                    }
+
+                    // Use nested loops to check for duplicate building status types.
+                    for (int i = 0; i < buildingStatusTypes.Length - 1; i++)
+                    {
+                        for (int j = i + 1; j < buildingStatusTypes.Length; j++)
+                        {
+                            if (buildingStatusTypes[i] == buildingStatusTypes[j])
                             {
-                                // Assume no renters.
-                                hasRenter = false;
+                                // Remove the duplicate.
+                                buildingStatusTypes.RemoveAtSwapBack(j);
 
-                                // Get renters.
-                                if (BufferLookupRenter.TryGetBuffer(entity, out DynamicBuffer<Game.Buildings.Renter> renters) && renters.Length > 0)
-                                {
-                                    // Check each renter for company data.
-                                    // Mixed use buildings (e.g. residential and commercial) can have residential renters without a company renter.
-                                    for (int j = 0; j < renters.Length; j++)
-                                    {
-                                        if (ComponentLookupCompanyData.HasComponent(renters[j].m_Renter))
-                                        {
-                                            hasRenter = true;
-                                            break;
-                                        }
-                                    }
-                                }
+                                // Check the entry that was swapped in.
+                                j--;
                             }
-                            else
+                        }
+                    }
+
+                    // Use nested loops to sort building status types in descending order.
+                    for (int i = 0; i < buildingStatusTypes.Length - 1; i++)
+                    {
+                        for (int j = i + 1; j < buildingStatusTypes.Length; j++)
+                        {
+                            if (buildingStatusTypes[i] < buildingStatusTypes[j])
                             {
-                                // Other than zoned buildings are considered to always have a renter.
-                                hasRenter = true;
+                                (buildingStatusTypes[i], buildingStatusTypes[j]) = (buildingStatusTypes[j], buildingStatusTypes[i]);
                             }
+                        }
+                    }
 
-                            // Check if building is not zoned or zoned building has a renter.
-                            if (hasRenter)
-                            {
-                                // Start with 100% as the default efficiency.
-                                float tempEfficiency = 1f;
+                    // Get whether or not main building has a company.
+                    // Only the main building is checked for company, not upgrades.
+                    bool mainBuildingHasCompany = TryGetCompany(mainBuildingEntity, out Entity _);
 
-                                // Do each entry in the buffer.
-                                // Note that a building with no efficiency entries will have the default efficiency of 100%, like in the game.
-                                foreach (Game.Buildings.Efficiency item in bufferEfficiency)
-                                {
-                                    // Exclude negative efficiencies.
-                                    // Note that the efficiency entry for Disabled has an efficiency value of zero.
-                                    // So disabled buildings will still be included, but will have 0% efficiency, like in the game.
-                                    if (item.m_Efficiency >= 0f)
-                                    {
-                                        // Efficiency is multiplicative.
-                                        tempEfficiency *= item.m_Efficiency;
-                                    }
-                                }
-
-                                // Convert efficiency to percent.
-              		            int efficiency = (int)math.round(100f * tempEfficiency);
-
-                                // Update entity color and accumulate totals.
-                                UpdateEntityColor(efficiency, (EfficiencyMaxColor200Percent ? 200L : 100L), infomodeActive, infomodeIndex, colors, i);
-                                totalUsed     += efficiency;
-                                totalCapacity += 100L;   // Capacity is always 100%, even if color is based on 200%.
-                            }
-                            else
-                            {
-                                // Zoned buildings with no renter are dislayed as 0%.
-                                UpdateEntityColor(0L, 0L, infomodeActive, infomodeIndex, colors, i);
-                                totalUsed     += 0L;
-                                totalCapacity += 100L;  // Count the building.
-                            }
+                    // Do each building status type.
+                    foreach (BUBuildingStatusType buildingStatusType in buildingStatusTypes)
+                    {
+                        // Check for commercial, industrial, or office with no company.
+                        long efficiency;
+                        if ((buildingStatusType == BUBuildingStatusType.EfficiencyCommercial ||
+                             buildingStatusType == BUBuildingStatusType.EfficiencyIndustrial ||
+                             buildingStatusType == BUBuildingStatusType.EfficiencyOffice) &&
+                            !mainBuildingHasCompany)
+                        {
+                            // Use 0% for efficiency.
+                            efficiency = 0L;
                         }
                         else
                         {
-                            // Building has no Efficiency buffer.
-
-                            // Check for zoned building
-                            if (buildingStatusType == BUBuildingStatusType.EfficiencyCommercial ||
-                                buildingStatusType == BUBuildingStatusType.EfficiencyIndustrial ||
-                                buildingStatusType == BUBuildingStatusType.EfficiencyOffice)
-                            {
-                                // Update entity color and accumulate totals for 0%.
-                                UpdateEntityColor(0L, (EfficiencyMaxColor200Percent ? 200L : 100L), infomodeActive, infomodeIndex, colors, i);
-                                totalUsed     += 0L;
-                                totalCapacity += 100L;   // Capacity is always 100%, even if color is based on 200%.
-                            }
-                            else
-                            {
-                                // Not a zoned building.
-                                // Leave default color.
-                            }
+                            // Use main building efficiency.
+                            efficiency = mainBuildingEfficiency;
                         }
+
+                        // Update entity color according to the efficiency max color setting.
+                        UpdateEntityColor(buildingStatusType, efficiency, (EfficiencyMaxColor200Percent ? 200L : 100L), ref color);
+
+                        // Update total used and capacity.
+                        // Capacity is always 100% even if entity color is based on 200%.
+                        UpdateTotalUsedCapacity(buildingStatusType, efficiency, 100L);
                     }
                 }
+            }
 
-                // Update total used and capacity data arrays.
-                UpdateTotalUsedCapacity(buildingStatusType, totalUsed, totalCapacity);
+            /// <summary>
+            /// Do a main building or upgrade for Efficiency infoview for a non-residential building to get details.
+            /// </summary>
+            private void DoBuildingEfficiencyNonResidentialDetail(
+                Entity entity,
+                Entity prefab,
+                NativeList<BUBuildingStatusType> buildingStatusTypes)
+            {
+                // Get building status types for zoned non-residential.
+                if (BuildingHasCommercial           (entity))           { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyCommercial       ); }
+                if (BuildingHasIndustrial           (entity))           { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyIndustrial       ); }
+                if (BuildingHasOffice               (entity))           { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyOffice           ); }
+
+                // Get all building status types based on the services that apply to this building.
+                // These are exactly the same as the Employees infoview.
+                if (BuildingHasParkingFacility    (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyParking          ); }
+                if (BuildingHasRoadMaintenance    (prefab, entity)) { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyRoadMaintenance  ); }
+                if (BuildingHasElectricity        (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyElectricity      ); }
+                if (BuildingHasWaterPumpingStation(prefab, entity)) { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyWater            ); }
+                if (BuildingHasSewageOutlet       (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencySewage           ); }
+                if (BuildingHasHospital           (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyHealthcare       ); }
+                if (BuildingHasDeathcareFacility  (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyDeathcare        ); }
+                if (BuildingHasGarbageFacility    (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyGarbageManagement); }
+                if (BuildingHasSchool             (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyEducation        ); }
+                if (BuildingHasResearchFacility   (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyResearch         ); }
+                if (BuildingHasFireRescue         (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyFireRescue       ); }
+                if (BuildingHasDisasterControl    (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyDisasterControl  ); }
+                if (BuildingHasPolice             (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyPolice           ); }
+                if (BuildingHasAdministration     (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyAdministration   ); }
+                if (BuildingHasTransportation     (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyTransportation   ); }
+                if (BuildingHasParkMaintenance    (prefab, entity)) { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyParkMaintenance  ); }
+                if (BuildingHasPark               (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyParksRecreation  ); }
+                if (BuildingHasPostFacility       (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyPost             ); }
+                if (BuildingHasTelecomFacility    (prefab))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyTelecom          ); }
             }
         }
     }

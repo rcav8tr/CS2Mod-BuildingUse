@@ -35,12 +35,14 @@ namespace BuildingUse
             // It is important to set a default for every value.
             ZonedBuildingColor           = ZonedBuildingColorChoice.ThreeColors;
             ServiceBuildingColor         = ServiceBuildingColorChoice.ThreeColors;
+            ProductionInfoviewColor      = ProductionInfoviewColorChoice.ThreeColors;
             ColorSpecializedIndustryLots = false;
             ReverseColors                = false;
 
             CountVehiclesInUse           = true;
             CountVehiclesInMaintenance   = true;
             EfficiencyMaxColor200Percent = false;
+            ProductionMaxColor200Percent = false;
         }
 
         /// <summary>
@@ -86,6 +88,24 @@ namespace BuildingUse
             set { _serviceBuildingColorChoice = value; SetInfomodeColors(); }
         }
 
+        // Gradient color choices for Production infoview.
+        public enum ProductionInfoviewColorChoice
+        {
+            ThreeColors,
+            VariousGame,
+            VariousResource,
+        }
+
+        // The selected gradient color choice for Production infoview.
+        // When this setting changes, need to set infomode colors.
+        private ProductionInfoviewColorChoice _productionInfoviewColorChoice;
+        [SettingsUISection(GroupGeneral)]
+        public ProductionInfoviewColorChoice ProductionInfoviewColor
+        {
+            get { return _productionInfoviewColorChoice; }
+            set { _productionInfoviewColorChoice = value; SetInfomodeColors(); }
+        }
+
         // Color specialized industry lots.
         [SettingsUISection(GroupGeneral)]
         public bool ColorSpecializedIndustryLots { get; set; }
@@ -105,37 +125,19 @@ namespace BuildingUse
         public string ModVersion { get { return ModAssemblyInfo.Version; } }
 
 
-        // Whether or not to count vehicles in use.
-        // When this hidden setting changes, need to explicitly save settings.
-        private bool _countVehiclesInUse;
+        // Whether or not to count vehicles in use and in maintenance.
         [SettingsUIHidden]
-        public bool CountVehiclesInUse
-        { 
-            get { return _countVehiclesInUse; }
-            set { _countVehiclesInUse = value; SaveSettings(); }
-        }
-
-        // Whether or not to count vehicles in maintenance.
-        // When this hidden setting changes, need to explicitly save settings.
-        private bool _countVehiclesInMaintenance;
+        public bool CountVehiclesInUse { get; set; }
         [SettingsUIHidden]
-        public bool CountVehiclesInMaintenance
-        {
-            get { return _countVehiclesInMaintenance; }
-            set { _countVehiclesInMaintenance = value; SaveSettings(); }
-        }
+        public bool CountVehiclesInMaintenance { get; set; }
 
-        // Efficiency max color 200 percent.
+        // Efficiency and Production max color 200 percent.
         // True means max color is 200 percent.
         // False means default of 100 percent.
-        // When this hidden setting changes, need to explicitly save settings.
-        private bool _efficiencyMaxColor200Percent;
         [SettingsUIHidden]
-        public bool EfficiencyMaxColor200Percent
-        {
-            get { return _efficiencyMaxColor200Percent; }
-            set { _efficiencyMaxColor200Percent = value; SaveSettings(); }
-        }
+        public bool EfficiencyMaxColor200Percent { get; set; }
+        [SettingsUIHidden]
+        public bool ProductionMaxColor200Percent { get; set; }
 
         /// <summary>
         /// Set infomode colors.
@@ -147,20 +149,6 @@ namespace BuildingUse
             if (_loaded)
             {
                 BUInfoviewDatas.instance.SetInfomodeColors();
-            }
-        }
-
-        /// <summary>
-        /// Save all settings.
-        /// </summary>
-        private async void SaveSettings()
-        {
-            // Settings must be loaded.
-            // This prevents saving settings while defaults are being set and while settings are loading.
-            if (_loaded)
-            {
-                // This saves settings for the game and all mods.
-                await AssetDatabase.global.SaveSettings();
             }
         }
     }

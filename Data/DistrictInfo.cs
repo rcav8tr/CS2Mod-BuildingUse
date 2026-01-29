@@ -10,13 +10,19 @@ namespace BuildingUse
     public class DistrictInfo : IJsonWritable, IComparable<DistrictInfo>
     {
         // Entity and name of the district.
-        public Entity entity { get; set; }
-        public string name { get; set; }
+        public Entity District { get; set; }
+        public string Name { get; set; }
 
-        public DistrictInfo(Entity entity, string name)
+        // Can construct only with parameters.
+        private DistrictInfo() { }
+
+        /// <summary>
+        /// Constructor for new instance.
+        /// </summary>
+        public DistrictInfo(Entity district, string name)
         {
-            this.entity = entity;
-            this.name = name;
+            District = district;
+            Name = name;
         }
 
         /// <summary>
@@ -24,12 +30,12 @@ namespace BuildingUse
         /// </summary>
         public void Write(IJsonWriter writer)
         {
-			writer.TypeBegin(ModAssemblyInfo.Name + ".DistrictInfo");
-			writer.PropertyName("entity");
-			writer.Write(entity);
-			writer.PropertyName("name");
-			writer.Write(name);
-			writer.TypeEnd();
+            writer.TypeBegin(ModAssemblyInfo.Name + ".DistrictInfo");
+            writer.PropertyName("district");
+            writer.Write(District);
+            writer.PropertyName("name");
+            writer.Write(Name);
+            writer.TypeEnd();
         }
 
         /// <summary>
@@ -37,7 +43,7 @@ namespace BuildingUse
         /// </summary>
         public int CompareTo(DistrictInfo other)
         {
-            return String.Compare(this.name, other.name, StringComparison.OrdinalIgnoreCase);
+            return String.Compare(Name, other.Name, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

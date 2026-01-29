@@ -63,16 +63,13 @@ namespace BuildingUse
                 string imagesPath = Path.Combine(assemblyPath, "Images");
                 UIManager.defaultUISystem.AddHostLocation(ImagesURI, imagesPath);
 
-                // Initialize infomode colors.
-                BUInfoviewDatas.instance.SetInfomodeColors();
-
                 // Create the building color system.
                 // This sytem does not need to be activated because it uses Harmony to run when ObjectColorsystem.OnUpdate() runs.
                 World.DefaultGameObjectInjectionWorld.GetOrCreateSystemManaged<BuildingColorSystem>();
 
                 // Create and activate this mod's UI system.
                 updateSystem.UpdateAt<BuildingUseUISystem>(SystemUpdatePhase.UIUpdate);
-            
+
 #if DEBUG
                 // Get localized text from the game where the value is or contains specific text.
                 //Colossal.Localization.LocalizationManager localizationManager = GameManager.instance.localizationManager;
@@ -81,8 +78,9 @@ namespace BuildingUse
                 //    // Exclude assets.
                 //    if (!keyValue.Key.StartsWith("Assets."))
                 //    {
-                //        if (keyValue.Value.ToLower().Contains("mwh"))
-                //        //if (keyValue.Value == "MWh")
+                //        if (keyValue.Value.ToLower() == "game" ||
+                //            keyValue.Value.ToLower() == "resource")
+                //        //if (keyValue.Key.StartsWith("SubServices.NAME[Transportation"))
                 //        {
                 //            log.Info(keyValue.Key + "\t" + keyValue.Value);
                 //        }
@@ -96,7 +94,7 @@ namespace BuildingUse
                 //    localizationManager.SetActiveLocale(localeID);
                 //    foreach (System.Collections.Generic.KeyValuePair<string, string> keyValue in localizationManager.activeDictionary.entries)
                 //    {
-                //        if (keyValue.Key == "Common.VALUE_MEGAWATT_HOURS")
+                //        if (keyValue.Key == "EconomyPanel.PRODUCTION_PAGE_PRODUCTION")
                 //        {
                 //            log.Info(keyValue.Key + "\t" + localeID + "\t" + keyValue.Value);
                 //            break;
@@ -112,7 +110,7 @@ namespace BuildingUse
                 //CreateUIFiles.Create();
 #endif
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 log.Error(ex);
             }

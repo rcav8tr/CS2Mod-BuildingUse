@@ -9,6 +9,7 @@ Vehicles  - ...\GameUI\Media\Game\Resources\Vehicles.svg
 The following infoview icons were adapated from other images:
 Efficiency - Adapted from my Performance Monitor activation icon.
 Processing - Adapted from svgator's library image for Refresh.
+Production - Adapted from production arrow on Production tab of Economy panel.
 
 Icons were resized (if needed) from their original size to 26x26.
 This seems to be the default size for infoview icons in the Icons folder.

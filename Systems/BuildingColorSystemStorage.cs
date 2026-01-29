@@ -1,13 +1,18 @@
-﻿using Unity.Collections;
+﻿using Game;
+using Game.Areas;
+using Game.Companies;
+using Game.Economy;
+using Game.Objects;
+using Game.Prefabs;
+using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
 
 namespace BuildingUse
 {
     /// <summary>
     /// Partial system to set building colors for Storage infoview.
     /// </summary>
-    public partial class BuildingColorSystem : Game.GameSystemBase
+    public partial class BuildingColorSystem : GameSystemBase
     {
         /// <summary>
         /// Partial job struct to set the color of each main building for Storage infoview.
@@ -16,460 +21,387 @@ namespace BuildingUse
         private partial struct UpdateColorsJobMainBuilding : IJobChunk
         {
             /// <summary>
-            /// Get building status types applicable to the building chunk for Storage infoview.
+            /// Do a main building for Storage infoview.
             /// </summary>
-            private void GetApplicableBuildingStatusTypesStorage(ArchetypeChunk buildingChunk, ref NativeList<BUBuildingStatusType> applicableBuildingStatusTypes)
+            private void DoBuildingStorage(in NativeList<EntityPrefab> mainBuildingAndUpgrades, ref Color color)
             {
-                // Add all building status types that apply to this building chunk.
-                if (buildingChunk.Has(ref ComponentTypeHandleCommercialProperty))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.StorageCommercial);
-                if (buildingChunk.Has(ref ComponentTypeHandleIndustrialProperty) && !buildingChunk.Has(ref ComponentTypeHandleOfficeProperty))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.StorageIndustrial);
-                if (buildingChunk.Has(ref ComponentTypeHandleOfficeProperty))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.StorageOffice);
-                if (buildingChunk.Has(ref ComponentTypeHandleBattery))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.StorageBatteryCharge);
-                if (buildingChunk.Has(ref ComponentTypeHandleElectricityProducer))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.StoragePowerPlantFuel);
-                if (buildingChunk.Has(ref ComponentTypeHandleHospital))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.StorageHealthcare);
-                if (buildingChunk.Has(ref ComponentTypeHandleGarbageFacility))
-                {
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.StorageLandfill);
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.StorageGarbageManagement);
-                }
-                if (buildingChunk.Has(ref ComponentTypeHandleEmergencyShelter))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.StorageEmergencyShelter);
-                if (buildingChunk.Has(ref ComponentTypeHandleTransportStation))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.StorageCargoTransportation);
-                if (buildingChunk.Has(ref ComponentTypeHandlePostFacility) || buildingChunk.Has(ref ComponentTypeHandleMailBox))
-                    applicableBuildingStatusTypes.Add(BUBuildingStatusType.StoragePost);
+                // Do service building status types first.
+                DoBuildingStorageService(in mainBuildingAndUpgrades, ref color);
+
+                // Do the company building status types in descending order.
+                DoBuildingStorageCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.StorageOffice);
+                DoBuildingStorageCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.StorageIndustrial);
+                DoBuildingStorageCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.StorageCommercial);
             }
 
             /// <summary>
-            /// Set building colors for Storage infoview.
+            /// Do a main building and upgrades for Storage infoview for a company.
             /// </summary>
-            private void SetBuildingColorsStorage
-            (
-                ArchetypeChunk buildingChunk,
-                bool infomodeActive,
-                int infomodeIndex,
-                NativeArray<Game.Objects.Color> colors,
-                BUBuildingStatusType buildingStatusType
-            )
+            private void DoBuildingStorageCompany(in NativeList<EntityPrefab> mainBuildingAndUpgrades, ref Color color, BUBuildingStatusType buildingStatusType)
             {
-                // Check which building status type.
-                switch (buildingStatusType)
+                // Do each main building and upgrade.
+                long used     = 0L;
+                long capacity = 0L;
+                bool hasCorrectProperty = false;
+                foreach (EntityPrefab mainBuildingOrUpgrade in mainBuildingAndUpgrades)
                 {
-                    case BUBuildingStatusType.StorageCommercial:
-                    case BUBuildingStatusType.StorageIndustrial:
-                    case BUBuildingStatusType.StorageOffice:
-                        SetBuildingColorsStorageResource(buildingChunk, infomodeActive, infomodeIndex, colors, buildingStatusType, true);
-                        break;
-
-                    case BUBuildingStatusType.StorageBatteryCharge:
-                        SetBuildingColorsStorageBatteryCharge(buildingChunk, infomodeActive, infomodeIndex, colors, buildingStatusType);
-                        break;
-                    
-                    case BUBuildingStatusType.StorageLandfill:
-                        SetBuildingColorsStorageGarbageManagement(buildingChunk, infomodeActive, infomodeIndex, colors, buildingStatusType, true);
-                        break;
-                    case BUBuildingStatusType.StorageGarbageManagement:
-                        SetBuildingColorsStorageGarbageManagement(buildingChunk, infomodeActive, infomodeIndex, colors, buildingStatusType, false);
-                        break;
-
-                    case BUBuildingStatusType.StoragePost:
-                        SetBuildingColorsStoragePost(buildingChunk, infomodeActive, infomodeIndex, colors, buildingStatusType);
-                        break;
-
-                    case BUBuildingStatusType.StoragePowerPlantFuel:
-                        if (buildingChunk.Has(ref ComponentTypeHandleGarbageFacility))
-                        {
-                            // Incinerator stored garbage is power plant fuel.
-                            SetBuildingColorsStorageGarbageManagement(buildingChunk, infomodeActive, infomodeIndex, colors, buildingStatusType, false);
-                        }
-                        else
-                        {
-                            // Other power plants use general resource storage.
-                            SetBuildingColorsStorageResource(buildingChunk, infomodeActive, infomodeIndex, colors, buildingStatusType, false);
-                        }
-                        break;
-
-                    // Everything else is resource storage.
-                    default:
-                        SetBuildingColorsStorageResource(buildingChunk, infomodeActive, infomodeIndex, colors, buildingStatusType, false);
-                        break;
-                }
-            }
-            
-            /// <summary>
-            /// Set building colors for Storage infoview for battery charge.
-            /// Logic adapted from Game.UI.InGame.BatterySection.
-            /// </summary>
-            private void SetBuildingColorsStorageBatteryCharge
-            (
-                ArchetypeChunk buildingChunk,
-                bool infomodeActive,
-                int infomodeIndex,
-                NativeArray<Game.Objects.Color> colors,
-                BUBuildingStatusType buildingStatusType
-            )
-            {
-                // Initialize total used and capacity.
-                long totalUsed     = 0L;
-                long totalCapacity = 0L;
-
-                // Get batteries.
-			    NativeArray<Game.Buildings.Battery> batteries = buildingChunk.GetNativeArray(ref ComponentTypeHandleBattery);
-
-                // Do each entity (i.e. building).
-                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
-                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
-                for (int i = 0; i < entities.Length; i++)
-                {
-                    // Building must be in selected district.
-                    if (BuildingInSelectedDistrict(districts[i].m_District))
+                    // Check if building has correct property.
+                    Entity entity = mainBuildingOrUpgrade.Entity;
+                    if ((buildingStatusType == BUBuildingStatusType.StorageCommercial && BuildingHasCommercial(entity)) ||
+                        (buildingStatusType == BUBuildingStatusType.StorageIndustrial && BuildingHasIndustrial(entity)) ||
+                        (buildingStatusType == BUBuildingStatusType.StorageOffice     && BuildingHasOffice    (entity)))
                     {
-                        // Get component data with upgrades.
-                        if (TryGetComponentDataWithUpgrades(entities[i], prefabRefs[i].m_Prefab, ref ComponentLookupBatteryData, out Game.Prefabs.BatteryData batteryData))
+                        // Building has the correct property.
+                        hasCorrectProperty = true;
+
+                        // Get the company, if any.
+                        if (TryGetCompany(entity, out Entity companyEntity))
                         {
-                            // Get used from battery.
-                            long used = batteries[i].storedEnergyHours;
-
-                            // Get capacity.
-                            long capacity = batteryData.m_Capacity;
-
-                            // Update entity color and accumulate totals.
-                            UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                            totalUsed     += used;
-                            totalCapacity += capacity;
-                        }
-                    }
-                }
-
-                // Update total used and capacity data arrays.
-                UpdateTotalUsedCapacity(buildingStatusType, totalUsed, totalCapacity);
-            }
-            
-            /// <summary>
-            /// Set building colors for Storage infoview for garbage management.
-            /// Logic adapted from Game.UI.InGame.GarbageSection.
-            /// </summary>
-            private void SetBuildingColorsStorageGarbageManagement
-            (
-                ArchetypeChunk buildingChunk,
-                bool infomodeActive,
-                int infomodeIndex,
-                NativeArray<Game.Objects.Color> colors,
-                BUBuildingStatusType buildingStatusType,
-                bool longTermStorage
-            )
-            {
-                // Initialize total used and capacity.
-                long totalUsed     = 0L;
-                long totalCapacity = 0L;
-
-                // Do each entity (i.e. building).
-                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
-                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
-                for (int i = 0; i < entities.Length; i++)
-                {
-                    // Building must be in selected district.
-                    if (BuildingInSelectedDistrict(districts[i].m_District))
-                    {
-                        // Get component data with upgrades.
-                        Entity entity = entities[i];
-                        if (TryGetComponentDataWithUpgrades(entity, prefabRefs[i].m_Prefab, ref ComponentLookupGarbageFacilityData, out Game.Prefabs.GarbageFacilityData garbageFacilityData))
-                        {
-                            // Check for landfill vs other garbage management.
-                            // Only landfill has long term storage.
-                            if (garbageFacilityData.m_LongTermStorage == longTermStorage)
+                            // Get used from the company resources buffer, not from the building.
+                            if (BufferLookupResources.TryGetBuffer(companyEntity, out DynamicBuffer<Resources> resourcesBuffer) &&
+                                resourcesBuffer.IsCreated)
                             {
-                                // Get used from resources buffer.
-                                long used = 0;
-			                    if (BufferLookupResources.TryGetBuffer(entity, out DynamicBuffer<Game.Economy.Resources> bufferResources))
-			                    {
-				                    used = Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.Garbage, bufferResources);
-			                    }
-
-                                // Get capacity.
-                                long capacity = garbageFacilityData.m_GarbageCapacity;
-
-                                // Add in any sub areas.
-		                        if (BufferLookupSubArea.TryGetBuffer(entity, out DynamicBuffer<Game.Areas.SubArea> subAreas))
-		                        {
-                                    // Do each sub area.
-		                            for (int j = 0; j < subAreas.Length; j++)
-		                            {
-                                        // Get storage information.
-			                            Entity subArea = subAreas[j].m_Area;
-			                            if (ComponentLookupStorage        .TryGetComponent(subArea, out Game.Areas.Storage subAreaStorage) &&
-                                            ComponentLookupGeometry       .TryGetComponent(subArea, out Game.Areas.Geometry subAreaGeometry) &&
-                                            ComponentLookupPrefabRef      .TryGetComponent(subArea, out Game.Prefabs.PrefabRef subAreaPrefabRef) &&
-                                            ComponentLookupStorageAreaData.TryGetComponent(subAreaPrefabRef.m_Prefab, out Game.Prefabs.StorageAreaData storageAreaData))
-			                            {
-					                        used     += subAreaStorage.m_Amount;
-					                        capacity += Game.Areas.AreaUtils.CalculateStorageCapacity(subAreaGeometry, storageAreaData);
-			                            }
-		                            }
-		                        }
-
-                                // Update entity color and accumulate totals.
-                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                                totalUsed     += used;
-                                totalCapacity += capacity;
-                            }
-                        }
-                    }
-                }
-
-                // Update total used and capacity data arrays.
-                UpdateTotalUsedCapacity(buildingStatusType, totalUsed, totalCapacity);
-            }
-            
-            /// <summary>
-            /// Set building colors for Storage infoview for post.
-            /// Logic adapted from Game.UI.InGame.MailSection.
-            /// </summary>
-            private void SetBuildingColorsStoragePost
-            (
-                ArchetypeChunk buildingChunk,
-                bool infomodeActive,
-                int infomodeIndex,
-                NativeArray<Game.Objects.Color> colors,
-                BUBuildingStatusType buildingStatusType
-            )
-            {
-                // Initialize total used and capacity.
-                long totalUsed     = 0L;
-                long totalCapacity = 0L;
-
-                // Do each entity (i.e. building).
-                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
-                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
-                NativeArray<Game.Routes.MailBox       > mailboxes  = buildingChunk.GetNativeArray(ref ComponentTypeHandleMailBox);
-                for (int i = 0; i < entities.Length; i++)
-                {
-                    // Building must be in selected district.
-                    if (BuildingInSelectedDistrict(districts[i].m_District))
-                    {
-                        // Get entity and prefab.
-                        Entity entity = entities[i];
-                        Entity prefab = prefabRefs[i].m_Prefab;
-
-                        // Get the post facility data.
-                        if (TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupPostFacilityData, out Game.Prefabs.PostFacilityData postFacilityData))
-                        {
-                            // Building must have capacity.
-                            long capacity = postFacilityData.m_MailCapacity;
-                            if (capacity > 0L)
-                            {
-                                // Get resources.
-                                long used = 0L;
-                                if (BufferLookupResources.TryGetBuffer(entity, out DynamicBuffer<Game.Economy.Resources> bufferResources))
+                                // Do each resources in the buffer.
+                                foreach (Resources resources in resourcesBuffer)
                                 {
-                                    // Mail stored is sum of mail amounts.
-                                    used =
-                                        Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.UnsortedMail, bufferResources) +
-                                        Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.LocalMail, bufferResources) +
-                                        Game.Economy.EconomyUtils.GetResources(Game.Economy.Resource.OutgoingMail, bufferResources);
-
-                                    // If post facility has a mailbox, add in its amount.
-                                    // It is unknown why the capacity of the mailbox is not included in the logic of Game.UI.InGame.MailSection.
-                                    if (mailboxes.Length > 0)
+                                    // Exclude NoResource, Money, and Last.
+                                    Resource resource = resources.m_Resource;
+                                    if (resource != Resource.NoResource && resource != Resource.Money && resource != Resource.Last)
                                     {
-                                        used += mailboxes[i].m_MailAmount;
+                                        used += resources.m_Amount;
                                     }
                                 }
-
-                                // Update entity color and accumulate totals.
-                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                                totalUsed     += used;
-                                totalCapacity += capacity;
                             }
-                        }
-                        // Get the mailbox data.
-                        else if (mailboxes.Length > 0 && ComponentLookupMailBoxData.TryGetComponent(prefab, out Game.Prefabs.MailBoxData mailBoxData))
-                        {
-                            // There must be capacity.
-                            long capacity = mailBoxData.m_MailCapacity;
-                            if (capacity > 0L)
+
+                            // Get storage capacity from the company prefab, not from the building prefab.
+                            if (ComponentLookupPrefabRef.TryGetComponent(companyEntity, out PrefabRef prefabRef) &&
+                                ComponentLookupStorageLimitData.TryGetComponent(prefabRef.m_Prefab, out  StorageLimitData storageLimitData))
                             {
-                                // Get used.
-                                long used = mailboxes[i].m_MailAmount;
-
-                                // Update entity color and accumulate totals.
-                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                                totalUsed     += used;
-                                totalCapacity += capacity;
+                                // Check for warehouse.
+                                if (ComponentLookupBuildingPropertyData .TryGetComponent(prefabRef.m_Prefab, out BuildingPropertyData buildingPropertyData) &&
+                                    ComponentLookupSpawnableBuildingData.TryGetComponent(prefabRef.m_Prefab, out SpawnableBuildingData spawnableBuildingData) &&
+                                    ComponentLookupBuildingData         .TryGetComponent(prefabRef.m_Prefab, out BuildingData buildingData) &&
+                                    buildingPropertyData.m_AllowedStored != Resource.NoResource)
+                                {
+                                    // For warehouse, storage capacity is computed.
+                                    capacity += storageLimitData.GetAdjustedLimitForWarehouse(spawnableBuildingData, buildingData);
+                                }
+                                else
+                                {
+                                    // For other than warehouse, storage capacity is obtained directly.
+                                    capacity += storageLimitData.m_Limit;
+                                }
                             }
                         }
                     }
                 }
 
-                // Update total used and capacity data arrays.
-                UpdateTotalUsedCapacity(buildingStatusType, totalUsed, totalCapacity);
+                // If main building plus upgrades has the correct property,
+                // update building color and total used and capacity even if no company.
+                if (hasCorrectProperty)
+                {
+                    UpdateEntityColorAndTotalUsedCapacity(buildingStatusType, used, capacity, ref color);
+                }
             }
 
             /// <summary>
-            /// Set building colors for Storage infoview for a building with resources.
+            /// Do a main building and upgrades for Storage infoview for Service.
             /// </summary>
-            private void SetBuildingColorsStorageResource
-            (
-                ArchetypeChunk buildingChunk,
-                bool infomodeActive,
-                int infomodeIndex,
-                NativeArray<Game.Objects.Color> colors,
-                BUBuildingStatusType buildingStatusType,
-                bool company
-            )
+            private void DoBuildingStorageService(in NativeList<EntityPrefab> mainBuildingAndUpgrades, ref Color color)
             {
-                // Logic adapted from Game.UI.InGame.StorageSection.
+                // Do mail box as the first service.
+                // Used and capacity for mail box are completely separate
+                // from the building's other resources and storage capacity.
+                DoBuildingStorageMailbox(in mainBuildingAndUpgrades, ref color);
 
-                // Initialize total used and capacity.
-                long totalUsed     = 0L;
-                long totalCapacity = 0L;
+                // Building Status Type     Capacity Is From
+                // ------------------------ -------------------------------
+                // StoragePowerPlantFuel    StorageLimitData
+                // StorageHealthcare        StorageLimitData
+                // StorageLandfill          GarbageFacilityData and SubArea
+                // StorageGarbageManagement GarbageFacilityData
+                // StorageEmergencyShelter  StorageLimitData
+                // StorageTransportation    StorageLimitData
+                // StoragePost              PostFacilityData
 
-                // Do each entity (i.e. building).
-                NativeArray<Game.Areas.CurrentDistrict> districts  = buildingChunk.GetNativeArray(ref ComponentTypeHandleCurrentDistrict);
-                NativeArray<Entity                    > entities   = buildingChunk.GetNativeArray(EntityTypeHandle);
-                NativeArray<Game.Prefabs.PrefabRef    > prefabRefs = buildingChunk.GetNativeArray(ref ComponentTypeHandlePrefabRef);
-                for (int i = 0; i < entities.Length; i++)
+                // Determine if the building has the building status type.
+                bool hasPowerPlantFuel         = false;
+                bool hasHealthcare             = false;
+                bool hasLandfill               = false;
+                bool hasGarbageManagement      = false;
+                bool hasEmergencyShelter       = false;
+                bool hasCargoTransportation    = false;
+                bool hasPost                   = false;
+
+                // At the same time get storage capacities.
+                long capacityStorageLimit      = 0L;
+                long capacityLandfill          = 0L;
+                long capacityGarbageManagement = 0L;
+                long capacityPost              = 0L;
+
+                // Do each main building and upgrade.
+                foreach (EntityPrefab mainBuildingOrUpgrade in mainBuildingAndUpgrades)
                 {
-                    // Building must be in selected district.
-                    if (BuildingInSelectedDistrict(districts[i].m_District))
-                    {
-                        // Get entity and prefab.
-                        Entity entity = entities[i];
-                        Entity prefab = prefabRefs[i].m_Prefab;
+                    // Get main building or upgrade prefab.
+                    Entity mainBuildingOrUpgradePrefab = mainBuildingOrUpgrade.Prefab;
 
-                        // Building or company must have storage.
-                        bool found = false;
-                        Entity companyEntity = Entity.Null;
-                        if
-                            (
-                                (
-                                    // Try to get storage limit data from the prefab of the entity.
-                                    TryGetComponentDataWithUpgrades(entity, prefab, ref ComponentLookupStorageLimitData, out Game.Companies.StorageLimitData storageLimitData)
-                                )
-                                ||
-                                (
-                                    // Try to get storage limit data from the prefab of the company of the entity.
-                                    Game.UI.InGame.CompanyUIUtils.HasCompany(entity, prefab, ref BufferLookupRenter, ref ComponentLookupBuildingPropertyData, ref ComponentLookupCompanyData, out companyEntity) &&
-                                    ComponentLookupPrefabRef.TryGetComponent(companyEntity, out Game.Prefabs.PrefabRef companyPrefabRef) &&
-                                    ComponentLookupStorageLimitData.TryGetComponent(companyPrefabRef.m_Prefab, out storageLimitData)
-                                )
-                            )
+                    // Try to get StorageLimitData for the building prefab.
+                    bool hasStorageLimitData = ComponentLookupStorageLimitData.TryGetComponent(mainBuildingOrUpgradePrefab, out StorageLimitData storageLimitData);
+
+                    // Accumulate capacity from StorageLimitData.
+                    if (hasStorageLimitData)
+                    {
+                        capacityStorageLimit += storageLimitData.m_Limit;
+                    }
+
+                    // For PowerPlantFuel, building must have electricity producer with storage.
+                    // There are elictricity producers without storage which should not be included.
+                    if (ComponentLookupElectricityProducer.HasComponent(mainBuildingOrUpgrade.Entity) &&
+                        hasStorageLimitData && storageLimitData.m_Limit > 0)
+                    {
+                        hasPowerPlantFuel = true;
+                    }
+
+                    // For Healthcare, building must have hospital.
+                    if (BuildingHasHospital(mainBuildingOrUpgradePrefab))
+                    {
+                        hasHealthcare = true;
+                    }
+
+                    // For Landfill, building must have garbage facility WITH long term storage.
+                    bool hasGarbageFacility = BuildingHasGarbageFacility(mainBuildingOrUpgradePrefab, out GarbageFacilityData garbageFacilityData);
+                    if (hasGarbageFacility && garbageFacilityData.m_LongTermStorage)
+                    {
+                        hasLandfill = true;
+                        capacityLandfill += garbageFacilityData.m_GarbageCapacity;
+                    }
+
+                    // For GarbageManagement, building must have garbage facility WITHOUT long term storage.
+                    if (hasGarbageFacility && !garbageFacilityData.m_LongTermStorage)
+                    {
+                        hasGarbageManagement = true;
+                        capacityGarbageManagement += garbageFacilityData.m_GarbageCapacity;
+                    }
+
+                    // For EmergencyShelter, building must have emergency shelter.
+                    if (BuildingHasEmergencyShelter(mainBuildingOrUpgradePrefab))
+                    {
+                        hasEmergencyShelter = true;
+                    }
+
+                    // For CargoTransportation, building must have cargo transport station.
+                    if (BuildingHasCargoTransportStation(mainBuildingOrUpgradePrefab))
+                    {
+                        hasCargoTransportation = true;
+                    }
+
+                    // For Post, building must have post facility.
+                    // Logic adapted from Game.UI.InGame.MailSection.OnProcess().
+                    // A post facility can also have a mail box.
+                    // But for reasons unknown, the used and capacity from the mailbox are not included for the post facility.
+                    if (BuildingHasPostFacility(mainBuildingOrUpgradePrefab, out PostFacilityData postFacilityData))
+                    {
+                        hasPost = true;
+                        capacityPost += postFacilityData.m_MailCapacity;
+                    }
+                }
+
+                // Get used amount for each building status type.
+                long usedPowerPlantFuel      = 0L;
+                long usedHealthcare          = 0L;
+                long usedLandfill            = 0L;
+                long usedGarbageManagement   = 0L;
+                long usedEmergencyShelter    = 0L;
+                long usedCargoTransportation = 0L;
+                long usedPost                = 0L;
+
+                // Do each main building and upgrade.
+                foreach (EntityPrefab mainBuildingOrUpgrade in mainBuildingAndUpgrades)
+                {
+                    // Get resources buffer, if any.
+                    if (BufferLookupResources.TryGetBuffer(mainBuildingOrUpgrade.Entity, out DynamicBuffer<Resources> resourcesBuffer) &&
+                        resourcesBuffer.IsCreated)
+                    {
+                        // Do each resources entry in the buffer.
+                        foreach (Resources resources in resourcesBuffer)
                         {
-                            // Storage must have capacity.
-                            long capacity = GetStorageCapacity(entity, prefab, storageLimitData);
-                            if (capacity > 0L)
+                            // For each specially checked resource,
+                            // the resource amount gets assigned first to one of the building status types if needed,
+                            // and if not so assigned then the resource amount gets assigned to CargoTransportion if needed.
+                            switch (resources.m_Resource)
                             {
-                                // Building or company has storage and storage has capacity.
-                                found = true;
+                                case Resource.NoResource:
+                                case Resource.Money:
+                                case Resource.Last:
+                                    // Skip these.
+                                    break;
 
-                                // Get used from resources.
-                                long used = GetTotalResourceAmount(entity, companyEntity);
-                                used = math.min(math.max(used, 0L), capacity);
+                                case Resource.Petrochemicals:
+                                case Resource.Coal:
+                                    // Petrochemicals and/or Coal can be stored by PowerPlantFuel or CargoTransportation.
+                                    if      (hasPowerPlantFuel     ) { usedPowerPlantFuel      += resources.m_Amount; }
+                                    else if (hasCargoTransportation) { usedCargoTransportation += resources.m_Amount; }
+                                    break;
 
-                                // Employee used and capacity are valid.
-                                // Update entity color and accumulate totals.
-                                UpdateEntityColor(used, capacity, infomodeActive, infomodeIndex, colors, i);
-                                totalUsed     += used;
-                                totalCapacity += capacity;
+                                case Resource.Pharmaceuticals:
+                                    // Pharmaceuticals can be stored by Healthcare or CargoTransportation.
+                                    if      (hasHealthcare         ) { usedHealthcare          += resources.m_Amount; }
+                                    else if (hasCargoTransportation) { usedCargoTransportation += resources.m_Amount; }
+                                    break;
+
+                                case Resource.Garbage:
+                                    // Garbage can be stored by Landfill, GarbageManagement, or CargoTransportation.
+                                    if      ( hasLandfill && !hasGarbageManagement) { usedLandfill          += resources.m_Amount; }
+                                    else if (!hasLandfill &&  hasGarbageManagement) { usedGarbageManagement += resources.m_Amount; }
+                                    else if ( hasLandfill &&  hasGarbageManagement)
+                                    {
+                                        // Building has both Landfill and GarbageManagement.
+                                        // This should never happen, but if it does, then each gets half.
+                                        usedLandfill          += resources.m_Amount / 2L;
+                                        usedGarbageManagement += resources.m_Amount / 2L;
+                                    }
+                                    else if (hasCargoTransportation) { usedCargoTransportation += resources.m_Amount; }
+                                    break;
+
+                                case Resource.Food:
+                                    // Food can be stored by EmergencyShelter or CargoTransportation.
+                                    if      (hasEmergencyShelter   ) { usedEmergencyShelter    += resources.m_Amount; }
+                                    else if (hasCargoTransportation) { usedCargoTransportation += resources.m_Amount; }
+                                    break;
+
+                                case Resource.LocalMail:
+                                case Resource.OutgoingMail:
+                                case Resource.UnsortedMail:
+                                    // Mail of any type can be stored by Post or CargoTransportation.
+                                    if      (hasPost               ) { usedPost                += resources.m_Amount; }
+                                    else if (hasCargoTransportation) { usedCargoTransportation += resources.m_Amount; }
+                                    break;
+
+                                default:
+                                    // All other resources can only be stored by CargoTransportation.
+                                    if (hasCargoTransportation) { usedCargoTransportation += resources.m_Amount; }
+                                    break;
                             }
                         }
-
-                        // For a company not found, update entity color for 0%.
-                        if (company && !found)
-                        {
-                            UpdateEntityColor(0L, 0L, infomodeActive, infomodeIndex, colors, i);
-                        }
                     }
-                }
 
-                // Update total used and capacity data arrays.
-                UpdateTotalUsedCapacity(buildingStatusType, totalUsed, totalCapacity);
-            }
-
-            /// <summary>
-            /// Get storage capacity.
-            /// </summary>
-            private int GetStorageCapacity(Entity entity, Entity prefab, Game.Companies.StorageLimitData storageLimitData)
-            {
-                // Logic adapted from Game.UI.InGame.StorageSection.Visible().
-
-                // Check how to compute storage capacity.
-                if
-                    (
-                        (
-                            (
-                                // Try to get building property data, spawnabale building data, and building data from property renter prefab.
-                                ComponentLookupPropertyRenter       .TryGetComponent(entity, out Game.Buildings.PropertyRenter propertyRenter) &&
-                                ComponentLookupPrefabRef            .TryGetComponent(propertyRenter.m_Property, out Game.Prefabs.PrefabRef propertyRenterPrefabRef) &&
-                                ComponentLookupBuildingPropertyData .TryGetComponent(propertyRenterPrefabRef.m_Prefab, out Game.Prefabs.BuildingPropertyData buildingPropertyData) &&
-                                ComponentLookupSpawnableBuildingData.TryGetComponent(propertyRenterPrefabRef.m_Prefab, out Game.Prefabs.SpawnableBuildingData spawnableBuildingData) &&
-                                ComponentLookupBuildingData         .TryGetComponent(propertyRenterPrefabRef.m_Prefab, out Game.Prefabs.BuildingData buildingData)
-                            )
-                            ||
-                            (
-                                // Try to get building property data, spawnabale building data, and building data from the prefab.
-                                ComponentLookupBuildingPropertyData .TryGetComponent(prefab, out buildingPropertyData) &&
-                                ComponentLookupSpawnableBuildingData.TryGetComponent(prefab, out spawnableBuildingData) &&
-                                ComponentLookupBuildingData         .TryGetComponent(prefab, out buildingData)
-                            )
-                        )
-                        &&
-                        (
-                            // Must allow resources to be sold, manufactured, or stored.
-                            buildingPropertyData.m_AllowedSold         != Game.Economy.Resource.NoResource ||
-                            buildingPropertyData.m_AllowedManufactured != Game.Economy.Resource.NoResource ||
-                            buildingPropertyData.m_AllowedStored       != Game.Economy.Resource.NoResource 
-                        )
-                    )
-                {
-                    // Storage capacity is computed from storage limit, spawnabale building data (i.e. building level), and building data (i.e. lot size).
-                    return storageLimitData.GetAdjustedLimitForWarehouse(spawnableBuildingData, buildingData);
-                }
-                else
-                {
-                    // Storage capacity is only from storage limit.
-                    return storageLimitData.m_Limit;
-                }
-            }
-
-            /// <summary>
-            /// Get total resource amount for entity or company entity.
-            /// </summary>
-            private int GetTotalResourceAmount(Entity entity, Entity companyEntity)
-            {
-                // Logic adapted from Game.UI.InGame.StorageSection.OnProcess().
-
-                // Get resources buffer from either the entity or the company entity.
-                int amount = 0;
-                if (BufferLookupResources.TryGetBuffer(entity, out DynamicBuffer<Game.Economy.Resources> bufferResources) ||
-                    BufferLookupResources.TryGetBuffer(companyEntity, out bufferResources))
-                {
-                    // Do each resource in the buffer.
-                    // Note that weighted (e.g. Electronics) and unweighted (e.g. Software) resource amounts
-                    // are combined with each other and are generally treated as weighted.
-                    for (int i = 0; i < bufferResources.Length; i++)
+                    // For Landfill, include Garbage used and capacity from sub areas that store garbage.
+                    // Logic adapted from Game.UI.InGame.GarbageSection.OnProcess().
+                    if (hasLandfill &&
+                        BufferLookupSubArea.TryGetBuffer(mainBuildingOrUpgrade.Entity, out DynamicBuffer<Game.Areas.SubArea> bufferSubAreas) &&
+                        bufferSubAreas.IsCreated)
                     {
-                        // Skip no resource and money.
-                        Game.Economy.Resources resources = bufferResources[i];
-                        if (resources.m_Resource != Game.Economy.Resource.NoResource && resources.m_Resource != Game.Economy.Resource.Money)
+                        foreach (Game.Areas.SubArea subArea in bufferSubAreas)
                         {
-                            // Accumulate resource amount.
-                            amount += resources.m_Amount;
+                            Entity subAreaEntity = subArea.m_Area;
+                            if (ComponentLookupStorage.TryGetComponent(subAreaEntity, out Storage subAreaStorage) &&
+                                ComponentLookupGeometry.TryGetComponent(subAreaEntity, out Geometry subAreaGeometry) &&
+                                ComponentLookupPrefabRef.TryGetComponent(subAreaEntity, out PrefabRef subAreaPrefabRef) &&
+                                ComponentLookupStorageAreaData.TryGetComponent(subAreaPrefabRef.m_Prefab, out StorageAreaData subAreaStorageAreaData) &&
+                                (subAreaStorageAreaData.m_Resources & Resource.Garbage) != 0)
+                            {
+                                usedLandfill     += subAreaStorage.m_Amount;
+                                capacityLandfill += AreaUtils.CalculateStorageCapacity(subAreaGeometry, subAreaStorageAreaData);
+                            }
                         }
                     }
                 }
 
-                // Return the amount.
-                return amount;
+                // For the building status types that share the capacity of the building (i.e. capacity is from StorageLimitData):
+                // if more than one is present, divide the capacity evenly between them.
+                // This is not ideal, but it is better than letting the full capacity remain with all of them.
+                int count = 0;
+                if (hasPowerPlantFuel     ) { count++; }
+                if (hasHealthcare         ) { count++; }
+                if (hasEmergencyShelter   ) { count++; }
+                if (hasCargoTransportation) { count++; }
+                if (count > 1)
+                {
+                    capacityStorageLimit /= count;
+                }
+
+                // For each building status type that has capacity, update entity color and total used and capacity.
+                // Do in descending order by building status type.
+                if (hasPost                && capacityPost              > 0L) { UpdateEntityColorAndTotalUsedCapacity(BUBuildingStatusType.StoragePost,                usedPost,                capacityPost,              ref color); }
+                if (hasCargoTransportation && capacityStorageLimit      > 0L) { UpdateEntityColorAndTotalUsedCapacity(BUBuildingStatusType.StorageCargoTransportation, usedCargoTransportation, capacityStorageLimit,      ref color); }
+                if (hasEmergencyShelter    && capacityStorageLimit      > 0L) { UpdateEntityColorAndTotalUsedCapacity(BUBuildingStatusType.StorageEmergencyShelter,    usedEmergencyShelter,    capacityStorageLimit,      ref color); }
+                if (hasGarbageManagement   && capacityGarbageManagement > 0L) { UpdateEntityColorAndTotalUsedCapacity(BUBuildingStatusType.StorageGarbageManagement,   usedGarbageManagement,   capacityGarbageManagement, ref color); }
+                if (hasLandfill            && capacityLandfill          > 0L) { UpdateEntityColorAndTotalUsedCapacity(BUBuildingStatusType.StorageLandfill,            usedLandfill,            capacityLandfill,          ref color); }
+                if (hasHealthcare          && capacityStorageLimit      > 0L) { UpdateEntityColorAndTotalUsedCapacity(BUBuildingStatusType.StorageHealthcare,          usedHealthcare,          capacityStorageLimit,      ref color); }
+                if (hasPowerPlantFuel      && capacityStorageLimit      > 0L) { UpdateEntityColorAndTotalUsedCapacity(BUBuildingStatusType.StoragePowerPlantFuel,      usedPowerPlantFuel,      capacityStorageLimit,      ref color); }
+
+                // Do battery charge as the last service.
+                // Used and capacity for battery charge are completely separate
+                // from the building's other resources and storage capacity.
+                DoBuildingStorageBatteryCharge(in mainBuildingAndUpgrades, ref color);
+            }
+
+            /// <summary>
+            /// Do a main building and upgrades for Storage infoview for Battery Charge.
+            /// </summary>
+            private void DoBuildingStorageBatteryCharge(in NativeList<EntityPrefab> mainBuildingAndUpgrades, ref Color color)
+            {
+                // Get used and capacity from main building and upgrades.
+                long used     = 0;
+                long capacity = 0;
+                foreach (EntityPrefab mainBuildingOrUpgrade in mainBuildingAndUpgrades)
+                {
+                    // Logic adapted from Game.UI.InGame.BatterySection.OnProcess().
+
+                    // Accumulate used from energy stored in the battery.
+                    if (ComponentLookupBattery.TryGetComponent(mainBuildingOrUpgrade.Entity, out Game.Buildings.Battery battery))
+                    {
+                        used += battery.storedEnergyHours;
+                    }
+
+                    // Accumulate capacity from the building.
+                    if (BuildingHasBattery(mainBuildingOrUpgrade.Prefab, out BatteryData batteryData))
+                    {
+                        capacity += batteryData.m_Capacity;
+                    }
+                }
+
+                // If main building plus upgrades has capacity, update entity color and total used and capacity.
+                if (capacity > 0)
+                {
+                    UpdateEntityColorAndTotalUsedCapacity(BUBuildingStatusType.StorageBatteryCharge, used, capacity, ref color);
+                }
+            }
+
+            /// <summary>
+            /// Do a main building and upgrades for Storage infoview for Mail Box.
+            /// </summary>
+            private void DoBuildingStorageMailbox(in NativeList<EntityPrefab> mainBuildingAndUpgrades, ref Color color)
+            {
+                // Get used and capacity from main building and upgrades.
+                long used     = 0L;
+                long capacity = 0L;
+                foreach (EntityPrefab mainBuildingOrUpgrade in mainBuildingAndUpgrades)
+                {
+                    // Logic adapted from Game.UI.InGame.MailSection.OnProcess().
+
+                    // Building must not have post facility.
+                    if (!BuildingHasPostFacility(mainBuildingOrUpgrade.Prefab))
+                    {
+                        // Accumulate used from the mail box.
+                        if (ComponentLookupMailBox.TryGetComponent(mainBuildingOrUpgrade.Entity, out Game.Routes.MailBox mailBox))
+                        {
+                            used += mailBox.m_MailAmount;
+                        }
+
+                        // Accumulate capacity from the mail box data.
+                        if (BuildingHasMailBox(mainBuildingOrUpgrade.Prefab, out MailBoxData mailBoxData))
+                        {
+                            capacity += mailBoxData.m_MailCapacity;
+                        }
+                    }
+                }
+
+                // If main building plus upgrades has capacity, update entity color and total used and capacity.
+                if (capacity > 0)
+                {
+                    UpdateEntityColorAndTotalUsedCapacity(BUBuildingStatusType.StorageMailbox, used, capacity, ref color);
+                }
             }
         }
     }

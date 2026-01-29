@@ -86,14 +86,16 @@ namespace BuildingUse
                 foreach (BUBuildingStatusTypeData buildingStatusTypeData in infoviewData.buildingStatusTypeDatas.Values)
                 {
                     // Skip special cases.
-                    if (!buildingStatusTypeData.isSpecialCase)
+                    if (!buildingStatusTypeData.IsSpecialCase)
                     {
-                        // Include both a used and a capacity binding.
-                        BUBuildingStatusType buildingStatusType = buildingStatusTypeData.buildingStatusType;
+                        // Include used, capacity, and count bindings.
+                        BUBuildingStatusType buildingStatusType = buildingStatusTypeData.BuildingStatusType;
                         string used     = buildingStatusType + "Used";
                         string capacity = buildingStatusType + "Capacity";
+                        string count    = buildingStatusType + "Count";
                         sb.AppendLine($"    {used    .PadRight(40)} : bindValue<number>(mod.id, {("\"" + used     + "\",").PadRight(48)} 0),");
                         sb.AppendLine($"    {capacity.PadRight(40)} : bindValue<number>(mod.id, {("\"" + capacity + "\",").PadRight(48)} 0),");
+                        sb.AppendLine($"    {count   .PadRight(40)} : bindValue<number>(mod.id, {("\"" + count    + "\",").PadRight(48)} 0),");
                     }
                 }
             }
@@ -107,6 +109,7 @@ namespace BuildingUse
             sb.AppendLine($"    public static {BuildingUseUISystem.BindingNameCountVehiclesInUse          .PadRight(40)} : string = \"{BuildingUseUISystem.BindingNameCountVehiclesInUse          }\";");
             sb.AppendLine($"    public static {BuildingUseUISystem.BindingNameCountVehiclesInMaintenance  .PadRight(40)} : string = \"{BuildingUseUISystem.BindingNameCountVehiclesInMaintenance  }\";");
             sb.AppendLine($"    public static {BuildingUseUISystem.BindingNameEfficiencyMaxColor200Percent.PadRight(40)} : string = \"{BuildingUseUISystem.BindingNameEfficiencyMaxColor200Percent}\";");
+            sb.AppendLine($"    public static {BuildingUseUISystem.BindingNameProductionMaxColor200Percent.PadRight(40)} : string = \"{BuildingUseUISystem.BindingNameProductionMaxColor200Percent}\";");
             sb.AppendLine($"    public static {BuildingUseUISystem.BindingNameSelectedDistrict            .PadRight(40)} : string = \"{BuildingUseUISystem.BindingNameSelectedDistrict            }\";");
             sb.AppendLine($"    public static {BuildingUseUISystem.BindingNameDistrictInfos               .PadRight(40)} : string = \"{BuildingUseUISystem.BindingNameDistrictInfos               }\";");
             sb.AppendLine("}");
@@ -119,6 +122,7 @@ namespace BuildingUse
             sb.AppendLine($"    public static {BuildingUseUISystem.EventNameCountVehiclesInUseClicked        .PadRight(40)} : string = \"{BuildingUseUISystem.EventNameCountVehiclesInUseClicked        }\";");
             sb.AppendLine($"    public static {BuildingUseUISystem.EventNameCountVehiclesInMaintenanceClicked.PadRight(40)} : string = \"{BuildingUseUISystem.EventNameCountVehiclesInMaintenanceClicked}\";");
             sb.AppendLine($"    public static {BuildingUseUISystem.EventNameEfficiencyMaxColorClicked        .PadRight(40)} : string = \"{BuildingUseUISystem.EventNameEfficiencyMaxColorClicked        }\";");
+            sb.AppendLine($"    public static {BuildingUseUISystem.EventNameProductionMaxColorClicked        .PadRight(40)} : string = \"{BuildingUseUISystem.EventNameProductionMaxColorClicked        }\";");
             sb.AppendLine($"    public static {BuildingUseUISystem.EventNameSelectedDistrictChanged          .PadRight(40)} : string = \"{BuildingUseUISystem.EventNameSelectedDistrictChanged          }\";");
             sb.AppendLine("}");
 
@@ -171,7 +175,7 @@ namespace BuildingUse
             UIConstants infoviewTitles = new UIConstants();
             foreach (BUInfoviewData infoviewData in BUInfoviewDatas.instance.Values)
             {
-                infoviewTitles.Add("InfoviewTitle" + infoviewData.infoview.ToString(), $"Infoviews.INFOVIEW[{infoviewData.infoviewName}]");
+                infoviewTitles.Add("InfoviewTitle" + infoviewData.Infoview.ToString(), $"Infoviews.INFOVIEW[{infoviewData.InfoviewName}]");
             }
             sb.AppendLine();
             sb.Append(GetTranslationsContent(csFile, "Infoview titles.", infoviewTitles));
@@ -184,10 +188,10 @@ namespace BuildingUse
                 foreach (BUBuildingStatusTypeData buildingStatusTypeData in infoviewData.buildingStatusTypeDatas.Values)
                 {
                     // Skip special cases.
-                    if (!buildingStatusTypeData.isSpecialCase)
+                    if (!buildingStatusTypeData.IsSpecialCase)
                     {
-                        BUBuildingStatusType buildingStatusType = buildingStatusTypeData.buildingStatusType;
-                        string buildingStatusTypeName = BUBuildingStatusTypeData.GetBuildingStatusTypeName(buildingStatusType);
+                        BUBuildingStatusType buildingStatusType = buildingStatusTypeData.BuildingStatusType;
+                        string buildingStatusTypeName = ModAssemblyInfo.Name + buildingStatusType.ToString();
                         infomodeTitles  .Add("InfomodeTitle"   + buildingStatusType.ToString(), $"Infoviews.INFOMODE[{        buildingStatusTypeName}]");
                         infomodeTooltips.Add("InfomodeTooltip" + buildingStatusType.ToString(), $"Infoviews.INFOMODE_TOOLTIP[{buildingStatusTypeName}]");
                     }
@@ -234,33 +238,39 @@ namespace BuildingUse
                 // Construct settings.
                 UIConstants _translationKeySettings = new UIConstants()
                 {
-                    { "SettingTitle",                                   Mod.ModSettings.GetSettingsLocaleID()                                                         },
-                                                                                                                                                                         
-                                                                                                                                                                         
-                    { "SettingGroupGeneral",                            Mod.ModSettings.GetOptionGroupLocaleID(ModSettings.GroupGeneral)                              },
-                                                                                                                                                                         
-                    { "SettingZonedBuildingColorLabel",                 Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ZonedBuildingColor               )) },
-                    { "SettingZonedBuildingColorDesc",                  Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ZonedBuildingColor               )) },
-                    { "SettingZonedBuildingColorChoiceThreeColors",     Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ZonedBuildingColorChoice.ThreeColors     ) },
-                    { "SettingZonedBuildingColorChoiceZoneColor",       Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ZonedBuildingColorChoice.ZoneColor       ) },
-
-                    { "SettingServiceBuildingColorLabel",               Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ServiceBuildingColor             )) },
-                    { "SettingServiceBuildingColorDesc",                Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ServiceBuildingColor             )) },
-                    { "SettingServiceBuildingColorChoiceThreeColors",   Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ServiceBuildingColorChoice.ThreeColors   ) },
-                    { "SettingServiceBuildingColorChoiceRed",           Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ServiceBuildingColorChoice.Red           ) },
-                    { "SettingServiceBuildingColorChoiceVarious",       Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ServiceBuildingColorChoice.Various       ) },
+                    { "SettingTitle",                                       Mod.ModSettings.GetSettingsLocaleID()                                                             },
+                                                                                                                                                                                 
+                                                                                                                                                                                 
+                    { "SettingGroupGeneral",                                Mod.ModSettings.GetOptionGroupLocaleID(ModSettings.GroupGeneral)                                  },
+                                                                                                                                                                                 
+                    { "SettingZonedBuildingColorLabel",                     Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ZonedBuildingColor                   )) },
+                    { "SettingZonedBuildingColorDesc",                      Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ZonedBuildingColor                   )) },
+                    { "SettingZonedBuildingColorChoiceThreeColors",         Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ZonedBuildingColorChoice.ThreeColors         ) },
+                    { "SettingZonedBuildingColorChoiceZoneColor",           Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ZonedBuildingColorChoice.ZoneColor           ) },
+                                                                                                                                                                           
+                    { "SettingServiceBuildingColorLabel",                   Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ServiceBuildingColor                 )) },
+                    { "SettingServiceBuildingColorDesc",                    Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ServiceBuildingColor                 )) },
+                    { "SettingServiceBuildingColorChoiceThreeColors",       Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ServiceBuildingColorChoice.ThreeColors       ) },
+                    { "SettingServiceBuildingColorChoiceRed",               Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ServiceBuildingColorChoice.Red               ) },
+                    { "SettingServiceBuildingColorChoiceVarious",           Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ServiceBuildingColorChoice.Various           ) },
+                                                                                                                                                                           
+                    { "SettingProductionInfoviewColorLabel",                Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ProductionInfoviewColor              )) },
+                    { "SettingProductionInfoviewColorDesc",                 Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ProductionInfoviewColor              )) },
+                    { "SettingProductionInfoviewColorChoiceThreeColors",    Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ProductionInfoviewColorChoice.ThreeColors    ) },
+                    { "SettingProductionInfoviewColorChoiceVariousGame",    Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ProductionInfoviewColorChoice.VariousGame    ) },
+                    { "SettingProductionInfoviewColorChoiceVariousResource",Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ProductionInfoviewColorChoice.VariousResource) },
                                                                                                                                                                           
-                    { "SettingColorSpecializedIndustryLotsLabel",       Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ColorSpecializedIndustryLots     )) },
-                    { "SettingColorSpecializedIndustryLotsDesc",        Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ColorSpecializedIndustryLots     )) },
-                                                                                                                                                                          
-                    { "SettingReverseColorsLabel",                      Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ReverseColors                    )) },
-                    { "SettingReverseColorsDesc",                       Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ReverseColors                    )) },
-                                                                                                                                                                          
-                                                                                                                                                                          
-                    { "SettingGroupAbout",                              Mod.ModSettings.GetOptionGroupLocaleID(ModSettings.GroupAbout)                                },
-                                                                                                                                                                          
-                    { "SettingModVersionLabel",                         Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ModVersion                       )) },
-                    { "SettingModVersionDesc",                          Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ModVersion                       )) },
+                    { "SettingColorSpecializedIndustryLotsLabel",           Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ColorSpecializedIndustryLots         )) },
+                    { "SettingColorSpecializedIndustryLotsDesc",            Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ColorSpecializedIndustryLots         )) },
+                                                                                                                                                                                  
+                    { "SettingReverseColorsLabel",                          Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ReverseColors                        )) },
+                    { "SettingReverseColorsDesc",                           Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ReverseColors                        )) },
+                                                                                                                                                                                  
+                                                                                                                                                                                  
+                    { "SettingGroupAbout",                                  Mod.ModSettings.GetOptionGroupLocaleID(ModSettings.GroupAbout)                                    },
+                                                                                                                                                                                  
+                    { "SettingModVersionLabel",                             Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ModVersion                           )) },
+                    { "SettingModVersionDesc",                              Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ModVersion                           )) },
                 };
 
                 // Append settings to the file.

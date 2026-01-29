@@ -1,0 +1,8 @@
+<svg id="infoviewproduction" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 26 26" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" project-id="dc3dd0c309854dec90f4184f64af9c2a" export-id="6eaf3f06063146499df2b866821f9974" cached="false" width="26" height="26">
+    <polygon points="9.138626,0.582463 14.138626,7.582463 9.138626,14.582463 -7.861374,14.582463 -2.861374,7.582463 -7.861374,0.582463 9.138626,0.582463" transform="translate(9.861374 5.417537)" fill="#4b91e2" stroke-width="0"/>
+    <g transform="matrix(0.75 0 0 0.75 8.5 8.5)">
+        <ellipse rx="2.25" ry="2.75" transform="translate(2.25 2.75)" fill="none" stroke="#000" stroke-width="1.5"/>
+        <ellipse rx="2.25" ry="2.75" transform="translate(9.75 9.25)" fill="none" stroke="#000" stroke-width="1.5"/>
+        <line x1="2" y1="12" x2="10" y2="0" fill="none" stroke="#000" stroke-width="1.5"/>
+    </g>
+</svg>

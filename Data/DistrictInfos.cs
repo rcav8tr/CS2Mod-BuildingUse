@@ -13,12 +13,12 @@ namespace BuildingUse
         /// </summary>
         public void Write(IJsonWriter writer)
         {
-			writer.ArrayBegin(this.Count);
-			foreach (DistrictInfo districtInfo in this)
-			{
-				districtInfo.Write(writer);
-			}
-			writer.ArrayEnd();
+            writer.ArrayBegin(this.Count);
+            foreach (DistrictInfo districtInfo in this)
+            {
+                districtInfo.Write(writer);
+            }
+            writer.ArrayEnd();
         }
     }
 }

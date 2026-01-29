@@ -8,10 +8,9 @@ namespace BuildingUse
     /// </summary>
     public class BUBuildingStatusTypeDatas : Dictionary<BUBuildingStatusType, BUBuildingStatusTypeData>
     {
-        // First and last building status types in the datas.
-        public BUBuildingStatusType buildingStatusTypeFirst { get; set; }
-        public BUBuildingStatusType buildingStatusTypeLast { get; set; }
-        
+        // First building status type in the datas.
+        public BUBuildingStatusType BuildingStatusTypeFirst { get; private set; }
+
         // Whether or not data values have been updated.
         private bool _dataValuesUpdated;
         public bool DataValuesUpdated
@@ -47,22 +46,18 @@ namespace BuildingUse
             string infoviewName = infoview.ToString();
 
             // Populate the building status type datas.
-            // Get first and last building status types.
-            buildingStatusTypeFirst = BUBuildingStatusType.None;
-            buildingStatusTypeLast  = BUBuildingStatusType.None;
+            // Get first building status type.
+            BuildingStatusTypeFirst = BUBuildingStatusType.None;
             foreach (BUBuildingStatusType buildingStatusType in Enum.GetValues(typeof(BUBuildingStatusType)))
             {
                 // Check if enum is for this infoview.
                 if (buildingStatusType.ToString().StartsWith(infoviewName))
                 {
                     // Save first only once.
-                    if (buildingStatusTypeFirst == BUBuildingStatusType.None)
+                    if (BuildingStatusTypeFirst == BUBuildingStatusType.None)
                     {
-                        buildingStatusTypeFirst = buildingStatusType;
+                        BuildingStatusTypeFirst = buildingStatusType;
                     }
-
-                    // Always save last.
-                    buildingStatusTypeLast = buildingStatusType;
 
                     // Add a new building status type data.
                     Add(buildingStatusType, new BUBuildingStatusTypeData(buildingStatusType));
@@ -85,13 +80,13 @@ namespace BuildingUse
         /// <summary>
         /// Update data values.
         /// </summary>
-        public void UpdateDataValues(double[] used, double[] capacity)
+        public void UpdateDataValues(double[] used, double[] capacity, int[] count)
         {
             // Do each building status type data.
             int index = 0;
             foreach (BUBuildingStatusTypeData buildingStatusTypeData in Values)
             {
-                buildingStatusTypeData.UpdateDataValues(used[index], capacity[index]);
+                buildingStatusTypeData.UpdateDataValues(used[index], capacity[index], count[index]);
                 index++;
             }
 

@@ -1,11 +1,12 @@
 ﻿# Building Use
-Six new infoviews show the use of buildings as a percent of their capacity for:
+Seven new infoviews show the use of buildings as a percent of their capacity for:
 - Employees
 - Visitors
 - Storage
 - Vehicles
 - Efficiency
 - Processing
+- Production
 
 See the Infoviews section below for more details on each infoview.
 
@@ -32,17 +33,18 @@ If your city has no districts:
 - You can select all or deselect all building types.
 - You can select and deselect individual building types.
 - To show only one building type, deselect all buildings types and then select only the one building type you want see.
-- The total for the entire city is still calculated and updated even when a building type is deselected.
+- The total for the selected district is still calculated and updated even when a building type is deselected.
+- The number of buildings for each building type is displayed in the tool tip.
 
 ### More Than One Building Type
 If a building has more than one building type (e.g. Mixed Use Residential is both residential and commercial):
 - If only one of the building types is selected, then the building color will be set according to the selected building type.
 - If more than one building type is selected, then the building color will be set according to the topmost selected building type.
-- The building used and capacity will be included in the total for the entire city for all applicable building types (i.e. double counted).
-  For example, employees in a Water Treatment Plant will be included in both Water and Sewage totals because the building has both building types.
+- The building will be counted for all applicable building types.
+  For example, a mixed residential building will be counted for both Residential and Commercial.
 
 ### Building Use Total
-The total use of buildings for the entire city is shown for each building type as follows:
+The total use of buildings for the selected district is shown for each building type as follows:
 - Position of the triangle indicator over the color gradient.
 - Percent number next to the color gradient.
 - Used and capacity amounts next to the percent number.
@@ -54,7 +56,7 @@ The total use of buildings for the entire city is shown for each building type a
 ### Buildings For Rent
 For residential, commercial, industrial, and office buildings that are available to rent,
 the capacity cannot be determined because the capacity comes from the renter.
-Therefore, such buildings do not contribute to the total used or capacity for the entire city
+Therefore, such buildings do not contribute to the total used or capacity for the selected district
 (except that such buildings do count toward capacity for Efficiency because efficiency capacity is always 100%).
 But the color of these buildings are set as if they are 0% used so the buildings can be identified.
 
@@ -81,16 +83,20 @@ All building types for residential, commercial, industrial, and office include b
   The count of unweighted resources are combined with the amount of weighted resources.
 - Processing buildings have both input and output resources.
   These are combined into one used total for the building because the game does not have separate capacities for inputs and outputs.
+- The Incineration Plant is counted as Garbage Management, not Power Plant Fuel, even though garbage is the power plant's fuel.
+- Companies can start with more resources than their capacity.
 
 ### Vehicles Infoview
 - Number of vehicles in use, in maintenance, or both as a percent of vehicle capacity.
+  Capacity is for the entire building regardless of the in use and in maintenance selections.
 - Your selections for in use and in maintenance are saved and restored between infoviews and between games.
 - The number of vehicles in maintenance is based on the building's efficiency.
   When efficiency is at least 100%, the building will have no vehicles in maintenance.
-- Commercial Truck, Industrial Truck, Office Truck, and Parked Vehicle do not have vehicles in maintenance.
-- Office buildings have capacity for delivery trucks, but they are rarely used.
-- For Fire Stations with a Disaster Response Unit upgrade and for Ports with the Emergency Response and/or Port Security upgrades,
-  the game appears to incorrectly compute vehicles in maintenance.
+- For Residential Car, the capacity is the number of cars owned by households in the building.
+  Not every household will have a car.
+  A parked residential car, regardless of its location, is considered not in use.
+- Residential Car, Commercial Truck, Industrial Truck, Office Truck, and 3 Parked do not have vehicles in maintenance.
+- For upgrades with a Disaster Response Unit, the game incorrectly computes vehicles in maintenance.
   So this mod's in maintenance count will not match the game's in maintenance vehicle count.
 - The Airport building has capacity for delivery trucks even if the Airport does not have the Cargo Terminal upgrade.
 - The Space Rocket from the ChirpX Space Center is not shown because it is always 1 used of 1 capacity.
@@ -108,15 +114,32 @@ All building types for residential, commercial, industrial, and office include b
   Your selections are saved and restored between infoviews and between games.
 - The color for buildings with an efficiency that exceeds the selected maximum of 100% or 200% will be set as if they are 100% or 200%.
 - Deactivated buildings have 0% efficiency.
-- Each building contributes its efficiency percent to the total used amount for the entire city.
-  Each building contributes 100% to the total capacity amount for the entire city.
-  Therefore, the total efficiency for the entire city for each building type is a simple average over the buildings of that type.
+- Each building contributes its efficiency percent to the total used amount for the selected district.
+  Each building contributes 100% to the total capacity amount for the selected district.
+  Therefore, the total efficiency for the selected district for each building type is a simple average over the buildings of that type.
   Small and large buildings contribute equally to the average.
-- Note that the total capacity divided by 100 is the number of buildings of that type.
 
 ### Processing Infoview
 - Production or processing speed as a percent of the production or processing speed capacity.
 - Crematoriums have a processing speed only when deceased are present.
+
+### Production Infoview
+- Resource production rate as a percent of production capacity.
+- Production rate varies based on factors including:
+  current building efficiency even if less than 100%,
+  company current number of employees,
+  happiness for each current employee,
+  and employee level for each current employee.
+- Production capacity varies based on factors including:
+  current building efficiency but not less than 100%,
+  company maximum number of employees,
+  average happiness (50%) for each of max employees,
+  and employee level for distribution of max employees.
+- Because of the variable factors above, resource production can be and often is greater than 100% of capacity.
+  You can choose to have the building color set for a maximum of 100% or 200%.
+  Your selections are saved and restored between infoviews and between games.
+- The color for buildings with a production rate that exceeds the selected maximum of 100% or 200% will be set as if they are 100% or 200%.
+- The Production infoview is also useful to identify the building(s) where a specific resource is produced.
 
 # Options
 The following settings are available on the Options screen.
@@ -144,6 +167,17 @@ There are three choices for the color of service buildings:
   Some building types with white/gray icons use a different arbitrary color to differentiate them from the default off-white color.
 
 For Red and Various, building use is indicated by the color brightness:  the lightest color is 0% used and the darkest color is 100% used (see Reverse Colors below).
+
+### Color for Production Infoview
+There are three choices for the colors for the Production infoview:
+- 3 Colors (default):  Building colors are red, yellow, green for low, medium, high building use respectively (see Reverse Colors below).
+  The colors green and red do not necessarily mean good and bad building use.
+  You must decide whether low or high building use is good or bad.
+- Various - Game: Building color for each resource is defined by the game.
+- Various - Resource: Building color for each resource is mostly based on the resource icon.
+  The colors are the same as for the Resource Locator mod.
+
+For both Various, building use is indicated by the color brightness:  the lightest color is 0% used and the darkest color is 100% used (see Reverse Colors below).
 
 ### Specialized Industry Lots
 - When unchecked (default), only the hub building color is set.

@@ -1,1 +1,9 @@
-﻿- Update for game version 1.4.2.
+﻿- Rewrite most internal logic to properly include building upgrades.
+- Display building count in tooltip.
+- Prevent double counting of used and capacity for buildings with more than one use category.
+- For Storage infoview, show actual used amount even if that is more than the capacity.
+- For Storage infoview, show Mail Box separately from Post.
+- For Vehicles infoview, replace Parked Vehicle with Parked Car At Facility and Parked Bike at Facility.
+- For Vehicles infoview, add ability to show Residential Car, Parked Vehicle At Other, and Ferry.
+- Add new Production infoview to show production of resources as a percent of production capacity.
+- Replace some localizations with game translations.

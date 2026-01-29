@@ -1,135 +1,7 @@
 ﻿using Colossal.UI.Binding;
-using System;
 
 namespace BuildingUse
 {
-    // This mod's building status types.
-    // The "BU" (i.e. Building Use) prefix differentiates this enum from Game.Prefabs.BuildingStatusType.
-    // Start at an arbitrary large number to avoid overlap with the game's BuildingStatusType and
-    // hopefully avoid conflicts with any other mod's building status types.
-    // This mod has logic that assumes these are numbered sequentially.
-    public enum BUBuildingStatusType
-    {
-        None = 123456700,
-
-        EmployeesDistrict,
-        EmployeesSelectDeselect,
-        EmployeesResidential,
-        EmployeesCommercial,
-        EmployeesIndustrial,
-        EmployeesOffice,
-        EmployeesParking,
-        EmployeesRoadMaintenance,
-        EmployeesElectricity,
-        EmployeesWater,
-        EmployeesSewage,
-        EmployeesHealthcare,
-        EmployeesDeathcare,
-        EmployeesGarbageManagement,
-        EmployeesEducation,
-        EmployeesResearch,
-        EmployeesFireRescue,
-        EmployeesDisasterControl,
-        EmployeesPolice,
-        EmployeesAdministration,
-        EmployeesTransportation,
-        EmployeesParkMaintenance,
-        EmployeesParksRecreation,
-        EmployeesPost,
-        EmployeesTelecom,
-
-        VisitorsDistrict,
-        VisitorsSelectDeselect,
-        VisitorsHealthcare,
-        VisitorsCemetery,
-        VisitorsCrematorium,
-        VisitorsElementarySchool,
-        VisitorsHighSchool,
-        VisitorsCollege,
-        VisitorsUniversity,
-        VisitorsEmergencyShelter,
-        VisitorsPoliceStation,
-        VisitorsPrison,
-
-        StorageDistrict,
-        StorageSelectDeselect,
-        StorageCommercial,
-        StorageIndustrial,
-        StorageOffice,
-        StorageBatteryCharge,
-        StoragePowerPlantFuel,
-        StorageHealthcare,
-        StorageLandfill,
-        StorageGarbageManagement,
-        StorageEmergencyShelter,
-        StorageCargoTransportation,
-        StoragePost,
-
-        VehiclesDistrict,
-        VehiclesSelectDeselect,
-        VehiclesInUseInMaintenance,
-        VehiclesCommercialTruck,
-        VehiclesIndustrialTruck,
-        VehiclesOfficeTruck,
-        VehiclesParked,
-        VehiclesRoadMaintenance,
-        VehiclesAmbulance,
-        VehiclesMedicalHelicopter,
-        VehiclesHearse,
-        VehiclesGarbageTruck,
-        VehiclesFireEngine,
-        VehiclesFireHelicopter,
-        VehiclesDisasterResponse,
-        VehiclesEvacuationBus,
-        VehiclesPoliceCar,
-        VehiclesPoliceHelicopter,
-        VehiclesPrisonVan,
-        VehiclesBus,
-        VehiclesTaxi,
-        VehiclesTrain,
-        VehiclesTram,
-        VehiclesSubway,
-        VehiclesParkMaintenance,
-        VehiclesPost,
-        VehiclesCargoStationTruck,
-
-        EfficiencyDistrict,
-        EfficiencySelectDeselect,
-        EfficiencyMaxColor,
-        EfficiencyResidential,
-        EfficiencyCommercial,
-        EfficiencyIndustrial,
-        EfficiencyOffice,
-        EfficiencyParking,
-        EfficiencyRoadMaintenance,
-        EfficiencyElectricity,
-        EfficiencyWater,
-        EfficiencySewage,
-        EfficiencyHealthcare,
-        EfficiencyDeathcare,
-        EfficiencyGarbageManagement,
-        EfficiencyEducation,
-        EfficiencyResearch,
-        EfficiencyFireRescue,
-        EfficiencyDisasterControl,
-        EfficiencyPolice,
-        EfficiencyAdministration,
-        EfficiencyTransportation,
-        EfficiencyParkMaintenance,
-        EfficiencyParksRecreation,
-        EfficiencyPost,
-        EfficiencyTelecom,
-
-        ProcessingDistrict,
-        ProcessingSelectDeselect,
-        ProcessingElectricityProduction,
-        ProcessingWaterOutput,
-        ProcessingSewageTreatment,
-        ProcessingCrematoriumProcessing,
-        ProcessingGarbageProcessing,
-        ProcessingMailSortingSpeed,
-    }
-
     /// <summary>
     /// Class to hold data for one of this mod's building status types.
     /// The "BU" (i.e. Building Use) prefix differentiates this class from any game objects.
@@ -137,23 +9,25 @@ namespace BuildingUse
     public class BUBuildingStatusTypeData
     {
         // The building status type this data is for.
-        public BUBuildingStatusType buildingStatusType { get; set; }
-        public string buildingStatusTypeName { get; set; }
+        public BUBuildingStatusType BuildingStatusType { get; private set; }
+        public string BuildingStatusTypeName { get; private set; }
 
         // Whether or not this is a special case.
-        public bool isSpecialCase { get; set; }
+        public bool IsSpecialCase { get; private set; }
 
         // Data bindings.
-        private ValueBinding<double> bindingUsed;
-        private ValueBinding<double> bindingCapacity;
+        private readonly ValueBinding<double> _bindingUsed;
+        private readonly ValueBinding<double> _bindingCapacity;
+        private readonly ValueBinding<int   > _bindingCount;
 
         // Total city-wide data values.
-        // City-wide data values are double because:
+        // City-wide data used and capacity values are double because:
         //      An int max value is exceeded by some city-wide totals.
         //      A long is not supported by ValueBinding.
         //      A float does not have enough precision.
-        private double used;
-        private double capacity;
+        private double _used;
+        private double _capacity;
+        private int    _count;
 
         // Lock for accessing data values.
         private readonly object _dataValuesLock = new object();
@@ -167,61 +41,39 @@ namespace BuildingUse
         public BUBuildingStatusTypeData(BUBuildingStatusType type)
         {
             // Save building status type.
-            buildingStatusType = type;
-            buildingStatusTypeName = GetBuildingStatusTypeName(buildingStatusType);
+            BuildingStatusType = type;
+            BuildingStatusTypeName = ModAssemblyInfo.Name + BuildingStatusType.ToString();
 
             // Determine whether or not building status type is a special case.
-            isSpecialCase =
-                buildingStatusType == BUBuildingStatusType.None ||
-                buildingStatusType == BUBuildingStatusType.VehiclesInUseInMaintenance ||
-                buildingStatusType == BUBuildingStatusType.EfficiencyMaxColor ||
-                buildingStatusTypeName.EndsWith("District") ||
-                buildingStatusTypeName.EndsWith("SelectDeselect");
+            IsSpecialCase =
+                BuildingStatusType == BUBuildingStatusType.None ||
+                BuildingStatusType == BUBuildingStatusType.VehiclesInUseInMaintenance ||
+                BuildingStatusType == BUBuildingStatusType.EfficiencyMaxColor ||
+                BuildingStatusType == BUBuildingStatusType.ProductionMaxColor ||
+                BuildingStatusTypeName.EndsWith("District") ||
+                BuildingStatusTypeName.EndsWith("SelectDeselect") ||
+                BuildingStatusTypeName.Contains("Heading");
 
             // Create data bindings, except for special cases.
-            if (!isSpecialCase)
+            if (!IsSpecialCase)
             {
-                bindingUsed     = new ValueBinding<double>(ModAssemblyInfo.Name, buildingStatusType + "Used",     0d);
-                bindingCapacity = new ValueBinding<double>(ModAssemblyInfo.Name, buildingStatusType + "Capacity", 0d);
+                _bindingUsed     = new ValueBinding<double>(ModAssemblyInfo.Name, BuildingStatusType + "Used",     0d);
+                _bindingCapacity = new ValueBinding<double>(ModAssemblyInfo.Name, BuildingStatusType + "Capacity", 0d);
+                _bindingCount    = new ValueBinding<int   >(ModAssemblyInfo.Name, BuildingStatusType + "Count",    0 );
             }
-        }
-
-        /// <summary>
-        /// Convert building status type enum to building status type name.
-        /// </summary>
-        public static string GetBuildingStatusTypeName(BUBuildingStatusType buildingStatusType)
-        {
-            // Simply prefix the building status type with the mod name.
-            return ModAssemblyInfo.Name + buildingStatusType.ToString();
-        }
-
-        /// <summary>
-        /// Convert building status type name to building status type enum.
-        /// </summary>
-        public static BUBuildingStatusType GetBuildingStatusType(string buildingStatusTypeName)
-        {
-            // Name must start with the mod name.
-            if (buildingStatusTypeName.StartsWith(ModAssemblyInfo.Name))
-            {
-                // Get the enum value from the name after the mod name prefix.
-                string nameSuffix = buildingStatusTypeName.Substring(ModAssemblyInfo.Name.Length);
-                if (Enum.TryParse(nameSuffix, out BUBuildingStatusType buildingStatusType))
-                {
-                    return buildingStatusType;
-                }
-            }
-
-            // Name is not for a building status type in this mod.
-            return BUBuildingStatusType.None;
         }
 
         /// <summary>
         /// Get the data bindings.
         /// </summary>
-        public void GetDataBindings(out ValueBinding<double> bindingUsed, out ValueBinding<double> bindingCapacity)
+        public void GetDataBindings(
+            out ValueBinding<double> bindingUsed,
+            out ValueBinding<double> bindingCapacity,
+            out ValueBinding<int>    bindingCount)
         {
-            bindingUsed     = this.bindingUsed;
-            bindingCapacity = this.bindingCapacity;
+            bindingUsed     = _bindingUsed;
+            bindingCapacity = _bindingCapacity;
+            bindingCount    = _bindingCount;
         }
 
         /// <summary>
@@ -230,13 +82,14 @@ namespace BuildingUse
         public void UpdateDataBindings()
         {
             // Do not update special cases.
-            if (!isSpecialCase)
+            if (!IsSpecialCase)
             {
                 // Allow only one thread at a time to access data values.
                 lock (_dataValuesLock)
                 {
-                    bindingUsed    .Update(used);
-                    bindingCapacity.Update(capacity);
+                    _bindingUsed    .Update(_used);
+                    _bindingCapacity.Update(_capacity);
+                    _bindingCount   .Update(_count);
                 }
             }
         }
@@ -244,13 +97,14 @@ namespace BuildingUse
         /// <summary>
         /// Update data values.
         /// </summary>
-        public void UpdateDataValues(double used, double capacity)
+        public void UpdateDataValues(double used, double capacity, int count)
         {
             // Allow only one thread at a time to access data values.
             lock (_dataValuesLock)
             {
-                this.used     = used;
-                this.capacity = capacity;
+                _used     = used;
+                _capacity = capacity;
+                _count    = count;
             }
         }
 
@@ -262,8 +116,9 @@ namespace BuildingUse
             // Allow only one thread at a time to access data values.
             lock (_dataValuesLock)
             {
-                used     = 0d;
-                capacity = 0d;
+                _used     = 0d;
+                _capacity = 0d;
+                _count    = 0;
             }
         }
     }

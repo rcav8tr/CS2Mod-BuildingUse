@@ -1,18 +1,18 @@
-﻿import { bindValue, useValue, trigger           } from "cs2/api";
-import { useLocalization                        } from "cs2/l10n";
-import { Dropdown, DropdownItem, DropdownToggle } from "cs2/ui";
-import { Entity                                 } from "cs2/utils";
+﻿import { bindValue, trigger, useValue   } from "cs2/api";
+import { useLocalization                } from "cs2/l10n";
+import { Dropdown, DropdownItem, DropdownToggle, FormattedParagraphs, Tooltip } from "cs2/ui";
+import { Entity                         } from "cs2/utils";
 
-import   styles                                   from "districtSelector.module.scss";
-import   mod                                      from "../mod.json";
-import { ModuleResolver                         } from "moduleResolver";
-import { uiBindingNames, uiEventNames           } from "uiBindings";
-import { UITranslationKey                       } from "uiTranslationKey";
+import   styles                           from "districtSelector.module.scss";
+import   mod                              from "../mod.json";
+import { ModuleResolver                 } from "moduleResolver";
+import { uiBindingNames, uiEventNames   } from "uiBindings";
+import { UITranslationKey               } from "uiTranslationKey";
 
 // Define district info passed from C#.
 type DistrictInfo =
     {
-        entity: Entity;
+        district: Entity;
         name: string;
     }
 
@@ -38,7 +38,7 @@ export const DistrictSelector = () =>
         (districtInfo: DistrictInfo) =>
         {
             // Get district entity and name from the district info.
-            const districtEntity: Entity = districtInfo.entity;
+            const districtEntity: Entity = districtInfo.district;
             const districtName:   string = districtInfo.name;
 
             // Check if this district info is for the selected district.
@@ -80,22 +80,14 @@ export const DistrictSelector = () =>
 
     // Entire row is a single dropdown of districts.
     return (
-        <ModuleResolver.instance.Tooltip
-            direction="right"
-            tooltip={<ModuleResolver.instance.FormattedParagraphs children={districtSelectorTooltip} />}
-            theme={ModuleResolver.instance.TooltipClasses}
-            children=
-            {
-                <div className={styles.districtDropdownRow}>
-                    <Dropdown
-                        theme={ModuleResolver.instance.DropdownClasses}
-                        content={districtDropdownItems}>
-                        <DropdownToggle>
-                            {selectedDistrictName}
-                        </DropdownToggle>
-                    </Dropdown>
-                </div>
-            }
-        />
+        <Tooltip direction="right" tooltip={<FormattedParagraphs children={districtSelectorTooltip} />} >
+            <div className={styles.districtDropdownRow}>
+                <Dropdown theme={ModuleResolver.instance.DropdownClasses} content={districtDropdownItems}>
+                    <DropdownToggle>
+                        {selectedDistrictName}
+                    </DropdownToggle>
+                </Dropdown>
+            </div>
+        </Tooltip>
     );
 }

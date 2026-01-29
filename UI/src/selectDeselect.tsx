@@ -1,10 +1,11 @@
-﻿import { trigger, useValue          } from "cs2/api";
-import { ActiveInfoview, infoview   } from "cs2/bindings";
-import { useLocalization            } from "cs2/l10n";
+﻿import { trigger, useValue              } from "cs2/api";
+import { ActiveInfoview, infoview       } from "cs2/bindings";
+import { useLocalization                } from "cs2/l10n";
+import { FormattedParagraphs, Tooltip   } from "cs2/ui";
 
-import { ModuleResolver             } from "moduleResolver";
-import   styles                       from "selectDeselect.module.scss";
-import { UITranslationKey           } from "uiTranslationKey";
+import { ModuleResolver                 } from "moduleResolver";
+import   styles                           from "selectDeselect.module.scss";
+import { UITranslationKey               } from "uiTranslationKey";
 
 // Custom infomode item for select all and deselect all buttons.
 export const SelectDeselect = () =>
@@ -43,17 +44,11 @@ export const SelectDeselect = () =>
 
     // A row with two buttons.
     return (
-        <ModuleResolver.instance.Tooltip
-            direction="right"
-            tooltip={<ModuleResolver.instance.FormattedParagraphs children={selectDeselectTooltip} />}
-            theme={ModuleResolver.instance.TooltipClasses}
-            children=
-            {
-                <div className={styles.buildingUseSelectDeselectRow}>
-                    <button className={styles.buildingUseSelectDeselectButton} onClick={() => onButtonClick(true )}>{selectAllLabel  }</button>
-                    <button className={styles.buildingUseSelectDeselectButton} onClick={() => onButtonClick(false)}>{deselectAllLabel}</button>
-                </div>
-            }
-        />
+        <Tooltip direction="right" tooltip={<FormattedParagraphs children={selectDeselectTooltip} />} >
+            <div className={styles.buildingUseSelectDeselectRow}>
+                <button className={styles.buildingUseSelectDeselectButton} onClick={() => onButtonClick(true )}>{selectAllLabel  }</button>
+                <button className={styles.buildingUseSelectDeselectButton} onClick={() => onButtonClick(false)}>{deselectAllLabel}</button>
+            </div>
+        </Tooltip>
     );
 }

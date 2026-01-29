@@ -27,7 +27,7 @@ namespace BuildingUse
             get { lock (_waitDataValuesUpdatedLock) { return __waitDataValuesUpdated;  } }
             set { lock (_waitDataValuesUpdatedLock) { __waitDataValuesUpdated = value; } }
         }
-        private readonly object _waitDataValuesUpdatedLock = new object();
+        private readonly object _waitDataValuesUpdatedLock = new();
 
         // Other systems.
         private NameSystem _nameSystem;
@@ -37,6 +37,7 @@ namespace BuildingUse
         public const string BindingNameCountVehiclesInUse           = "CountVehiclesInUse";
         public const string BindingNameCountVehiclesInMaintenance   = "CountVehiclesInMaintenance";
         public const string BindingNameEfficiencyMaxColor200Percent = "EfficiencyMaxColor200Percent";
+        public const string BindingNameProductionMaxColor200Percent = "ProductionMaxColor200Percent";
         public const string BindingNameSelectedDistrict             = "SelectedDistrict";
         public const string BindingNameDistrictInfos                = "DistrictInfos";
 
@@ -44,6 +45,7 @@ namespace BuildingUse
         private ValueBinding<bool>  _bindingCountVehiclesInUse;
         private ValueBinding<bool>  _bindingCountVehiclesInMaintenance;
         private ValueBinding<bool>  _bindingEfficiencyMaxColor200Percent;
+        private ValueBinding<bool>  _bindingProductionMaxColor200Percent;
         private ValueBinding<Entity>_bindingSelectedDistrict;
         private RawValueBinding     _bindingDistrictInfos;
 
@@ -51,13 +53,14 @@ namespace BuildingUse
         public const string EventNameCountVehiclesInUseClicked          = "CountVehiclesInUseClicked";
         public const string EventNameCountVehiclesInMaintenanceClicked  = "CountVehiclesInMaintenanceClicked";
         public const string EventNameEfficiencyMaxColorClicked          = "EfficiencyMaxColorClicked";
+        public const string EventNameProductionMaxColorClicked          = "ProductionMaxColorClicked";
         public const string EventNameSelectedDistrictChanged            = "SelectedDistrictChanged";
 
         // Districts.
         private EntityQuery _districtQuery;
-        private DistrictInfos _districtInfos = new DistrictInfos();
+        private DistrictInfos _districtInfos = new();
         public static Entity EntireCity { get; } = Entity.Null;
-        public Entity selectedDistrict { get; set; } = EntireCity;
+        public Entity SelectedDistrict { get; set; } = EntireCity;
 
         /// <summary>
         /// Do one-time initialization of the system.
@@ -79,11 +82,15 @@ namespace BuildingUse
                     foreach (BUBuildingStatusTypeData buildingStatusTypeData in infoviewData.buildingStatusTypeDatas.Values)
                     {
                         // Skip special cases.
-                        if (!buildingStatusTypeData.isSpecialCase)
+                        if (!buildingStatusTypeData.IsSpecialCase)
                         {
-                            buildingStatusTypeData.GetDataBindings(out ValueBinding<double> bindingUsed, out ValueBinding<double> bindingCapacity);
+                            buildingStatusTypeData.GetDataBindings(
+                                out ValueBinding<double> bindingUsed,
+                                out ValueBinding<double> bindingCapacity,
+                                out ValueBinding<int>    bindingCount);
                             AddBinding(bindingUsed);
                             AddBinding(bindingCapacity);
+                            AddBinding(bindingCount);
                         }
                     }
                 }
@@ -92,6 +99,7 @@ namespace BuildingUse
                 AddBinding(_bindingCountVehiclesInUse           = new ValueBinding<bool  >(ModAssemblyInfo.Name, BindingNameCountVehiclesInUse,           Mod.ModSettings.CountVehiclesInUse          ));
                 AddBinding(_bindingCountVehiclesInMaintenance   = new ValueBinding<bool  >(ModAssemblyInfo.Name, BindingNameCountVehiclesInMaintenance,   Mod.ModSettings.CountVehiclesInMaintenance  ));
                 AddBinding(_bindingEfficiencyMaxColor200Percent = new ValueBinding<bool  >(ModAssemblyInfo.Name, BindingNameEfficiencyMaxColor200Percent, Mod.ModSettings.EfficiencyMaxColor200Percent));
+                AddBinding(_bindingProductionMaxColor200Percent = new ValueBinding<bool  >(ModAssemblyInfo.Name, BindingNameProductionMaxColor200Percent, Mod.ModSettings.ProductionMaxColor200Percent));
                 AddBinding(_bindingSelectedDistrict             = new ValueBinding<Entity>(ModAssemblyInfo.Name, BindingNameSelectedDistrict,             EntireCity                                  ));
                 AddBinding(_bindingDistrictInfos                = new RawValueBinding     (ModAssemblyInfo.Name, BindingNameDistrictInfos,                UpdateDistrictInfos                         ));
 
@@ -99,6 +107,7 @@ namespace BuildingUse
                 AddBinding(new TriggerBinding        (ModAssemblyInfo.Name, EventNameCountVehiclesInUseClicked,         CountVehiclesInUseClicked        ));
                 AddBinding(new TriggerBinding        (ModAssemblyInfo.Name, EventNameCountVehiclesInMaintenanceClicked, CountVehiclesInMaintenanceClicked));
                 AddBinding(new TriggerBinding        (ModAssemblyInfo.Name, EventNameEfficiencyMaxColorClicked,         EfficiencyMaxColorClicked        ));
+                AddBinding(new TriggerBinding        (ModAssemblyInfo.Name, EventNameProductionMaxColorClicked,         ProductionMaxColorClicked        ));
                 AddBinding(new TriggerBinding<Entity>(ModAssemblyInfo.Name, EventNameSelectedDistrictChanged,           SelectedDistrictChanged          ));
 
                 // Define entity query to get districts.
@@ -124,8 +133,8 @@ namespace BuildingUse
         private void CheckForDistrictChange()
         {
             // Get district infos and find selected district.
-            bool foundSelectedDistrict = (selectedDistrict == EntireCity);
-            DistrictInfos districtInfos = new DistrictInfos();
+            bool foundSelectedDistrict = (SelectedDistrict == EntireCity);
+            DistrictInfos districtInfos = new();
             NativeArray<Entity> districtEntities = _districtQuery.ToEntityArray(Allocator.Temp);
             foreach (Entity districtEntity in districtEntities)
             {
@@ -137,7 +146,7 @@ namespace BuildingUse
                     districtInfos.Add(new DistrictInfo(districtEntity, districtName));
 
                     // Check if this is the selected district.
-                    if (districtEntity == selectedDistrict)
+                    if (districtEntity == SelectedDistrict)
                     {
                         foundSelectedDistrict = true;
                     }
@@ -169,7 +178,7 @@ namespace BuildingUse
                 // Compare each district info.
                 for (int i = 0; i < districtInfos.Count; i++)
                 {
-                    if (districtInfos[i].entity != _districtInfos[i].entity || districtInfos[i].name != _districtInfos[i].name)
+                    if (districtInfos[i].District != _districtInfos[i].District || districtInfos[i].Name != _districtInfos[i].Name)
                     {
                         districtsChanged = true;
                         break;
@@ -251,15 +260,30 @@ namespace BuildingUse
         }
 
         /// <summary>
+        /// Event callback for production max color clicked.
+        /// </summary>
+        private void ProductionMaxColorClicked()
+        {
+            // Toggle the settings value.
+            Mod.ModSettings.ProductionMaxColor200Percent = !Mod.ModSettings.ProductionMaxColor200Percent;
+
+            // Update binding to UI.
+            _bindingProductionMaxColor200Percent.Update(Mod.ModSettings.ProductionMaxColor200Percent);
+
+            // Update data values immediate.
+            UpdateDataValuesImmediate();
+        }
+
+        /// <summary>
         /// Event callback for selected district changed.
         /// </summary>
         private void SelectedDistrictChanged(Entity newDistrict)
         {
             // Save selected district.
-            selectedDistrict = newDistrict;
+            SelectedDistrict = newDistrict;
 
             // Immediately send the selected district back to the UI.
-            _bindingSelectedDistrict.Update(selectedDistrict);
+            _bindingSelectedDistrict.Update(SelectedDistrict);
 
             // Immediately update data values.
             UpdateDataValuesImmediate();

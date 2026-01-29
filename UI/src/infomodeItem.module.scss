@@ -43,7 +43,7 @@
 }
 
 .buildingUseInfomodePercent {
-    // Scale percent width so text fits for "100%".
+    // Scale percent width so text fits for "999%".
     // Specifying the width also ensures widths are the same for all infomodes (i.e. not based on content).
     width:              calc(9% + 16% * (var(--fontScale) - 1));
     text-align:         right;
