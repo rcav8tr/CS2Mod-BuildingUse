@@ -83,8 +83,8 @@ export class UITranslationKey
     public static InfomodeTitleVehiclesPoliceCar                    : string = "Infoviews.INFOMODE[BuildingUseVehiclesPoliceCar]";
     public static InfomodeTitleVehiclesPoliceHelicopter             : string = "Infoviews.INFOMODE[BuildingUseVehiclesPoliceHelicopter]";
     public static InfomodeTitleVehiclesPrisonVan                    : string = "Infoviews.INFOMODE[BuildingUseVehiclesPrisonVan]";
-    public static InfomodeTitleVehiclesBus                          : string = "Infoviews.INFOMODE[BuildingUseVehiclesBus]";
     public static InfomodeTitleVehiclesTaxi                         : string = "Infoviews.INFOMODE[BuildingUseVehiclesTaxi]";
+    public static InfomodeTitleVehiclesBus                          : string = "Infoviews.INFOMODE[BuildingUseVehiclesBus]";
     public static InfomodeTitleVehiclesTrain                        : string = "Infoviews.INFOMODE[BuildingUseVehiclesTrain]";
     public static InfomodeTitleVehiclesTram                         : string = "Infoviews.INFOMODE[BuildingUseVehiclesTram]";
     public static InfomodeTitleVehiclesSubway                       : string = "Infoviews.INFOMODE[BuildingUseVehiclesSubway]";
@@ -219,8 +219,8 @@ export class UITranslationKey
     public static InfomodeTooltipVehiclesPoliceCar                  : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesPoliceCar]";
     public static InfomodeTooltipVehiclesPoliceHelicopter           : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesPoliceHelicopter]";
     public static InfomodeTooltipVehiclesPrisonVan                  : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesPrisonVan]";
-    public static InfomodeTooltipVehiclesBus                        : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesBus]";
     public static InfomodeTooltipVehiclesTaxi                       : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesTaxi]";
+    public static InfomodeTooltipVehiclesBus                        : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesBus]";
     public static InfomodeTooltipVehiclesTrain                      : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesTrain]";
     public static InfomodeTooltipVehiclesTram                       : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesTram]";
     public static InfomodeTooltipVehiclesSubway                     : string = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesSubway]";

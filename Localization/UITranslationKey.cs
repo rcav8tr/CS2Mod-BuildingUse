@@ -85,8 +85,8 @@ namespace BuildingUse
         public const string InfomodeTitleVehiclesPoliceCar                     = "Infoviews.INFOMODE[BuildingUseVehiclesPoliceCar]";
         public const string InfomodeTitleVehiclesPoliceHelicopter              = "Infoviews.INFOMODE[BuildingUseVehiclesPoliceHelicopter]";
         public const string InfomodeTitleVehiclesPrisonVan                     = "Infoviews.INFOMODE[BuildingUseVehiclesPrisonVan]";
-        public const string InfomodeTitleVehiclesBus                           = "Infoviews.INFOMODE[BuildingUseVehiclesBus]";
         public const string InfomodeTitleVehiclesTaxi                          = "Infoviews.INFOMODE[BuildingUseVehiclesTaxi]";
+        public const string InfomodeTitleVehiclesBus                           = "Infoviews.INFOMODE[BuildingUseVehiclesBus]";
         public const string InfomodeTitleVehiclesTrain                         = "Infoviews.INFOMODE[BuildingUseVehiclesTrain]";
         public const string InfomodeTitleVehiclesTram                          = "Infoviews.INFOMODE[BuildingUseVehiclesTram]";
         public const string InfomodeTitleVehiclesSubway                        = "Infoviews.INFOMODE[BuildingUseVehiclesSubway]";
@@ -221,8 +221,8 @@ namespace BuildingUse
         public const string InfomodeTooltipVehiclesPoliceCar                   = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesPoliceCar]";
         public const string InfomodeTooltipVehiclesPoliceHelicopter            = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesPoliceHelicopter]";
         public const string InfomodeTooltipVehiclesPrisonVan                   = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesPrisonVan]";
-        public const string InfomodeTooltipVehiclesBus                         = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesBus]";
         public const string InfomodeTooltipVehiclesTaxi                        = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesTaxi]";
+        public const string InfomodeTooltipVehiclesBus                         = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesBus]";
         public const string InfomodeTooltipVehiclesTrain                       = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesTrain]";
         public const string InfomodeTooltipVehiclesTram                        = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesTram]";
         public const string InfomodeTooltipVehiclesSubway                      = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesSubway]";

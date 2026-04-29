@@ -1,8 +1,8 @@
 declare module "cs2/utils" {
   export type EqualityComparer<T> = (a: T, b: T) => boolean;
   export interface Entity {
-      index: number;
-      version: number;
+  	index: number;
+  	version: number;
   }
   export export function entityKey({ index, version }: Entity): string;
   export export function parseEntityKey(value: any): Entity | undefined;

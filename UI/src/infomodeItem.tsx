@@ -2,12 +2,12 @@
 
 import { bindValue, trigger, useValue   } from "cs2/api";
 import { infoviewTypes                  } from "cs2/bindings";
-import { LocalizedNumber, Unit, UnitSettings, useLocalization } from "cs2/l10n";
+import { Unit, UnitSettings, useLocalization } from "cs2/l10n";
 import { FormattedParagraphs, Tooltip   } from "cs2/ui";
 
 import   styles                           from "infomodeItem.module.scss";
 import   mod                              from "../mod.json";
-import { ModuleResolver                 } from "moduleResolver";
+import { LocalizedNumber, ModuleResolver} from "moduleResolver";
 import { uiBindings, uiBindingNames     } from "uiBindings";
 import { BUBuildingStatusType           } from "uiConstants";
 import { UITranslationKey               } from "uiTranslationKey";
@@ -293,6 +293,13 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
         left: Math.min(100, 100 * percent / maxColorPercent) + "%"
     }
 
+    // Get whether or not unit system is metric.
+    // Must get this outside of "if" statements below to avoid React runtime error.
+    const bindingUnitSettings = bindValue<UnitSettings>("options", "unitSettings");
+    const unitSettings = useValue(bindingUnitSettings);
+    const unitSystemMetric: number = 0;  // UnitSystem.Metric is 0.  For unknown reasons, using UnitSystem.Metric directly causes a runtime error.
+    const isMetric: boolean = (unitSettings.unitSystem === unitSystemMetric);
+
     // For building status types that include a unit of measure, adjust used and capacity manually and append unit of measure (UOM) to tooltip.
     // Used and capacity are adjusted manually here because in some cases the game's default for the UOM does not have a value reduction (e.g. kilo, mega).
     // UOM is appended to the tooltip because the text of most UOMs is too long to include with the value (e.g. m3/month).
@@ -300,12 +307,6 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
     const UOMPlaceholder: string = "(UOM)";
     if (infomodeTooltip?.includes(UOMPlaceholder))
     {
-        // Get whether or not unit system is metric.
-        const bindingUnitSettings = bindValue<UnitSettings>("options", "unitSettings");
-        const unitSettings = useValue(bindingUnitSettings);
-        const unitSystemMetric: number = 0;  // UnitSystem.Metric is 0.
-        const isMetric: boolean = (unitSettings.unitSystem === unitSystemMetric);
-
         // Define pounds per kilogram.
         const poundsPerKilogram = 2.204622622;
 
@@ -583,9 +584,6 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
     const formattedCount: string = count.toFixed(0).replace(regexReplacement, thousandsSeparator);
     infomodeTooltip += "\n" + buildings + ": " + formattedCount;
 
-    // Function to join classes.
-    function joinClasses(...classes: any) { return classes.join(" "); }
-
     // Handle button click.
     function onButtonClick()
     {
@@ -603,10 +601,10 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
     return (
         <Tooltip direction="right" tooltip={<FormattedParagraphs children={infomodeTooltip} />} >
             <button
-                className={joinClasses(ModuleResolver.instance.TransparentButtonClasses.button,
-                                       ModuleResolver.instance.InfomodeItemClasses.infomodeItem,
-                                       (infomode.active ? ModuleResolver.instance.InfomodeItemClasses.active : ""),
-                                       styles.buildingUseInfomodeButton)}
+                className={`${ModuleResolver.instance.TransparentButtonClasses.button}
+                            ${ModuleResolver.instance.InfomodeItemClasses.infomodeItem}
+                            ${(infomode.active ? ModuleResolver.instance.InfomodeItemClasses.active : "")}
+                            ${styles.buildingUseInfomodeButton}`}
                 onClick={() => onButtonClick()}
             >
                 <div className={ModuleResolver.instance.InfomodeItemClasses.header}>
@@ -616,37 +614,37 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
                     </div>
                     <div className={ModuleResolver.instance.InfomodeItemClasses.type}>
                         {buildingColor}
-                        <div className={joinClasses(ModuleResolver.instance.CheckboxClasses.toggle,
-                                                    ModuleResolver.instance.InfomodeItemClasses.checkbox,
-                                                    (infomode.active ? "checked" : "unchecked"))}>
-                            <div className={joinClasses(ModuleResolver.instance.CheckboxClasses.checkmark,
-                                                        (infomode.active ? "checked" : ""))}>
+                        <div className={`${ModuleResolver.instance.CheckboxClasses.toggle}
+                                         ${ModuleResolver.instance.InfomodeItemClasses.checkbox}
+                                         ${(infomode.active ? "checked" : "unchecked")}`}>
+                            <div className={`${ModuleResolver.instance.CheckboxClasses.checkmark}
+                                             ${(infomode.active ? "checked" : "")}`}>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className={joinClasses(ModuleResolver.instance.InfomodeItemClasses.legend,
-                                            styles.buildingUseInfomodeLegend)}>
+                <div className={`${ModuleResolver.instance.InfomodeItemClasses.legend}
+                                 ${styles.buildingUseInfomodeLegend}`}>
                     {
                         hasBuildings &&
                         (
                             <>
-                                <div className={joinClasses(ModuleResolver.instance.InfomodeItemClasses.gradient,
-                                                            styles.buildingUseInfomodeGradient)} style={gradientStyle}>
+                                <div className={`${ModuleResolver.instance.InfomodeItemClasses.gradient}
+                                                 ${styles.buildingUseInfomodeGradient}`} style={gradientStyle}>
                                     <div className={styles.buildingUseInfomodePointer} style={pointerStyle}>
                                         <img className={styles.buildingUseInfomodePointerIcon} src="Media/Misc/IndicatorBarPointer.svg" />
                                     </div>
                                 </div>
-                                <div className={joinClasses(ModuleResolver.instance.InfomodeItemClasses.label,
-                                                            styles.buildingUseInfomodePercent)}>
+                                <div className={`${ModuleResolver.instance.InfomodeItemClasses.label}
+                                                 ${styles.buildingUseInfomodePercent}`}>
                                     {percent + "%"}
                                 </div>
-                                <div className={joinClasses(ModuleResolver.instance.InfomodeItemClasses.label,
-                                                            styles.buildingUseInfomodeValue)}>
+                                <div className={`${ModuleResolver.instance.InfomodeItemClasses.label}
+                                                 ${styles.buildingUseInfomodeValue}`}>
                                     <LocalizedNumber value={used} unit={Unit.Integer} />
                                 </div>
-                                <div className={joinClasses(ModuleResolver.instance.InfomodeItemClasses.label,
-                                                            styles.buildingUseInfomodeValue)}>
+                                <div className={`${ModuleResolver.instance.InfomodeItemClasses.label}
+                                                 ${styles.buildingUseInfomodeValue}`}>
                                     <LocalizedNumber value={capacity} unit={Unit.Integer} />
                                 </div>
                             </>
@@ -655,8 +653,8 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
                     {
                         hasBuildings ||
                         (
-                            <div className={joinClasses(ModuleResolver.instance.InfomodeItemClasses.label,
-                                                        styles.buildingUseInfomodeValueNoBuildings)}>
+                            <div className={`${ModuleResolver.instance.InfomodeItemClasses.label}
+                                             ${styles.buildingUseInfomodeValueNoBuildings}`}>
                                 {noBuildings}
                             </div>
                         )

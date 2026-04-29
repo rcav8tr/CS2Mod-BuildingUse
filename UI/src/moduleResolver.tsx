@@ -1,6 +1,12 @@
 ﻿import { Theme      } from "cs2/bindings";
 import { getModule  } from "cs2/modding";
 
+// TBD Provide temporary replacement for DropdownItem from cs2/ui which is broken.
+export const DropdownItem = getModule("game-ui/common/input/dropdown/items/dropdown-item.tsx", "DropdownItem");
+
+// TBD Provide temporary replacement for LocalizedNumber from cs2/l10n which is broken.
+export const LocalizedNumber = getModule("game-ui/common/localization/localized-number.tsx", "LocalizedNumber");
+
 // Provide access to modules from index.js.
 export class ModuleResolver
 {

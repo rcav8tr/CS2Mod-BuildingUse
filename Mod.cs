@@ -22,7 +22,7 @@ namespace BuildingUse
             .SetShowsStackTraceAboveLevels(Level.Error);    // Include stack trace for severity level Error and above.
 
         // The global settings for this mod.
-        public static ModSettings ModSettings { get; set; }
+        public static ModSettings ModSettings { get; private set;}
 
         // URI for UI images.
         // When the URI is used to access an image, the game forces the URI portion to lower case.
@@ -62,6 +62,9 @@ namespace BuildingUse
                 string assemblyPath = Path.GetDirectoryName(modExecutableAsset.path);
                 string imagesPath = Path.Combine(assemblyPath, "Images");
                 UIManager.defaultUISystem.AddHostLocation(ImagesURI, imagesPath);
+                
+                // Initialize infoview datas by referencing the instance.
+                BUInfoviewDatas infoviewDatas = BUInfoviewDatas.instance;
 
                 // Create the building color system.
                 // This sytem does not need to be activated because it uses Harmony to run when ObjectColorsystem.OnUpdate() runs.
@@ -107,7 +110,7 @@ namespace BuildingUse
                 // Uncomment this only when the UI files need to be created or recreated.
                 // Then run the mod once in the game to create the files.
                 // Then comment this again.  The UI files are now available to use.
-                //CreateUIFiles.Create();
+                CreateUIFiles.Create();
 #endif
             }
             catch (Exception ex)

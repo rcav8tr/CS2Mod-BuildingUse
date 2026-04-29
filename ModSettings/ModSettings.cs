@@ -7,7 +7,7 @@ namespace BuildingUse
     /// <summary>
     /// The settings for this mod.
     /// </summary>
-    [FileLocation(nameof(BuildingUse))]
+    [FileLocation("ModsSettings/" + nameof(BuildingUse) + "/" + nameof(BuildingUse))]
     [SettingsUIGroupOrder(GroupGeneral, GroupAbout)]
     [SettingsUIShowGroupName(GroupGeneral, GroupAbout)]
     public class ModSettings : ModSetting

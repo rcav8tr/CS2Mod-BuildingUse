@@ -22,19 +22,16 @@ export const InfomodeCheckBox = ({ onClickEventName, isChecked, label }: Infomod
         trigger(mod.id, onClickEventName);
     }
 
-    // Function to join classes.
-    function joinClasses(...classes: any) { return classes.join(" "); }
-
     // A check box with a label.
     // A click anywhere on the enclosing container is considered a click on the check box.
     return (
         <div className={styles.buildingUseInfomodeCheckBoxContainer} onClick={() => onCheckBoxClick()}>
-            <div className={joinClasses(ModuleResolver.instance.CheckboxClasses.toggle,
-                                        ModuleResolver.instance.InfomodeItemClasses.checkbox,
-                                        styles.buildingUseInfomodeCheckBox,
-                                        (isChecked ? "checked" : "unchecked"))}>
-                <div className={joinClasses(ModuleResolver.instance.CheckboxClasses.checkmark,
-                                            (isChecked ? "checked" : ""))}></div>
+            <div className={`${ModuleResolver.instance.CheckboxClasses.toggle}
+                             ${ModuleResolver.instance.InfomodeItemClasses.checkbox}
+                             ${styles.buildingUseInfomodeCheckBox}
+                             ${(isChecked ? "checked" : "unchecked")}`}>
+                <div className={`${ModuleResolver.instance.CheckboxClasses.checkmark}
+                                 ${(isChecked ? "checked" : "")}`}></div>
             </div>
             <div className={styles.buildingUseInfomodeCheckBoxLabel}>
                 {label}

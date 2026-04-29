@@ -951,7 +951,6 @@ namespace BuildingUse
                     // Get the color of the attached entity.
                     if (ComponentLookupColor.TryGetComponent(attachments[i].m_Attached, out Color attachedColor))
                     {
-
                         // Set color of this attachment entity to the color of the attached entity.
                         Entity entity = entities[i];
                         Color color = ComponentLookupColor[entity];
