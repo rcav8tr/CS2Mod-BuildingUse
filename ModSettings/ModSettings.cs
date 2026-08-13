@@ -36,7 +36,6 @@ namespace BuildingUse
             ZonedBuildingColor           = ZonedBuildingColorChoice.ThreeColors;
             ServiceBuildingColor         = ServiceBuildingColorChoice.ThreeColors;
             ProductionInfoviewColor      = ProductionInfoviewColorChoice.ThreeColors;
-            ColorSpecializedIndustryLots = false;
             ReverseColors                = false;
 
             CountVehiclesInUse           = true;
@@ -105,10 +104,6 @@ namespace BuildingUse
             get { return _productionInfoviewColorChoice; }
             set { _productionInfoviewColorChoice = value; SetInfomodeColors(); }
         }
-
-        // Color specialized industry lots.
-        [SettingsUISection(GroupGeneral)]
-        public bool ColorSpecializedIndustryLots { get; set; }
 
         // Whether or not to reverse the colors.
         // When this setting changes, need to set infomode colors.

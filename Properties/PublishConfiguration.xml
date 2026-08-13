@@ -70,7 +70,7 @@ The total use of buildings for the selected district is shown for each building 
 - Deactivated building upgrades are not counted towards capacity.
 
 ### Buildings For Rent
-For residential, commercial, industrial, and office buildings that are available to rent,
+For residential, commercial, extractor, industrial, warehouse, and office buildings that are available to rent,
 the capacity cannot be determined because the capacity comes from the renter.
 Therefore, such buildings do not contribute to the total used or capacity for the selected district
 (except that such buildings do count toward capacity for Efficiency because efficiency capacity is always 100%).
@@ -82,11 +82,12 @@ Abandoned, condemned, deleted, and destroyed buildings are excluded.
 # Infoviews
 The following sections provide more information for each infoview.
 Due to rounding, total used and capacity values may not exactly match the game's total values.
-All building types for residential, commercial, industrial, and office include both growable buildings and signature buildings.
+All building types for residential, commercial, extractor, industrial, warehouse, and office include both growable buildings and signature buildings.
 
 ### Employees Infoview
 - Number of employees as a percent of employee capacity.
 - Residential building use is households instead of employees.
+- Warehouses do not have employees.
 - The Employees infoview is also useful to identify the locations of zoned and service buildings because most buildings have employees.
 
 ### Visitors Infoview
@@ -111,7 +112,7 @@ All building types for residential, commercial, industrial, and office include b
 - For Residential Car, the capacity is the number of cars owned by households in the building.
   Not every household will have a car.
   A parked residential car, regardless of its location, is considered not in use.
-- Residential Car, Commercial Truck, Industrial Truck, Office Truck, and 3 Parked do not have vehicles in maintenance.
+- Residential Car, Commercial Truck, Extractor Truck, Industrial Truck, Warehouse Truck, Office Truck, and 3 Parked do not have vehicles in maintenance.
 - For upgrades with a Disaster Response Unit, the game incorrectly computes vehicles in maintenance.
   So this mod's in maintenance count will not match the game's in maintenance vehicle count.
 - The Airport building has capacity for delivery trucks even if the Airport does not have the Cargo Terminal upgrade.
@@ -134,6 +135,7 @@ All building types for residential, commercial, industrial, and office include b
   Each building contributes 100% to the total capacity amount for the selected district.
   Therefore, the total efficiency for the selected district for each building type is a simple average over the buildings of that type.
   Small and large buildings contribute equally to the average.
+- Warehouses do not have efficiency.
 
 ### Processing Infoview
 - Production or processing speed as a percent of the production or processing speed capacity.
@@ -166,7 +168,7 @@ There are two choices for the color of zoned buildings, including signature buil
   The colors green and red do not necessarily mean good and bad building use.
   You must decide whether low or high building use is good or bad.
 - Zone Color:  Building colors are set according to their respective zone type:
-  residential = green, commercial = blue, industrial = yellow, and office = purple.
+  residential = green, commercial = blue, extractor/industrial/warehouse = yellow, and office = purple.
 
 For Zone Color, building use is indicated by the color brightness:  the lightest color is 0% used and the darkest color is 100% used (see Reverse Colors below).
 
@@ -194,10 +196,6 @@ There are three choices for the colors for the Production infoview:
   The colors are the same as for the Resource Locator mod.
 
 For both Various, building use is indicated by the color brightness:  the lightest color is 0% used and the darkest color is 100% used (see Reverse Colors below).
-
-### Specialized Industry Lots
-- When unchecked (default), only the hub building color is set.
-- When checked, the color of the attached lot for each specialized industry is set the same as its hub building to make the building use easier to see.
 
 ### Reverse Colors
 - When unchecked (default), low to high building use is represented by lighter to darker colors (or red, yellow, green for 3 Colors).
@@ -248,10 +246,10 @@ The following mods were used extensively in the development of this mod:
     <ForumLink Value="https://forum.paradoxplaza.com/forum/threads/building-use.1716181/" />
 
     <!-- Version of the mod.  Copied from assembly Version. -->
-    <ModVersion Value="2.0.1" />
+    <ModVersion Value="2.1.0" />
 
     <!-- Recommended version of the base game to use the mod. -->
-    <GameVersion Value="1.5.7*" />
+    <GameVersion Value="1.6.0*" />
 
     <!-- Dependency for the mod.  Can be set multiple times. -->
     <Dependency Id="" />
@@ -262,7 +260,8 @@ The following mods were used extensively in the development of this mod:
 
     <!-- Change log.  Copied from ChangeLog.md file.  Supports minimal markdown subset. -->
     <ChangeLog>
-- Update for game version 1.5.7.
+- Separate extractor and warehouse from industrial.
+- Remove ability to color the lot of a specialized industry.
 </ChangeLog>
 
     <!-- External links.  Can be set multiple times. -->

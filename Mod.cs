@@ -81,8 +81,7 @@ namespace BuildingUse
                 //    // Exclude assets.
                 //    if (!keyValue.Key.StartsWith("Assets."))
                 //    {
-                //        if (keyValue.Value.ToLower() == "game" ||
-                //            keyValue.Value.ToLower() == "resource")
+                //        if (keyValue.Value.ToLower() == "warehouse")
                 //        //if (keyValue.Key.StartsWith("SubServices.NAME[Transportation"))
                 //        {
                 //            log.Info(keyValue.Key + "\t" + keyValue.Value);
@@ -110,7 +109,7 @@ namespace BuildingUse
                 // Uncomment this only when the UI files need to be created or recreated.
                 // Then run the mod once in the game to create the files.
                 // Then comment this again.  The UI files are now available to use.
-                CreateUIFiles.Create();
+                //CreateUIFiles.Create();
 #endif
             }
             catch (Exception ex)

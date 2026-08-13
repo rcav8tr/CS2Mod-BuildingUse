@@ -144,10 +144,19 @@ namespace BuildingUse
                         }
                         break;
 
+
+                    case BUBuildingStatusType.EmployeesExtractor:
+                    case BUBuildingStatusType.StorageExtractor:
+                    case BUBuildingStatusType.VehiclesExtractorTruck:
+                    case BUBuildingStatusType.EfficiencyExtractor:
+
                     case BUBuildingStatusType.EmployeesIndustrial:
                     case BUBuildingStatusType.StorageIndustrial:
                     case BUBuildingStatusType.VehiclesIndustrialTruck:
                     case BUBuildingStatusType.EfficiencyIndustrial:
+
+                    case BUBuildingStatusType.StorageWarehouse:
+                    case BUBuildingStatusType.VehiclesWarehouseTruck:
                         if (Mod.ModSettings.ZonedBuildingColor == ModSettings.ZonedBuildingColorChoice.ThreeColors)
                         {
                             useThreeColors = true;

@@ -7,7 +7,7 @@
         <!--The file where mod information which is required for publishing mod on PDX mods are stored-->
         <PublishConfigurationPath>Properties\PublishConfiguration.xml</PublishConfigurationPath>
         <Title>Building Use</Title>
-        <Version>2.0.1</Version>
+        <Version>2.1.0</Version>
         <Description>Seven new infoviews show the use of buildings as a percent of their capacity.</Description>
         <Copyright>Copyright © 2024-2026</Copyright>
         <TreatWarningsAsErrors>True</TreatWarningsAsErrors>

@@ -30,7 +30,9 @@ namespace BuildingUse
 
                 // Do the company building status types in descending order.
                 DoBuildingStorageCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.StorageOffice);
+                DoBuildingStorageCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.StorageWarehouse);
                 DoBuildingStorageCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.StorageIndustrial);
+                DoBuildingStorageCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.StorageExtractor);
                 DoBuildingStorageCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.StorageCommercial);
             }
 
@@ -48,7 +50,9 @@ namespace BuildingUse
                     // Check if building has correct property.
                     Entity entity = mainBuildingOrUpgrade.Entity;
                     if ((buildingStatusType == BUBuildingStatusType.StorageCommercial && BuildingHasCommercial(entity)) ||
+                        (buildingStatusType == BUBuildingStatusType.StorageExtractor  && BuildingHasExtractor (entity)) ||
                         (buildingStatusType == BUBuildingStatusType.StorageIndustrial && BuildingHasIndustrial(entity)) ||
+                        (buildingStatusType == BUBuildingStatusType.StorageWarehouse  && BuildingHasStorage   (entity)) ||
                         (buildingStatusType == BUBuildingStatusType.StorageOffice     && BuildingHasOffice    (entity)))
                     {
                         // Building has the correct property.
@@ -74,14 +78,14 @@ namespace BuildingUse
                             }
 
                             // Get storage capacity from the company prefab, not from the building prefab.
-                            if (ComponentLookupPrefabRef.TryGetComponent(companyEntity, out PrefabRef prefabRef) &&
-                                ComponentLookupStorageLimitData.TryGetComponent(prefabRef.m_Prefab, out  StorageLimitData storageLimitData))
+                            if (ComponentLookupPrefabRef.TryGetComponent(companyEntity, out PrefabRef companyPrefabRef) &&
+                                ComponentLookupStorageLimitData.TryGetComponent(companyPrefabRef.m_Prefab, out  StorageLimitData storageLimitData))
                             {
                                 // Check for warehouse.
-                                if (ComponentLookupBuildingPropertyData .TryGetComponent(prefabRef.m_Prefab, out BuildingPropertyData buildingPropertyData) &&
-                                    ComponentLookupSpawnableBuildingData.TryGetComponent(prefabRef.m_Prefab, out SpawnableBuildingData spawnableBuildingData) &&
-                                    ComponentLookupBuildingData         .TryGetComponent(prefabRef.m_Prefab, out BuildingData buildingData) &&
-                                    buildingPropertyData.m_AllowedStored != Resource.NoResource)
+                                if (buildingStatusType == BUBuildingStatusType.StorageWarehouse &&
+                                    ComponentLookupPrefabRef.TryGetComponent(entity, out PrefabRef buildingPrefabRef) &&
+                                    ComponentLookupSpawnableBuildingData.TryGetComponent(buildingPrefabRef.m_Prefab, out SpawnableBuildingData spawnableBuildingData) &&
+                                    ComponentLookupBuildingData.TryGetComponent(buildingPrefabRef.m_Prefab, out BuildingData buildingData))
                                 {
                                     // For warehouse, storage capacity is computed.
                                     capacity += storageLimitData.GetAdjustedLimitForWarehouse(spawnableBuildingData, buildingData);

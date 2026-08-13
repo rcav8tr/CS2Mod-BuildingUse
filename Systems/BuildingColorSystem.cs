@@ -480,15 +480,20 @@ namespace BuildingUse
                 return false;
             }
 
-            // The following methods return whether or not the building (main or upgrade) has residential, commercial, industrial, or office.
+            // The following methods return whether or not the building (main or upgrade) has
+            // residential, commercial, extractor, industrial, warehouse, or office.
             // Check the property of the entity, which determines whether or not the building CAN have RCIO,
             // even if the building does not currently have RCIO.
             // The prefab is not checked.
             private bool BuildingHasResidential(Entity entity) => ComponentLookupResidentialProperty.HasComponent(entity);
-            private bool BuildingHasCommercial (Entity entity) => ComponentLookupCommercialProperty.HasComponent(entity);
-            private bool BuildingHasIndustrial (Entity entity) => ComponentLookupIndustrialProperty.HasComponent(entity) &&
-                                                                 !ComponentLookupOfficeProperty    .HasComponent(entity);
-            private bool BuildingHasOffice     (Entity entity) => ComponentLookupOfficeProperty.HasComponent(entity);
+            private bool BuildingHasCommercial (Entity entity) => ComponentLookupCommercialProperty .HasComponent(entity);
+            private bool BuildingHasExtractor  (Entity entity) => ComponentLookupExtractorProperty  .HasComponent(entity);
+            private bool BuildingHasIndustrial (Entity entity) => ComponentLookupIndustrialProperty .HasComponent(entity) &&
+                                                                 !ComponentLookupExtractorProperty  .HasComponent(entity) &&
+                                                                 !ComponentLookupStorageProperty    .HasComponent(entity) &&
+                                                                 !ComponentLookupOfficeProperty     .HasComponent(entity);
+            private bool BuildingHasStorage    (Entity entity) => ComponentLookupStorageProperty    .HasComponent(entity);
+            private bool BuildingHasOffice     (Entity entity) => ComponentLookupOfficeProperty     .HasComponent(entity);
 
             // The following methods return whether or not the building (main or upgrade) currently has a service.
             // The logic uses the prefab data with conditons on the prefab data fields
@@ -923,47 +928,6 @@ namespace BuildingUse
 
 
         /// <summary>
-        /// Job to set the color of each attachment building to the color of the building to which it is attached.
-        /// Attachment buildings are the lots attached to specialized industry hubs.
-        /// </summary>
-        [BurstCompile]
-        private struct UpdateColorsJobAttachmentBuilding : IJobChunk
-        {
-            // Color component lookup to update.
-            [NativeDisableParallelForRestriction] public ComponentLookup<Color> ComponentLookupColor;
-
-            // Component type handles.
-            [ReadOnly] public ComponentTypeHandle<Attachment> ComponentTypeHandleAttachment;
-
-            // Entity type handle.
-            [ReadOnly] public EntityTypeHandle EntityTypeHandle;
-
-            /// <summary>
-            /// Job execution.
-            /// </summary>
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
-            {
-                // Do each attachment entity.
-                NativeArray<Attachment> attachments = chunk.GetNativeArray(ref ComponentTypeHandleAttachment);
-                NativeArray<Entity    > entities    = chunk.GetNativeArray(EntityTypeHandle);
-                for (int i = 0; i < entities.Length; i++)
-                {
-                    // Get the color of the attached entity.
-                    if (ComponentLookupColor.TryGetComponent(attachments[i].m_Attached, out Color attachedColor))
-                    {
-                        // Set color of this attachment entity to the color of the attached entity.
-                        Entity entity = entities[i];
-                        Color color = ComponentLookupColor[entity];
-                        color.m_Index = attachedColor.m_Index;
-                        color.m_Value = attachedColor.m_Value;
-                        ComponentLookupColor[entity] = color;
-                    }
-                }
-            }
-        }
-
-
-        /// <summary>
         /// Job to set the color of each middle building to the color of its owner.
         /// Middle buildings include sub buildings (i.e. building upgrades placed around the perimeter of the main building).
         /// Logic is adapted from Game.Rendering.ObjectColorSystem.UpdateMiddleObjectColorsJob except:
@@ -1305,7 +1269,6 @@ namespace BuildingUse
             // Get each query and job.
             GetQueryJobDefault           (out EntityQuery queryDefault,            out UpdateColorsJobDefault            updateColorsJobDefault);
             GetQueryJobMainBuilding      (out EntityQuery queryMainBuilding,       out UpdateColorsJobMainBuilding       updateColorsJobMainBuilding);
-            GetQueryJobAttachmentBuilding(out EntityQuery queryAttachmentBuilding, out UpdateColorsJobAttachmentBuilding updateColorsJobAttachmentBuilding);
             GetQueryJobMiddleBuilding    (out EntityQuery queryMiddleBuilding,     out UpdateColorsJobMiddleBuilding     updateColorsJobMiddleBuilding);
             GetQueryJobTempObject        (out EntityQuery queryTempObject,         out UpdateColorsJobTempObject         updateColorsJobTempObject);
             GetQueryJobSubObject         (out EntityQuery querySubObject,          out UpdateColorsJobSubObject          updateColorsJobSubObject);
@@ -1318,15 +1281,9 @@ namespace BuildingUse
             // Schedule the jobs with dependencies so the jobs run in order.
             // Schedule each job to execute in parallel (i.e. job uses multiple threads, if available).
             // Parallel threads execute much faster than a single thread.
-            // Do attachment buildings before middle buildings because some middle buildings have an attachment building as owner.
             JobHandle jobHandleDefault        = JobChunkExtensions.ScheduleParallel(updateColorsJobDefault,            queryDefault,            base.Dependency);
             JobHandle jobHandleMainBuilding   = JobChunkExtensions.ScheduleParallel(updateColorsJobMainBuilding,       queryMainBuilding,       jobHandleDefault);
-            JobHandle jobHandleNext = jobHandleMainBuilding;
-            if (Mod.ModSettings.ColorSpecializedIndustryLots)
-            {
-                jobHandleNext                 = JobChunkExtensions.ScheduleParallel(updateColorsJobAttachmentBuilding, queryAttachmentBuilding, jobHandleMainBuilding);
-            }
-            JobHandle jobHandleMiddleBuilding = JobChunkExtensions.ScheduleParallel(updateColorsJobMiddleBuilding,     queryMiddleBuilding,     jobHandleNext);
+            JobHandle jobHandleMiddleBuilding = JobChunkExtensions.ScheduleParallel(updateColorsJobMiddleBuilding,     queryMiddleBuilding,     jobHandleMainBuilding);
             JobHandle jobHandleTempObject     = JobChunkExtensions.ScheduleParallel(updateColorsJobTempObject,         queryTempObject,         jobHandleMiddleBuilding);
             JobHandle jobHandleSubObject      = JobChunkExtensions.ScheduleParallel(updateColorsJobSubObject,          querySubObject,          jobHandleTempObject);
 
@@ -1453,7 +1410,7 @@ namespace BuildingUse
                 .WithAll<Object, PrefabRef, CurrentDistrict>()
                 .WithAny<Building, MailBox>()
                 .WithNone<Abandoned, Condemned, Deleted, Destroyed>()
-                .WithNone<Attachment>()     // Exclude attachments (see attachments query below).
+                .WithNone<Attachment>()     // Exclude attachments (i.e. the lot on a specialized industry).
                 .WithNone<Owner>()          // Exclude subbuildings (see middle buildings query below).
                 .WithNone<Temp>()           // Exclude temp (see temp objects query below).
                 .Build();
@@ -1597,31 +1554,6 @@ namespace BuildingUse
         }
 
         /// <summary>
-        /// Get query and job for attachment building.
-        /// </summary>
-        private void GetQueryJobAttachmentBuilding(out EntityQuery queryAttachmentBuilding, out UpdateColorsJobAttachmentBuilding updateColorsJobAttachmentBuilding)
-        {
-            // Define query to get attachment buildings.
-            // Attachments are the lots attached to specialized industry.
-            queryAttachmentBuilding = SystemAPI.QueryBuilder()
-                .WithAllRW<Color>()
-                .WithAll<Building, Attachment>()
-                .WithNone<Hidden, Deleted>()
-                .WithNone<Owner>()          // Exclude middle buildings (see middle buildings query below).
-                .Build();
-
-            // Create a job to update attachment building colors.
-            updateColorsJobAttachmentBuilding = new UpdateColorsJobAttachmentBuilding()
-            {
-                ComponentLookupColor            = SystemAPI.GetComponentLookup<Color>(false),
-                
-                ComponentTypeHandleAttachment   = SystemAPI.GetComponentTypeHandle<Attachment>(true),
-                
-                EntityTypeHandle                = SystemAPI.GetEntityTypeHandle(),
-            };
-        }
-
-        /// <summary>
         /// Get query and job for middle building.
         /// </summary>
         private void GetQueryJobMiddleBuilding(out EntityQuery queryMiddleBuilding, out UpdateColorsJobMiddleBuilding updateColorsJobMiddleBuilding)
@@ -1633,7 +1565,7 @@ namespace BuildingUse
                 .WithAllRW<Color>()
                 .WithAll<Building, Owner>()
                 .WithNone<Hidden, Deleted>()
-                .WithNone<Attachment>()     // Exclude attachments (see attachment buildings query above).
+                .WithNone<Attachment>()     // Exclude attachments (i.e. the lot on a specialized industry).
                 .Build();
 
             // Create a job to update middle building colors.

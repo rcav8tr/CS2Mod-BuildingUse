@@ -49,11 +49,23 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
             icon = "Media/Game/Icons/ZoneCommercial.svg";
             break;
 
+        case BUBuildingStatusType.EmployeesExtractor:
+        case BUBuildingStatusType.StorageExtractor:
+        case BUBuildingStatusType.VehiclesExtractorTruck:
+        case BUBuildingStatusType.EfficiencyExtractor:
+            icon = "Media/Game/Icons/ZoneExtractors.svg";
+            break;
+
         case BUBuildingStatusType.EmployeesIndustrial:
         case BUBuildingStatusType.StorageIndustrial:
         case BUBuildingStatusType.VehiclesIndustrialTruck:
         case BUBuildingStatusType.EfficiencyIndustrial:
-            icon = "Media/Game/Icons/ZoneIndustrial.svg";
+            icon = "Media/Game/Icons/ZoneIndustrialManufacturing.svg";
+            break;
+
+        case BUBuildingStatusType.StorageWarehouse:
+        case BUBuildingStatusType.VehiclesWarehouseTruck:
+            icon = "Media/Game/Icons/ZoneIndustrialWarehouses.svg";
             break;
 
         case BUBuildingStatusType.EmployeesOffice:
@@ -318,7 +330,9 @@ export const InfomodeItem = ({ infomode, buildingStatusType }: InfomodeItemProps
         switch (buildingStatusType)
         {
             case BUBuildingStatusType.StorageCommercial:
+            case BUBuildingStatusType.StorageExtractor:
             case BUBuildingStatusType.StorageIndustrial:
+            case BUBuildingStatusType.StorageWarehouse:
             case BUBuildingStatusType.StorageOffice:
             case BUBuildingStatusType.StoragePowerPlantFuel:
             case BUBuildingStatusType.StorageHealthcare:

@@ -259,9 +259,6 @@ namespace BuildingUse
                     { "SettingProductionInfoviewColorChoiceThreeColors",    Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ProductionInfoviewColorChoice.ThreeColors    ) },
                     { "SettingProductionInfoviewColorChoiceVariousGame",    Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ProductionInfoviewColorChoice.VariousGame    ) },
                     { "SettingProductionInfoviewColorChoiceVariousResource",Mod.ModSettings.GetEnumValueLocaleID  (ModSettings.ProductionInfoviewColorChoice.VariousResource) },
-                                                                                                                                                                          
-                    { "SettingColorSpecializedIndustryLotsLabel",           Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ColorSpecializedIndustryLots         )) },
-                    { "SettingColorSpecializedIndustryLotsDesc",            Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ColorSpecializedIndustryLots         )) },
                                                                                                                                                                                   
                     { "SettingReverseColorsLabel",                          Mod.ModSettings.GetOptionLabelLocaleID(nameof(ModSettings.ReverseColors                        )) },
                     { "SettingReverseColorsDesc",                           Mod.ModSettings.GetOptionDescLocaleID (nameof(ModSettings.ReverseColors                        )) },

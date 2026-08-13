@@ -31,6 +31,7 @@ namespace BuildingUse
                 // Do in descending order by building status type.
                 DoBuildingEmployeesCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.EmployeesOffice);
                 DoBuildingEmployeesCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.EmployeesIndustrial);
+                DoBuildingEmployeesCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.EmployeesExtractor);
                 DoBuildingEmployeesCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.EmployeesCommercial);
                 DoBuildingEmployeesResidential(in mainBuildingAndUpgrades, ref color);
             }
@@ -123,6 +124,7 @@ namespace BuildingUse
                 switch (buildingStatusType)
                 {
                     case BUBuildingStatusType.EmployeesCommercial: hasProperty = BuildingHasCommercial(entity); break;
+                    case BUBuildingStatusType.EmployeesExtractor:  hasProperty = BuildingHasExtractor (entity); break;
                     case BUBuildingStatusType.EmployeesIndustrial: hasProperty = BuildingHasIndustrial(entity); break;
                     case BUBuildingStatusType.EmployeesOffice:     hasProperty = BuildingHasOffice    (entity); break;
                     default:

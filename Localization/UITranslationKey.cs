@@ -23,6 +23,7 @@ namespace BuildingUse
         // Infomode titles.
         public const string InfomodeTitleEmployeesResidential                  = "Infoviews.INFOMODE[BuildingUseEmployeesResidential]";
         public const string InfomodeTitleEmployeesCommercial                   = "Infoviews.INFOMODE[BuildingUseEmployeesCommercial]";
+        public const string InfomodeTitleEmployeesExtractor                    = "Infoviews.INFOMODE[BuildingUseEmployeesExtractor]";
         public const string InfomodeTitleEmployeesIndustrial                   = "Infoviews.INFOMODE[BuildingUseEmployeesIndustrial]";
         public const string InfomodeTitleEmployeesOffice                       = "Infoviews.INFOMODE[BuildingUseEmployeesOffice]";
         public const string InfomodeTitleEmployeesParking                      = "Infoviews.INFOMODE[BuildingUseEmployeesParking]";
@@ -55,7 +56,9 @@ namespace BuildingUse
         public const string InfomodeTitleVisitorsPoliceStation                 = "Infoviews.INFOMODE[BuildingUseVisitorsPoliceStation]";
         public const string InfomodeTitleVisitorsPrison                        = "Infoviews.INFOMODE[BuildingUseVisitorsPrison]";
         public const string InfomodeTitleStorageCommercial                     = "Infoviews.INFOMODE[BuildingUseStorageCommercial]";
+        public const string InfomodeTitleStorageExtractor                      = "Infoviews.INFOMODE[BuildingUseStorageExtractor]";
         public const string InfomodeTitleStorageIndustrial                     = "Infoviews.INFOMODE[BuildingUseStorageIndustrial]";
+        public const string InfomodeTitleStorageWarehouse                      = "Infoviews.INFOMODE[BuildingUseStorageWarehouse]";
         public const string InfomodeTitleStorageOffice                         = "Infoviews.INFOMODE[BuildingUseStorageOffice]";
         public const string InfomodeTitleStorageBatteryCharge                  = "Infoviews.INFOMODE[BuildingUseStorageBatteryCharge]";
         public const string InfomodeTitleStoragePowerPlantFuel                 = "Infoviews.INFOMODE[BuildingUseStoragePowerPlantFuel]";
@@ -68,7 +71,9 @@ namespace BuildingUse
         public const string InfomodeTitleStorageMailbox                        = "Infoviews.INFOMODE[BuildingUseStorageMailbox]";
         public const string InfomodeTitleVehiclesResidentialCar                = "Infoviews.INFOMODE[BuildingUseVehiclesResidentialCar]";
         public const string InfomodeTitleVehiclesCommercialTruck               = "Infoviews.INFOMODE[BuildingUseVehiclesCommercialTruck]";
+        public const string InfomodeTitleVehiclesExtractorTruck                = "Infoviews.INFOMODE[BuildingUseVehiclesExtractorTruck]";
         public const string InfomodeTitleVehiclesIndustrialTruck               = "Infoviews.INFOMODE[BuildingUseVehiclesIndustrialTruck]";
+        public const string InfomodeTitleVehiclesWarehouseTruck                = "Infoviews.INFOMODE[BuildingUseVehiclesWarehouseTruck]";
         public const string InfomodeTitleVehiclesOfficeTruck                   = "Infoviews.INFOMODE[BuildingUseVehiclesOfficeTruck]";
         public const string InfomodeTitleVehiclesParkedCar                     = "Infoviews.INFOMODE[BuildingUseVehiclesParkedCar]";
         public const string InfomodeTitleVehiclesParkedBike                    = "Infoviews.INFOMODE[BuildingUseVehiclesParkedBike]";
@@ -96,6 +101,7 @@ namespace BuildingUse
         public const string InfomodeTitleVehiclesCargoStationTruck             = "Infoviews.INFOMODE[BuildingUseVehiclesCargoStationTruck]";
         public const string InfomodeTitleEfficiencyResidential                 = "Infoviews.INFOMODE[BuildingUseEfficiencyResidential]";
         public const string InfomodeTitleEfficiencyCommercial                  = "Infoviews.INFOMODE[BuildingUseEfficiencyCommercial]";
+        public const string InfomodeTitleEfficiencyExtractor                   = "Infoviews.INFOMODE[BuildingUseEfficiencyExtractor]";
         public const string InfomodeTitleEfficiencyIndustrial                  = "Infoviews.INFOMODE[BuildingUseEfficiencyIndustrial]";
         public const string InfomodeTitleEfficiencyOffice                      = "Infoviews.INFOMODE[BuildingUseEfficiencyOffice]";
         public const string InfomodeTitleEfficiencyParking                     = "Infoviews.INFOMODE[BuildingUseEfficiencyParking]";
@@ -159,6 +165,7 @@ namespace BuildingUse
         // Infomode tooltips.
         public const string InfomodeTooltipEmployeesResidential                = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEmployeesResidential]";
         public const string InfomodeTooltipEmployeesCommercial                 = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEmployeesCommercial]";
+        public const string InfomodeTooltipEmployeesExtractor                  = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEmployeesExtractor]";
         public const string InfomodeTooltipEmployeesIndustrial                 = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEmployeesIndustrial]";
         public const string InfomodeTooltipEmployeesOffice                     = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEmployeesOffice]";
         public const string InfomodeTooltipEmployeesParking                    = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEmployeesParking]";
@@ -191,7 +198,9 @@ namespace BuildingUse
         public const string InfomodeTooltipVisitorsPoliceStation               = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVisitorsPoliceStation]";
         public const string InfomodeTooltipVisitorsPrison                      = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVisitorsPrison]";
         public const string InfomodeTooltipStorageCommercial                   = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStorageCommercial]";
+        public const string InfomodeTooltipStorageExtractor                    = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStorageExtractor]";
         public const string InfomodeTooltipStorageIndustrial                   = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStorageIndustrial]";
+        public const string InfomodeTooltipStorageWarehouse                    = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStorageWarehouse]";
         public const string InfomodeTooltipStorageOffice                       = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStorageOffice]";
         public const string InfomodeTooltipStorageBatteryCharge                = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStorageBatteryCharge]";
         public const string InfomodeTooltipStoragePowerPlantFuel               = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStoragePowerPlantFuel]";
@@ -204,7 +213,9 @@ namespace BuildingUse
         public const string InfomodeTooltipStorageMailbox                      = "Infoviews.INFOMODE_TOOLTIP[BuildingUseStorageMailbox]";
         public const string InfomodeTooltipVehiclesResidentialCar              = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesResidentialCar]";
         public const string InfomodeTooltipVehiclesCommercialTruck             = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesCommercialTruck]";
+        public const string InfomodeTooltipVehiclesExtractorTruck              = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesExtractorTruck]";
         public const string InfomodeTooltipVehiclesIndustrialTruck             = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesIndustrialTruck]";
+        public const string InfomodeTooltipVehiclesWarehouseTruck              = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesWarehouseTruck]";
         public const string InfomodeTooltipVehiclesOfficeTruck                 = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesOfficeTruck]";
         public const string InfomodeTooltipVehiclesParkedCar                   = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesParkedCar]";
         public const string InfomodeTooltipVehiclesParkedBike                  = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesParkedBike]";
@@ -232,6 +243,7 @@ namespace BuildingUse
         public const string InfomodeTooltipVehiclesCargoStationTruck           = "Infoviews.INFOMODE_TOOLTIP[BuildingUseVehiclesCargoStationTruck]";
         public const string InfomodeTooltipEfficiencyResidential               = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyResidential]";
         public const string InfomodeTooltipEfficiencyCommercial                = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyCommercial]";
+        public const string InfomodeTooltipEfficiencyExtractor                 = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyExtractor]";
         public const string InfomodeTooltipEfficiencyIndustrial                = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyIndustrial]";
         public const string InfomodeTooltipEfficiencyOffice                    = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyOffice]";
         public const string InfomodeTooltipEfficiencyParking                   = "Infoviews.INFOMODE_TOOLTIP[BuildingUseEfficiencyParking]";
@@ -336,8 +348,6 @@ namespace BuildingUse
         public const string SettingProductionInfoviewColorChoiceThreeColors    = "Options.BuildingUse.BuildingUse.Mod.PRODUCTIONINFOVIEWCOLORCHOICE[ThreeColors]";
         public const string SettingProductionInfoviewColorChoiceVariousGame    = "Options.BuildingUse.BuildingUse.Mod.PRODUCTIONINFOVIEWCOLORCHOICE[VariousGame]";
         public const string SettingProductionInfoviewColorChoiceVariousResource = "Options.BuildingUse.BuildingUse.Mod.PRODUCTIONINFOVIEWCOLORCHOICE[VariousResource]";
-        public const string SettingColorSpecializedIndustryLotsLabel           = "Options.OPTION[BuildingUse.BuildingUse.Mod.ModSettings.ColorSpecializedIndustryLots]";
-        public const string SettingColorSpecializedIndustryLotsDesc            = "Options.OPTION_DESCRIPTION[BuildingUse.BuildingUse.Mod.ModSettings.ColorSpecializedIndustryLots]";
         public const string SettingReverseColorsLabel                          = "Options.OPTION[BuildingUse.BuildingUse.Mod.ModSettings.ReverseColors]";
         public const string SettingReverseColorsDesc                           = "Options.OPTION_DESCRIPTION[BuildingUse.BuildingUse.Mod.ModSettings.ReverseColors]";
         public const string SettingGroupAbout                                  = "Options.GROUP[BuildingUse.BuildingUse.Mod.About]";

@@ -179,9 +179,10 @@ namespace BuildingUse
                     // Do each building status type.
                     foreach (BUBuildingStatusType buildingStatusType in buildingStatusTypes)
                     {
-                        // Check for commercial, industrial, or office with no company.
+                        // Check for commercial, extractor, industrial, or office with no company.
                         long efficiency;
                         if ((buildingStatusType == BUBuildingStatusType.EfficiencyCommercial ||
+                             buildingStatusType == BUBuildingStatusType.EfficiencyExtractor  ||
                              buildingStatusType == BUBuildingStatusType.EfficiencyIndustrial ||
                              buildingStatusType == BUBuildingStatusType.EfficiencyOffice) &&
                             !mainBuildingHasCompany)
@@ -214,9 +215,10 @@ namespace BuildingUse
                 NativeList<BUBuildingStatusType> buildingStatusTypes)
             {
                 // Get building status types for zoned non-residential.
-                if (BuildingHasCommercial           (entity))           { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyCommercial       ); }
-                if (BuildingHasIndustrial           (entity))           { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyIndustrial       ); }
-                if (BuildingHasOffice               (entity))           { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyOffice           ); }
+                if (BuildingHasCommercial         (entity))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyCommercial       ); }
+                if (BuildingHasExtractor          (entity))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyExtractor        ); }
+                if (BuildingHasIndustrial         (entity))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyIndustrial       ); }
+                if (BuildingHasOffice             (entity))         { buildingStatusTypes.Add(BUBuildingStatusType.EfficiencyOffice           ); }
 
                 // Get all building status types based on the services that apply to this building.
                 // These are exactly the same as the Employees infoview.

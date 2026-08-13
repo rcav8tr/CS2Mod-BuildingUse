@@ -33,7 +33,9 @@ namespace BuildingUse
                 // Do building status types for companies, which need different handling than service.
                 // Do in descending order by building status type.
                 DoBuildingVehiclesCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.VehiclesOfficeTruck);
+                DoBuildingVehiclesCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.VehiclesWarehouseTruck);
                 DoBuildingVehiclesCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.VehiclesIndustrialTruck);
+                DoBuildingVehiclesCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.VehiclesExtractorTruck);
                 DoBuildingVehiclesCompany(in mainBuildingAndUpgrades, ref color, BUBuildingStatusType.VehiclesCommercialTruck);
 
                 // Do residential last, which needs different handling than the above.
@@ -117,7 +119,9 @@ namespace BuildingUse
                     // Check if building has correct property.
                     Entity entity = mainBuildingOrUpgrade.Entity;
                     if ((buildingStatusType == BUBuildingStatusType.VehiclesCommercialTruck && BuildingHasCommercial(entity)) ||
+                        (buildingStatusType == BUBuildingStatusType.VehiclesExtractorTruck  && BuildingHasExtractor (entity)) ||
                         (buildingStatusType == BUBuildingStatusType.VehiclesIndustrialTruck && BuildingHasIndustrial(entity)) ||
+                        (buildingStatusType == BUBuildingStatusType.VehiclesWarehouseTruck  && BuildingHasStorage   (entity)) ||
                         (buildingStatusType == BUBuildingStatusType.VehiclesOfficeTruck     && BuildingHasOffice    (entity)))
                     {
                         // Building has the correct property.
