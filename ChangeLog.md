@@ -1,2 +1,1 @@
-﻿- Separate extractor and warehouse from industrial.
-- Remove ability to color the lot of a specialized industry.
+﻿- Update for game version 1.6.2.

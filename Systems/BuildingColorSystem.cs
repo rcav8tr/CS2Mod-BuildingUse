@@ -129,7 +129,7 @@ namespace BuildingUse
         /// Job to set the color to default on all objects that have a color.
         /// In this way, any object not set by subsequent jobs is assured to be the default color.
         /// </summary>
-        [BurstCompile]
+        // TBD [BurstCompile]
         private partial struct UpdateColorsJobDefault : IJobChunk
         {
             // Color component type to update.
@@ -159,7 +159,7 @@ namespace BuildingUse
         /// See also other partial structs in files BuildingColorSystem* for each infoview.
         /// Burst compilation for this entire struct (including other partials) is handled here.
         /// </summary>
-        [BurstCompile]
+        // TBD [BurstCompile]
         private partial struct UpdateColorsJobMainBuilding : IJobChunk
         {
             // Color component type to update (not ReadOnly).
@@ -935,7 +935,7 @@ namespace BuildingUse
         ///     Handle port middle buildings specially.
         ///     Variables are renamed to improve readability.
         /// </summary>
-        [BurstCompile]
+        // TBD [BurstCompile]
         private struct UpdateColorsJobMiddleBuilding : IJobChunk
         {
             // Color component lookup to update.
@@ -998,7 +998,7 @@ namespace BuildingUse
         /// Temp objects are when cursor is hovered over an object.
         /// Logic copied exactly from Game.Rendering.ObjectColorSystem.UpdateTempObjectColorsJob except variables are renamed to improve readability.
         /// </summary>
-        [BurstCompile]
+        // TBD [BurstCompile]
         private struct UpdateColorsJobTempObject : IJobChunk
         {
             // Color component lookup to update.
@@ -1035,7 +1035,7 @@ namespace BuildingUse
         /// Logic copied exactly from Game.Rendering.ObjectColorSystem.UpdateSubObjectColorsJob except
         /// variables are renamed to improve readability and if owner color cannot be found leave default color.
         /// </summary>
-        [BurstCompile]
+        // TBD [BurstCompile]
         private struct UpdateColorsJobSubObject : IJobChunk
         {
             // Color component lookup to update.
